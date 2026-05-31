@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daftar | Jejak Ilmu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary-container": "#061748", "primary": "#001142",
+        "on-primary": "#ffffff", "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff", "primary-fixed-dim": "#b6c4fe",
+        "on-primary-fixed": "#061748", "on-primary-fixed-variant": "#364475",
+        "secondary-container": "#fdb965", "secondary": "#855300",
+        "on-secondary-container": "#754900", "secondary-fixed": "#ffddb8",
+        "on-secondary-fixed": "#2a1700", "warning-gold": "#fea619",
+        "success-green": "#10b981", "error": "#ba1a1a",
+        "error-container": "#ffdad6", "on-error-container": "#93000a",
+        "surface": "#f8f9fa", "background": "#f8f9fa",
+        "on-surface": "#191c1d", "on-surface-variant": "#45464f",
+        "surface-container": "#edeeef", "surface-container-low": "#f3f4f5",
+        "surface-container-high": "#e7e8e9", "surface-container-highest": "#e1e3e4",
+        "surface-container-lowest": "#ffffff",
+        "outline": "#767680", "outline-variant": "#c6c6d0",
+        "sidebar-gradient-end": "#001b0f"
+      },
+      fontFamily: { "label-sm": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "display-lg": ["Inter"], "body-lg": ["Inter"], "caption-xs": ["Inter"] },
+      fontSize: {
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001b0f); }
+  .role-card { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+  .role-card:hover { transform: translateY(-2px); }
+</style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+<main class="w-full h-full flex overflow-hidden bg-white">
+
+  <!-- Kiri: Branding -->
+  <section class="hidden md:flex flex-col w-[45%] sidebar-gradient relative p-12 justify-between overflow-hidden">
+    <div class="flex items-center gap-3 z-10">
+      <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+        <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+      </div>
+      <h1 class="font-headline-md text-headline-md font-black text-white">Jejak Ilmu</h1>
+    </div>
+
+    <div class="z-10 max-w-md">
+      <div class="w-12 h-1 bg-warning-gold mb-8"></div>
+      <h2 class="font-display-lg text-display-lg text-white mb-6">Bergabunglah dengan Ekosistem Terbaik.</h2>
+      <p class="font-body-lg text-body-lg text-primary-fixed-dim/80">
+        Pilih peran Anda dan mulai perjalanan akademik yang terstruktur bersama ribuan mentor, mentee, dan pengajar berprestasi.
+      </p>
+      <div class="mt-10 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-warning-gold flex-shrink-0"></div>
+          <span class="font-label-sm text-label-sm text-white/70">MENTOR DARI INSTITUSI TERKEMUKA</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-success-green flex-shrink-0"></div>
+          <span class="font-label-sm text-label-sm text-white/70">KURIKULUM TERSTANDARISASI</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-primary-fixed-dim flex-shrink-0"></div>
+          <span class="font-label-sm text-label-sm text-white/70">SERTIFIKAT RESMI TERAKREDITASI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="z-10">
+      <p class="font-caption-xs text-caption-xs text-white/40 uppercase tracking-[0.3em]">Elite Mentorship Ecosystem</p>
+    </div>
+    <div class="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_80%_20%,rgba(253,185,101,0.15),transparent_60%)]"></div>
+  </section>
+
+  <!-- Kanan: Pilih Peran -->
+  <section class="w-full md:w-[55%] flex flex-col justify-center items-center px-6 md:px-24 py-12 bg-white overflow-y-auto">
+    <div class="w-full max-w-[480px]">
+
+      <!-- Mobile Header -->
+      <div class="md:hidden flex items-center gap-3 mb-12">
+        <div class="w-10 h-10 rounded-xl sidebar-gradient flex items-center justify-center">
+          <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+        </div>
+        <h1 class="font-headline-md text-headline-md font-black text-primary-container">Jejak Ilmu</h1>
+      </div>
+
+      <div class="mb-10">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-2">Buat Akun Baru</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Pilih peran yang sesuai dengan tujuan akademik Anda.</p>
+      </div>
+
+      <!-- Role Cards -->
+      <div class="space-y-4">
+
+        <!-- Mentor -->
+        <a th:href="@{/register/mentor}"
+           class="role-card flex items-center gap-5 p-5 border-2 border-outline-variant rounded-2xl hover:border-primary-container hover:bg-primary-fixed/20 group cursor-pointer block">
+          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center flex-shrink-0 group-hover:bg-primary-container transition-colors">
+            <span class="material-symbols-outlined text-primary-container group-hover:text-white transition-colors text-2xl" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-label-sm text-label-sm text-on-surface group-hover:text-primary-container transition-colors">MENTOR</h3>
+              <span class="font-caption-xs text-caption-xs bg-primary-fixed text-primary-container px-2 py-0.5 rounded-full uppercase tracking-widest">Siswa / Mahasiswa</span>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant">Saya ingin <strong class="text-on-surface">mengajar</strong> dan berbagi ilmu kepada teman sebaya</p>
+          </div>
+          <span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors flex-shrink-0">arrow_forward</span>
+        </a>
+
+        <!-- Mentee -->
+        <a th:href="@{/register/mentee}"
+           class="role-card flex items-center gap-5 p-5 border-2 border-outline-variant rounded-2xl hover:border-success-green hover:bg-success-green/5 group cursor-pointer block">
+          <div class="w-14 h-14 rounded-2xl bg-success-green/10 flex items-center justify-center flex-shrink-0 group-hover:bg-success-green/20 transition-colors">
+            <span class="material-symbols-outlined text-success-green text-2xl" style="font-variation-settings:'FILL' 1;">menu_book</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-label-sm text-label-sm text-on-surface group-hover:text-success-green transition-colors">MENTEE</h3>
+              <span class="font-caption-xs text-caption-xs bg-success-green/10 text-success-green px-2 py-0.5 rounded-full uppercase tracking-widest">Siswa / Mahasiswa</span>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant">Saya ingin <strong class="text-on-surface">belajar</strong> dan mendapat bimbingan dari mentor</p>
+          </div>
+          <span class="material-symbols-outlined text-outline group-hover:text-success-green transition-colors flex-shrink-0">arrow_forward</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4 py-1">
+          <div class="flex-1 h-px bg-outline-variant"></div>
+          <span class="font-caption-xs text-caption-xs text-outline uppercase tracking-widest">atau</span>
+          <div class="flex-1 h-px bg-outline-variant"></div>
+        </div>
+
+        <!-- Guru / Dosen -->
+        <a th:href="@{/register-pengawas}"
+           class="role-card flex items-center gap-5 p-5 border-2 border-outline-variant rounded-2xl hover:border-warning-gold hover:bg-warning-gold/5 group cursor-pointer block">
+          <div class="w-14 h-14 rounded-2xl bg-warning-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-warning-gold/20 transition-colors">
+            <span class="material-symbols-outlined text-warning-gold text-2xl" style="font-variation-settings:'FILL' 1;">supervisor_account</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-label-sm text-label-sm text-on-surface group-hover:text-warning-gold transition-colors">GURU / DOSEN</h3>
+              <span class="font-caption-xs text-caption-xs bg-warning-gold/10 text-warning-gold px-2 py-0.5 rounded-full uppercase tracking-widest">Pengawas Akademik</span>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant">Saya ingin <strong class="text-on-surface">mengawasi</strong> dan memvalidasi program mentoring</p>
+          </div>
+          <span class="material-symbols-outlined text-outline group-hover:text-warning-gold transition-colors flex-shrink-0">arrow_forward</span>
+        </a>
+
+      </div>
+
+      <!-- Login Link -->
+      <p class="mt-10 text-center font-body-md text-body-md text-on-surface-variant">
+        Sudah punya akun?
+        <a th:href="@{/login}" class="text-primary-container font-black hover:underline">Masuk di sini</a>
+      </p>
+
+      <div class="mt-6 text-center">
+        <p class="font-caption-xs text-caption-xs text-outline uppercase tracking-widest">© 2024 Jejak Ilmu. Empowering Academic Excellence.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buka Sesi Baru - Jejak Ilmu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  .premium-card-shadow { box-shadow: 0 4px 6px -1px rgba(0,17,66,0.04), 0 2px 4px -1px rgba(0,17,66,0.03); }
+  .premium-card-shadow:hover { box-shadow: 0 20px 25px -5px rgba(0,17,66,0.1), 0 10px 10px -5px rgba(0,17,66,0.04); }
+  body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="font-body-md text-on-background">
+
+<!-- ==================== SIDEBAR (Mentorship active) ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <!-- ACTIVE: Mentorship -->
+    <a th:href="@{/dashboard/mentorship}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">groups</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">school</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">library_books</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari mentee atau jadwal..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+      </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
+          <h3 class="font-bold text-[15px] text-primary">Notifikasi</h3>
+          <button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button>
+        </div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors">
+            <div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span>
+            </div>
+            <div>
+              <p class="text-[13px] font-bold">Sesi Divalidasi</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p>
+              <p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p>
+            </div>
+          </div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors">
+            <div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span>
+            </div>
+            <div>
+              <p class="text-[13px] font-bold">Rating Baru Diterima</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p>
+              <p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50">
+          <button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button>
+        </div>
+      </div>
+    </div>
+    <div class="relative">
+      <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">mail</span>
+      </button>
+      <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
+          <h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3>
+          <button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button>
+        </div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors">
+            <div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">AT</div>
+            <div class="min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-[13px] font-bold truncate">Andi Pratama</p>
+                <p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:30</p>
+              </div>
+              <p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Kak, boleh saya tanya soal materi integral?</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50">
+          <button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button>
+        </div>
+      </div>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
+           th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[72px] min-h-screen bg-surface flex flex-col">
+<div class="flex-1 px-margin-desktop py-10">
+
+  <!-- Flash Messages -->
+  <div th:if="${sukses}" class="mb-6 p-4 bg-green-50 border border-green-300 text-green-800 rounded-xl flex items-center gap-2 text-sm">
+    <span class="material-symbols-outlined text-[18px] text-green-600">check_circle</span>
+    <span th:text="${sukses}"></span>
+  </div>
+  <div th:if="${error}" class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl flex items-center gap-2 text-sm">
+    <span class="material-symbols-outlined text-[18px]">error</span>
+    <span th:text="${error}"></span>
+  </div>
+
+  <!-- Back Button -->
+  <a th:href="@{/dashboard/mentorship}"
+     class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary font-label-sm text-label-sm uppercase tracking-widest mb-5 transition-colors group">
+    <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+    Kembali ke Mentorship
+  </a>
+
+  <!-- Breadcrumb & Header -->
+  <div class="mb-8">
+    <nav class="flex items-center gap-2 mb-3">
+      <a th:href="@{/dashboard}" class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary uppercase tracking-widest">Dashboard</a>
+      <span class="material-symbols-outlined text-[14px] text-on-surface-variant">chevron_right</span>
+      <a th:href="@{/dashboard/mentorship}" class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary uppercase tracking-widest">Mentorship</a>
+      <span class="material-symbols-outlined text-[14px] text-on-surface-variant">chevron_right</span>
+      <span class="font-caption-xs text-caption-xs text-primary uppercase tracking-widest">Buka Sesi Baru</span>
+    </nav>
+    <h2 class="font-headline-md text-[40px] font-black text-primary tracking-tight">Atur Bimbingan Strategis</h2>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-2">Ciptakan ruang kolaboratif untuk perkembangan mentee Anda. Detailkan tujuan sesi untuk efektivitas maksimal.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+
+    <!-- ===== FORM CARD ===== -->
+    <div class="lg:col-span-8">
+      <div class="bg-white rounded-2xl premium-card-shadow p-8 border-l-4 border-primary relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-fixed/30 rounded-full blur-3xl pointer-events-none"></div>
+
+        <form th:action="@{/mentoring/jadwalkan-sesi}" method="post" class="space-y-7 relative z-10" id="sessionForm">
+          <!-- Durasi default 60 menit (hidden, required by backend) -->
+          <input type="hidden" name="durasiMenit" value="60"/>
+
+          <!-- Judul Sesi -->
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="topikPembahasan">
+              Judul Sesi Akademik
+            </label>
+            <input class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed focus:border-primary-fixed transition-all outline-none font-body-lg text-body-lg"
+                   id="topikPembahasan" name="topikPembahasan" type="text" required
+                   placeholder="Contoh: Pendalaman Metodologi Penelitian Kuantitatif"/>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Pilih Mentee -->
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="menteeId">
+                Pilih Mentee
+              </label>
+              <div class="relative">
+                <select class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed appearance-none outline-none font-body-md text-body-md pr-12"
+                        id="menteeId" name="menteeId" required>
+                  <option value="" disabled selected>Pilih dari daftar aktif...</option>
+                  <option th:each="m : ${daftarMentee}"
+                          th:value="${m.id}"
+                          th:attr="data-nama=${m.namaLengkap},data-prodi=${m.programStudi ?: 'Mahasiswa'},data-inisial=${#strings.substring(m.namaLengkap, 0, 2).toUpperCase()}"
+                          th:selected="${selectedMenteeId != null and m.id == selectedMenteeId}"
+                          th:text="${m.namaLengkap + ' - ' + (m.programStudi ?: 'Mahasiswa')}">Mentee</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+              </div>
+              <p th:if="${#lists.isEmpty(daftarMentee)}" class="text-[11px] text-on-surface-variant italic">Belum ada mentee terdaftar.</p>
+            </div>
+
+            <!-- Tipe Pertemuan -->
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">
+                Tipe Pertemuan
+              </label>
+              <div class="grid grid-cols-2 gap-3 p-1 bg-surface-container-low rounded-xl">
+                <label class="cursor-pointer">
+                  <input checked class="hidden peer" name="platformDaring" type="radio" value="Zoom"/>
+                  <div class="flex items-center justify-center gap-2 py-3 rounded-lg peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm text-on-surface-variant font-bold transition-all">
+                    <span class="material-symbols-outlined text-[20px]">videocam</span>
+                    <span class="text-sm">Online</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="hidden peer" name="platformDaring" type="radio" value="Tatap Muka"/>
+                  <div class="flex items-center justify-center gap-2 py-3 rounded-lg peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm text-on-surface-variant font-bold transition-all">
+                    <span class="material-symbols-outlined text-[20px]">location_on</span>
+                    <span class="text-sm">Offline</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Tanggal Sesi -->
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="tanggal">
+                Tanggal Sesi
+              </label>
+              <div class="relative">
+                <input class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none font-body-md text-body-md"
+                       id="tanggal" name="tanggal" type="date" required/>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">calendar_today</span>
+              </div>
+            </div>
+            <!-- Waktu Mulai -->
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="jamMulai">
+                Waktu Mulai
+              </label>
+              <div class="relative">
+                <input class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none font-body-md text-body-md"
+                       id="jamMulai" name="jamMulai" type="time" required/>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">schedule</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tujuan & Deskripsi -->
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="catatan">
+              Tujuan &amp; Deskripsi Sesi
+            </label>
+            <textarea class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none font-body-md text-body-md resize-none"
+                      id="catatan" name="catatan" rows="5"
+                      placeholder="Tuliskan poin-poin bahasan atau target yang ingin dicapai dalam sesi ini..."></textarea>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
+            <button class="w-full sm:w-auto px-10 py-4 bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-all shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-3"
+                    type="submit" id="submitBtn">
+              <span>KONFIRMASI JADWAL</span>
+              <span class="material-symbols-outlined">send</span>
+            </button>
+            <a th:href="@{/dashboard/mentorship}"
+               class="w-full sm:w-auto px-10 py-4 bg-white text-primary border border-outline-variant font-bold rounded-xl hover:bg-surface-container-low transition-all active:scale-95 text-center flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+              KEMBALI KE MENTORSHIP
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== SIDEBAR INFO ===== -->
+    <div class="lg:col-span-4 space-y-6">
+
+      <!-- Kapasitas Mentor -->
+      <div class="bg-white rounded-2xl premium-card-shadow p-7 border-l-4 border-warning-gold relative overflow-hidden">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-11 h-11 bg-warning-gold/10 rounded-xl flex items-center justify-center text-warning-gold">
+            <span class="material-symbols-outlined">event_available</span>
+          </div>
+          <h3 class="font-headline-md text-[18px] font-black text-primary">Kapasitas Mentor</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="font-body-md text-body-md text-on-surface-variant">Slot Minggu Ini</span>
+            <span class="font-bold text-primary" th:text="|${sesiAktifMingguIni} / ${maxSlot}|">0 / 15</span>
+          </div>
+          <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-warning-gold rounded-full transition-all duration-500"
+                 th:style="|width: ${persenTerpakai}%|"></div>
+          </div>
+          <p th:if="${slotTersedia != null and slotTersedia > 0}"
+             class="text-[11px] text-on-surface-variant italic leading-relaxed"
+             th:text="|Anda masih memiliki ${slotTersedia} slot kosong untuk bimbingan minggu ini.|">
+            Anda masih memiliki 3 slot kosong.
+          </p>
+          <p th:if="${slotTersedia == null or slotTersedia <= 0}"
+             class="text-[11px] text-on-surface-variant italic leading-relaxed">
+            Slot bimbingan minggu ini sudah penuh.
+          </p>
+        </div>
+      </div>
+
+      <!-- Mentee Preview (muncul saat dipilih) -->
+      <div class="bg-white rounded-2xl premium-card-shadow p-7 border-l-4 border-success-green relative overflow-hidden hidden" id="menteePreview">
+        <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-4">Profil Mentee Terpilih</h3>
+        <div class="flex items-center gap-4 mb-5">
+          <div class="w-14 h-14 rounded-xl bg-primary/10 border-2 border-primary-fixed flex items-center justify-center text-primary font-black text-xl" id="previewInitials">?</div>
+          <div>
+            <p class="font-bold text-primary leading-tight text-[16px]" id="previewName">-</p>
+            <p class="text-[10px] text-on-surface-variant uppercase tracking-tighter mt-0.5" id="previewMajor">-</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 text-[12px] text-on-surface-variant">
+            <span class="material-symbols-outlined text-[16px] text-success-green">check_circle</span>
+            <span>Mentee aktif terdaftar</span>
+          </div>
+          <div class="flex items-center gap-2 text-[12px] text-on-surface-variant">
+            <span class="material-symbols-outlined text-[16px] text-primary">school</span>
+            <span id="previewProgram">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips Sesi Efektif -->
+      <div class="bg-[#001142] rounded-2xl p-7 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <h3 class="font-headline-md text-[18px] font-black mb-4 relative z-10">Tips Sesi Efektif</h3>
+        <ul class="space-y-4 relative z-10">
+          <li class="flex gap-3">
+            <span class="text-secondary-container font-black flex-shrink-0">01</span>
+            <p class="text-[13px] opacity-80 leading-relaxed">Tentukan objektif yang spesifik (SMART) untuk setiap pertemuan.</p>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-secondary-container font-black flex-shrink-0">02</span>
+            <p class="text-[13px] opacity-80 leading-relaxed">Unggah bahan bacaan setidaknya 24 jam sebelum sesi dimulai.</p>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-secondary-container font-black flex-shrink-0">03</span>
+            <p class="text-[13px] opacity-80 leading-relaxed">Berikan slot tanya jawab di 15 menit terakhir sesi.</p>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-outline-variant py-5 px-margin-desktop bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center gap-4">
+  <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">© 2024 JEJAK ILMU ACADEMIC FOUNDATION. ALL RIGHTS RESERVED.</p>
+  <div class="flex gap-6">
+    <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">KEBIJAKAN PRIVASI</a>
+    <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">SYARAT &amp; KETENTUAN</a>
+    <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">HUBUNGI KAMI</a>
+  </div>
+</footer>
+</main>
+
+<script>
+  document.getElementById('menteeId').addEventListener('change', function(e) {
+    const option = e.target.selectedOptions[0];
+    const preview = document.getElementById('menteePreview');
+    if (option && option.dataset.nama) {
+      document.getElementById('previewInitials').textContent = option.dataset.inisial || '??';
+      document.getElementById('previewName').textContent = option.dataset.nama;
+      document.getElementById('previewMajor').textContent = (option.dataset.prodi || '').toUpperCase();
+      document.getElementById('previewProgram').textContent = option.dataset.prodi || '';
+      preview.classList.remove('hidden');
+    } else {
+      preview.classList.add('hidden');
+    }
+  });
+
+  // Set min date ke hari ini
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tanggal').setAttribute('min', today);
+
+  // Pre-select jika sudah ada nilai terpilih
+  const sel = document.getElementById('menteeId');
+  if (sel.value) sel.dispatchEvent(new Event('change'));
+
+  // Submit animation
+  document.getElementById('sessionForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<span class="animate-spin material-symbols-outlined">sync</span><span>MEMPROSES...</span>';
+    btn.disabled = true;
+  });
+
+  // Popup toggle
+  function togglePopup(id, event) {
+    event.stopPropagation();
+    document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+    document.getElementById(id).classList.toggle('hidden');
+  }
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+  });
+
+  // Button press effect
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+    btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+    btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+  });
+</script>
+</body>
+</html>

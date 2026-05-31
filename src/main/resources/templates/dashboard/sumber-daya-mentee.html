@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Sumber Daya - ' + ${mahasiswa.namaLengkap}">Jejak Ilmu - Sumber Daya</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff",
+        "secondary": "#855300"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"],
+        "display-lg": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}],
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .premium-card-shadow { box-shadow: 0 4px 20px rgba(0,17,66,0.04); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .premium-card-shadow:hover { box-shadow: 0 12px 30px rgba(0,17,66,0.1); transform: translateY(-4px); }
+</style>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+
+<!-- ==================== SIDEBAR (Sumber Daya active) ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/mentoring/sesi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">menu_book</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <!-- ACTIVE: Sumber Daya -->
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">folder_shared</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari jurnal, materi, atau bank soal..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}"
+              class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center"
+              th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+      </button>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary" th:text="${mahasiswa.namaLengkap}">Mentee</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
+           th:text="${mahasiswa.programStudi ?: 'Elite Mentee'}">Elite Mentee</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
+           th:text="${#strings.substring(mahasiswa.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[72px] min-h-screen bg-surface flex flex-col">
+<div class="p-margin-desktop  w-full space-y-10">
+
+  <!-- Hero Header -->
+  <div class="pt-4">
+    <h2 class="font-display-lg text-display-lg text-primary mb-2">Pusat Sumber Daya</h2>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Akses koleksi eksklusif literatur akademik, arsip ujian nasional, dan basis data riset untuk mendukung kesuksesan studimu.</p>
+  </div>
+
+  <!-- Bento Grid Header -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+    <!-- Highlight Card -->
+    <div class="md:col-span-8 bg-primary rounded-2xl p-8 text-on-primary flex flex-col md:flex-row items-center gap-8 overflow-hidden relative">
+      <div class="relative z-10 flex-1">
+        <span class="bg-secondary-container text-on-secondary-fixed px-3 py-1 rounded-full font-caption-xs text-caption-xs mb-4 inline-block">TRENDING MINGGU INI</span>
+        <h3 class="text-3xl font-black mb-4 leading-tight">Bank Soal Prediksi<br/>OSN Ekonomi 2024</h3>
+        <p class="opacity-80 mb-6 font-body-md">Dikurasi langsung oleh Mentor Gold Medalist. Berisi 250+ latihan soal dengan pembahasan mendalam dan strategi pengerjaan cepat.</p>
+        <button class="bg-white text-primary px-8 py-3 rounded-xl font-bold tracking-wider hover:scale-105 transition-transform">UNDUH SEKARANG</button>
+      </div>
+      <div class="relative z-10 w-full md:w-1/3 aspect-square rounded-2xl overflow-hidden shadow-2xl rotate-3 bg-white/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-white/30 text-8xl" style="font-variation-settings:'FILL' 1;">auto_stories</span>
+      </div>
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="md:col-span-4 grid grid-rows-2 gap-6">
+      <div class="bg-white rounded-2xl p-6 premium-card-shadow border-l-4 border-primary">
+        <div class="flex items-center gap-4 mb-2">
+          <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_stories</span>
+          </div>
+          <span class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Total Jurnal</span>
+        </div>
+        <div class="text-4xl font-black text-primary">1,240+</div>
+        <p class="font-caption-xs text-caption-xs text-success-green mt-1 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">trending_up</span> +12 dari kemarin
+        </p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 premium-card-shadow border-l-4 border-warning-gold">
+        <div class="flex items-center gap-4 mb-2">
+          <div class="w-11 h-11 rounded-xl bg-warning-gold/10 flex items-center justify-center text-warning-gold">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">download</span>
+          </div>
+          <span class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Unduhan Anda</span>
+        </div>
+        <div class="text-4xl font-black text-primary">48</div>
+        <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-1">Sisa kuota: 12GB</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Categories Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-10">
+
+    <!-- Jurnal Akademik -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary">article</span>
+          <h4 class="font-headline-md text-headline-md text-primary">Jurnal Akademik</h4>
+        </div>
+        <button class="text-primary hover:underline font-label-sm text-label-sm">Lihat Semua</button>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-white p-5 rounded-2xl premium-card-shadow group cursor-pointer">
+          <div class="flex gap-4">
+            <div class="w-16 h-20 bg-surface-container-low rounded-lg flex-shrink-0 flex items-center justify-center text-on-surface-variant/30">
+              <span class="material-symbols-outlined text-4xl">article</span>
+            </div>
+            <div class="flex-1">
+              <h5 class="font-bold text-primary group-hover:text-primary/70 transition-colors line-clamp-2 leading-tight">Analisis Makroekonomi Terapan pada Pasar Berkembang</h5>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-1">Nature Finance • 2023</p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-primary/5 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">Ekonomi</span>
+                <span class="bg-success-green/5 text-success-green text-[10px] font-bold px-2 py-0.5 rounded uppercase">Peer Reviewed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl premium-card-shadow group cursor-pointer">
+          <div class="flex gap-4">
+            <div class="w-16 h-20 bg-surface-container-low rounded-lg flex-shrink-0 flex items-center justify-center text-on-surface-variant/30">
+              <span class="material-symbols-outlined text-4xl">functions</span>
+            </div>
+            <div class="flex-1">
+              <h5 class="font-bold text-primary group-hover:text-primary/70 transition-colors line-clamp-2 leading-tight">Implementasi Algoritma Heuristik pada Optimasi Logistik</h5>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-1">IEEE Journal • 2024</p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-primary/5 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">Teknologi</span>
+                <span class="bg-success-green/5 text-success-green text-[10px] font-bold px-2 py-0.5 rounded uppercase">Eksklusif</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bank Soal -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-warning-gold">quiz</span>
+          <h4 class="font-headline-md text-headline-md text-primary">Bank Soal</h4>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="bg-white p-6 rounded-2xl premium-card-shadow border-t-4 border-secondary-container">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-secondary-container/10 text-secondary rounded-xl">
+              <span class="material-symbols-outlined">history_edu</span>
+            </div>
+            <span class="bg-surface-container-high px-2 py-1 rounded-md font-caption-xs text-caption-xs">PDF • 4.2 MB</span>
+          </div>
+          <h5 class="font-bold text-primary mb-2">Simulasi UTBK Mandiri 2024 (Paket A)</h5>
+          <p class="text-on-surface-variant text-sm mb-4">Lengkap dengan kunci jawaban dan analisis tingkat kesulitan setiap butir soal.</p>
+          <button class="w-full py-2 bg-surface text-primary border border-outline-variant rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all">UNDUH MATERI</button>
+        </div>
+        <div class="bg-white p-6 rounded-2xl premium-card-shadow border-t-4 border-primary">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-primary/10 text-primary rounded-xl">
+              <span class="material-symbols-outlined">functions</span>
+            </div>
+            <span class="bg-surface-container-high px-2 py-1 rounded-md font-caption-xs text-caption-xs">DOCX • 1.8 MB</span>
+          </div>
+          <h5 class="font-bold text-primary mb-2">Topik Khusus: Kalkulus Multivariabel</h5>
+          <p class="text-on-surface-variant text-sm mb-4">Kumpulan soal olimpiade tingkat provinsi sepuluh tahun terakhir.</p>
+          <button class="w-full py-2 bg-surface text-primary border border-outline-variant rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all">UNDUH MATERI</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Referensi Utama -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-success-green">bookmark</span>
+          <h4 class="font-headline-md text-headline-md text-primary">Referensi Utama</h4>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl premium-card-shadow overflow-hidden">
+        <div class="p-4 bg-surface-container-low flex items-center justify-between">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">LINK BERGUNA</span>
+          <span class="material-symbols-outlined text-[18px] opacity-40">open_in_new</span>
+        </div>
+        <div class="divide-y divide-outline-variant">
+          <a class="flex items-center gap-4 p-4 hover:bg-surface-container-lowest transition-colors group" href="#">
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">local_library</span>
+            </div>
+            <div>
+              <p class="font-bold text-primary group-hover:underline">Digital Library UI</p>
+              <p class="text-[10px] text-on-surface-variant">Akses gratis 50.000+ e-book</p>
+            </div>
+          </a>
+          <a class="flex items-center gap-4 p-4 hover:bg-surface-container-lowest transition-colors group" href="#">
+            <div class="w-10 h-10 rounded-lg bg-success-green/10 flex items-center justify-center text-success-green flex-shrink-0">
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">manage_search</span>
+            </div>
+            <div>
+              <p class="font-bold text-primary group-hover:underline">Scholar Search Engine</p>
+              <p class="text-[10px] text-on-surface-variant">Mesin pencari khusus riset</p>
+            </div>
+          </a>
+          <a class="flex items-center gap-4 p-4 hover:bg-surface-container-lowest transition-colors group" href="#">
+            <div class="w-10 h-10 rounded-lg bg-warning-gold/10 flex items-center justify-center text-warning-gold flex-shrink-0">
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">edit_note</span>
+            </div>
+            <div>
+              <p class="font-bold text-primary group-hover:underline">APA Citation Guide</p>
+              <p class="text-[10px] text-on-surface-variant">Panduan sitasi standar internasional</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="bg-gradient-to-br from-[#001142] to-[#001b0f] rounded-2xl p-6 text-white relative overflow-hidden group cursor-pointer">
+        <span class="material-symbols-outlined text-4xl mb-4 text-white/40 group-hover:scale-110 transition-transform inline-block" style="font-variation-settings:'FILL' 1;">volunteer_activism</span>
+        <h5 class="text-xl font-black mb-2 leading-tight">Minta Sumber Daya Baru?</h5>
+        <p class="text-sm text-white/70 mb-4">Jika Anda butuh materi spesifik yang belum tersedia, hubungi pustakawan kami.</p>
+        <a th:href="@{/dashboard/bantuan}" class="font-bold border-b border-white pb-1 hover:opacity-80 transition-opacity">Kirim Permintaan</a>
+        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full pointer-events-none"></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-auto border-t border-outline-variant bg-surface w-full py-8">
+  <div class="flex flex-col md:flex-row justify-between items-center px-gutter  gap-4">
+    <div class="text-center md:text-left">
+      <p class="font-label-sm text-label-sm text-primary">Jejak Ilmu Academic Foundation</p>
+      <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-1">© 2024 Jejak Ilmu. All rights reserved.</p>
+    </div>
+    <div class="flex gap-8">
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Kebijakan Privasi</a>
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Syarat &amp; Ketentuan</a>
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Hubungi Kami</a>
+    </div>
+  </div>
+</footer>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Siswa - EduMentor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: { extend: { colors: {
+    "primary-container": "#1e3a8a", "primary": "#00236f",
+    "outline-variant": "#c5c5d3", "on-surface": "#191c1d",
+    "on-surface-variant": "#444651", "surface-container": "#edeeef",
+    "surface-container-low": "#f3f4f5", "background": "#f8f9fa",
+    "secondary-container": "#fea619", "on-secondary-container": "#684000",
+    "error": "#ba1a1a", "on-primary": "#ffffff"
+  } } }
+}
+</script>
+<style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-background min-h-screen">
+
+<!-- TOPBAR -->
+<header class="bg-white border-b border-outline-variant px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings:'FILL' 1;">school</span>
+    <span class="font-bold text-primary text-lg">EduMentor</span>
+  </div>
+  <div class="flex items-center gap-4">
+    <a th:href="@{/mentoring/cari-mentor}" class="text-sm text-on-surface-variant hover:text-primary transition-colors">Cari Mentor</a>
+    <div class="relative">
+      <span class="material-symbols-outlined text-on-surface-variant cursor-pointer text-2xl">notifications</span>
+      <span th:if="${notifBelumDibaca > 0}"
+            class="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+            th:text="${notifBelumDibaca}">0</span>
+    </div>
+    <a th:href="@{/logout}" class="flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[18px]">logout</span>
+      Keluar
+    </a>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-8">
+  <!-- Selamat datang -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-on-surface">Selamat datang, <span th:text="${siswa.namaLengkap}">Siswa</span>!</h1>
+    <p class="text-on-surface-variant mt-1">
+      <span th:text="${siswa.namaSekolah}">Sekolah</span> &bull; Kelas <span th:text="${siswa.kelas}">Kelas</span>
+    </p>
+  </div>
+
+  <!-- Statistik -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl border border-outline-variant p-5">
+      <p class="text-xs text-on-surface-variant font-medium mb-1">Total Poin</p>
+      <p class="text-2xl font-bold text-primary" th:text="${totalPoin}">0</p>
+      <p class="text-xs text-on-surface-variant mt-1">poin progres</p>
+    </div>
+    <div class="bg-white rounded-xl border border-outline-variant p-5">
+      <p class="text-xs text-on-surface-variant font-medium mb-1">Rata-rata Rating</p>
+      <p class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(rataRating,1,1)}">0.0</p>
+      <p class="text-xs text-on-surface-variant mt-1">dari 5.0</p>
+    </div>
+    <div class="bg-white rounded-xl border border-outline-variant p-5">
+      <p class="text-xs text-on-surface-variant font-medium mb-1">Status Mentor</p>
+      <p class="text-base font-bold" th:class="${siswa.mentor} ? 'text-green-600' : 'text-on-surface-variant'"
+         th:text="${siswa.mentor} ? 'Aktif' : 'Tidak Aktif'">Tidak Aktif</p>
+    </div>
+    <div class="bg-white rounded-xl border border-outline-variant p-5">
+      <p class="text-xs text-on-surface-variant font-medium mb-1">Sesi Selesai</p>
+      <p class="text-2xl font-bold text-primary" th:text="${siswa.sesiDiselesaikan}">0</p>
+      <p class="text-xs text-on-surface-variant mt-1">sesi</p>
+    </div>
+  </div>
+
+  <!-- Sesi Mendatang -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-on-surface mb-4">Sesi Mendatang</h2>
+    <div th:if="${#lists.isEmpty(sesiMendatang)}" class="bg-white rounded-xl border border-outline-variant p-8 text-center">
+      <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 block">event_busy</span>
+      <p class="text-on-surface-variant">Belum ada sesi mendatang.</p>
+      <a th:href="@{/mentoring/cari-mentor}" class="mt-3 inline-block text-sm text-primary font-semibold hover:underline">Cari Mentor Sekarang</a>
+    </div>
+    <div th:each="sesi : ${sesiMendatang}" class="bg-white rounded-xl border border-outline-variant p-5 mb-3 flex items-center justify-between">
+      <div>
+        <p class="font-semibold text-on-surface" th:text="${sesi.topikPembahasan}">Topik</p>
+        <p class="text-sm text-on-surface-variant mt-1">
+          <span class="material-symbols-outlined text-[16px] align-middle">schedule</span>
+          <span th:text="${sesi.waktuMulai}">Waktu</span> &bull;
+          <span th:text="${sesi.durasiMenit}">60</span> menit
+        </p>
+      </div>
+      <span class="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium"
+            th:text="${sesi.statusSesi.label}">Status</span>
+    </div>
+  </div>
+
+  <!-- Semua Sesi -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-on-surface">Riwayat Sesi</h2>
+      <a th:href="@{/mentoring/sesi}" class="text-sm text-primary hover:underline">Lihat Semua</a>
+    </div>
+    <div th:if="${#lists.isEmpty(semuaSesi)}" class="bg-white rounded-xl border border-outline-variant p-6 text-center">
+      <p class="text-on-surface-variant text-sm">Belum ada riwayat sesi.</p>
+    </div>
+    <div th:each="sesi,iter : ${semuaSesi}" th:if="${iter.index < 5}"
+         class="bg-white rounded-xl border border-outline-variant p-4 mb-3 flex items-center justify-between">
+      <div>
+        <p class="font-medium text-on-surface text-sm" th:text="${sesi.topikPembahasan}">Topik</p>
+        <p class="text-xs text-on-surface-variant mt-1" th:text="${sesi.jenisSesi?.label}">Jenis</p>
+      </div>
+      <span class="text-xs px-2 py-1 rounded-full font-medium"
+            th:classappend="${sesi.statusSesi.name() == 'SELESAI'} ? 'bg-green-100 text-green-700' : (${sesi.statusSesi.name() == 'DIBATALKAN'} ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700')"
+            th:text="${sesi.statusSesi.label}">Status</span>
+    </div>
+  </div>
+</main>
+</body>
+</html>

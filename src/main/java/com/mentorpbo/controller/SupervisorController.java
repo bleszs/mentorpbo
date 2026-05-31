@@ -1,0 +1,192 @@
+package com.mentorpbo.controller;
+
+import com.mentorpbo.model.*;
+import com.mentorpbo.service.MentoringService;
+import com.mentorpbo.service.PenggunaService;
+import com.mentorpbo.service.SupervisorService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+
+/**
+ * Controller SupervisorController - Menangani fitur khusus supervisor (Guru/Dosen).
+ *
+ * Endpoint:
+ * - GET  /validasi-program         → Daftar sesi menunggu validasi
+ * - POST /validasi-program/{id}    → Validasi sesi
+ * - POST /tolak-sesi/{id}          → Tolak sesi
+ * - GET  /monitoring-mentor        → Ranking/monitoring mentor
+ * - GET  /data-mahasiswa           → Data mahasiswa & kandidat Asdos
+ * - POST /rekomendasiAsdos         → Rekomendasikan mahasiswa sebagai Asdos
+ * - GET  /laporan-akademik         → Laporan akademik
+ * - GET  /pengaturan               → Pengaturan akun supervisor
+ * - GET  /bantuan                  → Pusat bantuan supervisor
+ */
+@Controller
+public class SupervisorController {
+
+    private final SupervisorService supervisorService;
+    private final MentoringService mentoringService;
+    private final PenggunaService penggunaService;
+
+    @Autowired
+    public SupervisorController(SupervisorService supervisorService,
+                                MentoringService mentoringService,
+                                PenggunaService penggunaService) {
+        this.supervisorService = supervisorService;
+        this.mentoringService = mentoringService;
+        this.penggunaService = penggunaService;
+    }
+
+    // === ENDPOINT ===
+
+    /** GET /validasi-program — Daftar sesi menunggu validasi */
+    @GetMapping("/validasi-program")
+    public String halamanValidasi(HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        List<SesiMentoring> sesiMenunggu = supervisorService.getSesiMenungguValidasi(penggunaId);
+        model.addAttribute("sesiMenungguValidasi", sesiMenunggu);
+        model.addAttribute("totalSesiDivalidasi",
+            supervisorService.getStatistikDashboard(penggunaId).get("sesiDivalidasi"));
+        return "supervisor/validasi";
+    }
+
+    /** POST /validasi-program/{id} — Validasi sesi */
+    @PostMapping("/validasi-program/{sesiId}")
+    public String validasiSesi(@PathVariable Long sesiId,
+                               @RequestParam String catatan,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            supervisorService.validasiSesi(sesiId, penggunaId, catatan);
+            redirectAttributes.addFlashAttribute("sukses", "Sesi berhasil divalidasi.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/validasi-program";
+    }
+
+    /** POST /tolak-sesi/{id} — Tolak validasi */
+    @PostMapping("/tolak-sesi/{sesiId}")
+    public String tolakSesi(@PathVariable Long sesiId,
+                            @RequestParam String alasan,
+                            HttpSession session,
+                            RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            supervisorService.tolakValidasiSesi(sesiId, penggunaId, alasan);
+            redirectAttributes.addFlashAttribute("sukses", "Sesi ditolak.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/validasi-program";
+    }
+
+    /** GET /monitoring-mentor — Monitoring & ranking mentor */
+    @GetMapping("/monitoring-mentor")
+    public String halamanMonitoringMentor(
+            @RequestParam(required = false, defaultValue = "KAMPUS") String lingkungan,
+            HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+
+        if ("SEKOLAH".equalsIgnoreCase(lingkungan)) {
+            model.addAttribute("rankingMentor", mentoringService.getRankingMentorSiswa());
+            model.addAttribute("lingkungan", "SEKOLAH");
+        } else {
+            model.addAttribute("rankingMentor", mentoringService.getRankingMentorMahasiswa());
+            model.addAttribute("lingkungan", "KAMPUS");
+        }
+
+        return "supervisor/ranking-mentor";
+    }
+
+    /** GET /data-mahasiswa — Data mahasiswa & kandidat asdos */
+    @GetMapping("/data-mahasiswa")
+    public String halamanDataMahasiswa(
+            @RequestParam(required = false, defaultValue = "3.0") double minIpk,
+            @RequestParam(required = false, defaultValue = "4.0") double minRating,
+            @RequestParam(required = false, defaultValue = "5") int minSesi,
+            HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+
+        List<Mahasiswa> kandidat = supervisorService.cariKandidatAsdos(minIpk, 5, minSesi, minRating);
+        model.addAttribute("kandidatAsdos", kandidat);
+        model.addAttribute("asdosAktif", supervisorService.getAsdosAktif());
+        model.addAttribute("minIpk", minIpk);
+        model.addAttribute("minRating", minRating);
+        model.addAttribute("minSesi", minSesi);
+
+        return "supervisor/data-mahasiswa";
+    }
+
+    /** POST /rekomendasiAsdos — Rekomendasikan sebagai asdos */
+    @PostMapping("/rekomendasiAsdos")
+    public String rekomendasiAsdos(@RequestParam Long mahasiswaId,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        Long dosenId = (Long) session.getAttribute("penggunaId");
+        if (dosenId == null) return "redirect:/login";
+
+        try {
+            supervisorService.rekomendasikanSebagaiAsdos(mahasiswaId, dosenId);
+            redirectAttributes.addFlashAttribute("sukses",
+                "Mahasiswa berhasil direkomendasikan sebagai kandidat Asdos!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/data-mahasiswa";
+    }
+
+    /** GET /pengaturan — Pengaturan akun supervisor */
+    @GetMapping("/pengaturan")
+    public String halamanPengaturan(HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        return "supervisor/pengaturan";
+    }
+
+    /** GET /bantuan — Pusat bantuan supervisor */
+    @GetMapping("/bantuan")
+    public String halamanBantuan(HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        return "dashboard/bantuan-dosen";
+    }
+
+    /** GET /laporan-akademik — Laporan akademik supervisor */
+    @GetMapping("/laporan-akademik")
+    public String halamanLaporanAkademik(HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+
+        var statistik = supervisorService.getStatistikDashboard(penggunaId);
+        model.addAttribute("statistik", statistik);
+
+        return "supervisor/laporan-akademik";
+    }
+}

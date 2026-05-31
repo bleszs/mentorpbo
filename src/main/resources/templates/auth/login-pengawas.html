@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Masuk Portal Pengawas | EduMentor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+darkMode: "class",
+theme: {
+extend: {
+"colors": {
+"surface": "#f8f9fa",
+"on-primary-container": "#90a8ff",
+"surface-tint": "#4059aa",
+"primary-container": "#1e3a8a",
+"primary-fixed": "#dce1ff",
+"surface-bright": "#f8f9fa",
+"inverse-on-surface": "#f0f1f2",
+"on-tertiary-fixed-variant": "#005236",
+"on-primary-fixed-variant": "#264191",
+"surface-container": "#edeeef",
+"primary-fixed-dim": "#b6c4ff",
+"on-tertiary": "#ffffff",
+"surface-container-low": "#f3f4f5",
+"tertiary-fixed-dim": "#4edea3",
+"secondary-container": "#fea619",
+"inverse-surface": "#2e3132",
+"surface-container-high": "#e7e8e9",
+"on-surface-variant": "#444651",
+"tertiary-fixed": "#6ffbbe",
+"tertiary": "#00311f",
+"secondary": "#855300",
+"outline-variant": "#c5c5d3",
+"surface-variant": "#e1e3e4",
+"secondary-fixed-dim": "#ffb95f",
+"error-container": "#ffdad6",
+"primary": "#00236f",
+"on-primary-fixed": "#00164e",
+"on-surface": "#191c1d",
+"surface-container-highest": "#e1e3e4",
+"secondary-fixed": "#ffddb8",
+"on-secondary": "#ffffff",
+"on-tertiary-container": "#27c38a",
+"on-secondary-container": "#684000",
+"on-tertiary-fixed": "#002113",
+"on-secondary-fixed-variant": "#653e00",
+"on-background": "#191c1d",
+"outline": "#757682",
+"surface-container-lowest": "#ffffff",
+"on-error": "#ffffff",
+"background": "#f8f9fa",
+"on-secondary-fixed": "#2a1700",
+"on-primary": "#ffffff",
+"on-error-container": "#93000a",
+"inverse-primary": "#b6c4ff",
+"surface-dim": "#d9dadb",
+"tertiary-container": "#004a31",
+"error": "#ba1a1a"
+},
+"borderRadius": {
+"DEFAULT": "0.25rem",
+"lg": "0.5rem",
+"xl": "0.75rem",
+"full": "9999px"
+},
+"spacing": {
+"sidebar_width": "280px",
+"margin_mobile": "16px",
+"gutter": "24px",
+"margin_desktop": "32px",
+"topbar_height": "72px",
+"container_max_width": "1280px",
+"base": "8px"
+},
+"fontFamily": {
+"body-lg": ["Inter"],
+"headline-md": ["Inter"],
+"display-lg": ["Inter"],
+"display-lg-mobile": ["Inter"],
+"body-md": ["Inter"],
+"label-sm": ["Inter"]
+},
+"fontSize": {
+"body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+"headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+"display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+"display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+"body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+"label-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.auth-card {
+box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.08), 0 2px 4px -1px rgba(30, 58, 138, 0.04);
+}
+.input-focus-ring:focus {
+border-color: #00236f;
+box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.1);
+outline: none;
+}
+</style>
+</head>
+<body class="bg-surface min-h-screen flex flex-col">
+<!-- Auth Background Elements -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-primary-fixed rounded-full blur-3xl"></div>
+<div class="absolute top-1/2 -right-24 w-64 h-64 bg-tertiary-fixed-dim rounded-full blur-3xl"></div>
+</div>
+
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center px-margin_mobile md:px-margin_desktop z-10 py-12">
+<div class="w-full max-w-[480px]">
+<!-- Branding -->
+<div class="flex flex-col items-center mb-8">
+<div class="w-16 h-16 bg-primary-container flex items-center justify-center rounded-xl mb-4 shadow-lg">
+<span class="material-symbols-outlined text-on-primary-container text-[40px]">school</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary">EduMentor</h1>
+</div>
+
+<!-- Login Card -->
+<div class="bg-surface-container-lowest auth-card border border-outline-variant rounded-xl p-8 md:p-10">
+<header class="mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Masuk Portal Pengawas</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Akses dashboard akademik untuk memantau aktivitas mentoring.</p>
+</header>
+
+<!-- Alert Error Login -->
+<div th:if="${error} or ${param.error}" class="mb-6 flex items-center gap-3 rounded-lg border border-error bg-error-container px-4 py-3">
+<span class="material-symbols-outlined text-on-error-container text-[20px]">error</span>
+<p class="font-label-sm text-label-sm text-on-error-container" th:text="${error} ?: 'Email atau kata sandi salah.'">
+Email atau kata sandi salah.
+</p>
+</div>
+
+<!-- Alert Logout Success -->
+<div th:if="${param.logout}" class="mb-6 flex items-center gap-3 rounded-lg border border-tertiary-container bg-tertiary-fixed px-4 py-3">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-[20px]">check_circle</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-fixed">
+Anda telah berhasil keluar.
+</p>
+</div>
+
+<form th:action="@{/login}" method="post" class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block" for="email">Email Institusi</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded-lg font-body-md text-body-md input-focus-ring transition-all" id="email" name="email" placeholder="nama@institusi.ac.id" required="" type="email"/>
+</div>
+</div>
+
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant block" for="password">Kata Sandi</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Lupa Kata Sandi?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full pl-10 pr-12 py-3 bg-white border border-outline-variant rounded-lg font-body-md text-body-md input-focus-ring transition-all" id="password" name="kataSandi" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface-variant transition-colors" type="button" id="togglePassword">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+
+<!-- Primary CTA -->
+<button class="w-full py-3.5 bg-primary text-on-primary font-body-md text-body-md font-semibold rounded-lg hover:bg-[#001d5a] active:scale-[0.98] transition-all shadow-md" type="submit">
+Masuk Sekarang
+</button>
+
+<!-- Divider -->
+<div class="relative flex items-center py-2">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="flex-shrink mx-4 font-label-sm text-label-sm text-outline">atau masuk dengan</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+
+<!-- SSO Options -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-2.5 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors font-label-sm text-label-sm text-on-surface-variant" type="button">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTKWQ6Q5v4-jTXamXgy9njm6tJ0NR0etRZTSZl6dJiwZW3fherVDL-S8XZUcd4Uf-zJD3AmkrnGjvqBM9xV-AXB7Qti6rMcByU5JDhQlpdRx0TKT6uMnEC3Eb5l4sVGUNMZPNETnC4hY3uJ1v9z1mWbbc2652rQVioTO58YsuvW-iUYLphxSLIwS7zs1AONjqEmIWwQB7EPHuhdNSYGbD0w6h8k4zVe4KD_CxxPvEK8nI0LCaGQlOF-AhUH3Cey34iZoFDapJn_Yc"/>
+Google
+</button>
+<button class="flex items-center justify-center gap-2 py-2.5 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors font-label-sm text-label-sm text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-[#00a1f1] text-[20px]" data-weight="fill">grid_view</span>
+Microsoft
+</button>
+</div>
+</form>
+
+<!-- Footer Link -->
+<footer class="mt-8 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+Belum memiliki akun? 
+<a class="text-primary font-semibold hover:underline" th:href="@{/register-pengawas}">Daftar sebagai Pengawas</a>
+</p>
+</footer>
+</div>
+
+<!-- Accessibility / Support Links -->
+<div class="mt-8 flex justify-center gap-6 font-label-sm text-label-sm text-outline">
+<a class="hover:text-on-surface-variant transition-colors" href="#">Kebijakan Privasi</a>
+<a class="hover:text-on-surface-variant transition-colors" href="#">Syarat &amp; Ketentuan</a>
+<a class="hover:text-on-surface-variant transition-colors" href="#">Bantuan</a>
+</div>
+</div>
+</main>
+
+<script>
+// Micro-interaction for password visibility
+const toggleBtn = document.getElementById('togglePassword');
+const passInput = document.getElementById('password');
+const passIcon = toggleBtn.querySelector('.material-symbols-outlined');
+
+toggleBtn.addEventListener('click', () => {
+if (passInput.type === 'password') {
+passInput.type = 'text';
+passIcon.textContent = 'visibility_off';
+} else {
+passInput.type = 'password';
+passIcon.textContent = 'visibility';
+}
+});
+
+// Atmospheric parallax effect on background blobs
+document.addEventListener('mousemove', (e) => {
+const x = e.clientX / window.innerWidth;
+const y = e.clientY / window.innerHeight;
+const blobs = document.querySelectorAll('.fixed.inset-0 div');
+blobs[0].style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+blobs[1].style.transform = `translate(${x * -30}px, ${y * -30}px)`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Materi Belajar - ' + ${mahasiswa.namaLengkap}">Jejak Ilmu - Materi Belajar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  .premium-card-shadow { box-shadow: 0 4px 6px -1px rgba(0,17,66,0.04), 0 2px 4px -1px rgba(0,17,66,0.03); }
+  .premium-card-shadow:hover { box-shadow: 0 20px 25px -5px rgba(0,17,66,0.1), 0 10px 10px -5px rgba(0,17,66,0.04); transform: translateY(-4px); }
+  body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="font-body-md text-on-background">
+
+<!-- ==================== SIDEBAR (Materi active) ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/mentoring/sesi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <!-- ACTIVE: Materi -->
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">menu_book</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">folder_shared</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari materi, ebook, atau video..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}"
+              class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center"
+              th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+      </button>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary" th:text="${mahasiswa.namaLengkap}">Mentee</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
+           th:text="${mahasiswa.programStudi ?: 'Elite Mentee'}">Program Studi</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
+           th:text="${#strings.substring(mahasiswa.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[72px] min-h-screen bg-surface">
+<div class="p-margin-desktop  space-y-10">
+
+  <!-- Hero Header -->
+  <section class="pt-4">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+      <div>
+        <nav class="flex gap-2 mb-2">
+          <span class="font-caption-xs text-caption-xs text-on-surface-variant">BELAJAR</span>
+          <span class="font-caption-xs text-caption-xs text-outline">/</span>
+          <span class="font-caption-xs text-caption-xs text-primary">KOLEKSI MATERI</span>
+        </nav>
+        <h2 class="font-headline-md text-headline-md font-black text-primary">Akselerasi Potensimu.</h2>
+        <p class="text-body-lg text-on-surface-variant mt-2 max-w-2xl">Akses kurikulum eksklusif Jejak Ilmu mulai dari fundamental hingga strategi profesional tingkat lanjut.</p>
+      </div>
+      <div class="flex gap-3">
+        <button class="px-6 py-3 bg-white border border-outline-variant rounded-xl font-label-sm text-label-sm text-primary flex items-center gap-2 hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-[18px]">filter_list</span>
+          Filter
+        </button>
+        <button class="px-6 py-3 bg-primary text-on-primary rounded-xl font-label-sm text-label-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          Unduh Semua
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress Bento Grid -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Featured Course Progress -->
+    <div class="md:col-span-2 relative overflow-hidden rounded-2xl bg-[#001142] p-8 text-white flex flex-col justify-between min-h-[280px] premium-card-shadow">
+      <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_top_right,_rgba(253,185,101,0.4),_transparent_60%)]"></div>
+      <div class="relative z-10">
+        <span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container font-caption-xs text-caption-xs rounded-full mb-4">SEDANG DIPELAJARI</span>
+        <h3 class="font-headline-md text-headline-md font-black max-w-md" th:text="${mentorSaya != null ? 'Materi dari Mentor ' + mentorSaya.namaLengkap : 'Eksplorasi Koleksi Materi'}">Eksplorasi Koleksi Materi</h3>
+        <div class="flex items-center gap-4 mt-4">
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-black text-xs"
+               th:text="${mentorSaya != null ? #strings.substring(mentorSaya.namaLengkap, 0, 2).toUpperCase() : 'JI'}">JI</div>
+          <p class="text-sm text-white/80" th:text="${mentorSaya != null ? 'Dibimbing oleh ' + mentorSaya.namaLengkap : 'Jejak Ilmu Academic Foundation'}">Jejak Ilmu Academic Foundation</p>
+        </div>
+      </div>
+      <div class="relative z-10 mt-6">
+        <div class="flex justify-between items-end mb-2">
+          <p class="font-label-sm text-label-sm text-white/80">Progres Belajar</p>
+          <p class="font-label-sm text-label-sm text-secondary-container"
+             th:text="${totalPoin != null ? totalPoin + ' Poin' : '0 Poin'}">0 Poin</p>
+        </div>
+        <div class="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+          <div class="h-full bg-secondary-container rounded-full shadow-[0_0_10px_rgba(253,185,101,0.5)]"
+               th:style="'width: ' + (${totalPoin != null ? (totalPoin > 100 ? 100 : totalPoin) : 0}) + '%'"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="flex flex-col gap-6">
+      <div class="flex-1 bg-white p-6 rounded-2xl border-l-4 border-primary premium-card-shadow">
+        <div class="flex justify-between items-start mb-3">
+          <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">book</span>
+          </div>
+          <span class="font-caption-xs text-caption-xs text-success-green bg-success-green/10 px-2 py-1 rounded">Tersedia</span>
+        </div>
+        <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Total Materi</p>
+        <h4 class="font-headline-md text-headline-md font-black text-primary mt-1"
+            th:text="${totalMateri != null ? totalMateri : '0'}">0</h4>
+      </div>
+      <div class="flex-1 bg-white p-6 rounded-2xl border-l-4 border-warning-gold premium-card-shadow">
+        <div class="flex justify-between items-start mb-3">
+          <div class="w-11 h-11 rounded-xl bg-warning-gold/10 flex items-center justify-center text-warning-gold">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          </div>
+          <span class="font-caption-xs text-caption-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded"
+                th:text="${#numbers.formatDecimal(rataRating != null ? rataRating : 0, 1, 1) + ' / 5.0'}">0.0 / 5.0</span>
+        </div>
+        <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Rating Sesi</p>
+        <h4 class="font-headline-md text-headline-md font-black text-primary mt-1"
+            th:text="${sesiMendatang != null ? sesiMendatang.size() : '0'}">0</h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Daftar Materi -->
+  <section th:if="${daftarMateri != null and !daftarMateri.isEmpty()}">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <h3 class="font-headline-md text-headline-md font-black text-primary">Materi dari Mentor</h3>
+        <span class="px-2 py-0.5 bg-surface-container-high rounded text-[10px] font-bold"
+              th:text="${daftarMateri.size() + ' MATERI'}">0 MATERI</span>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div th:each="materi : ${daftarMateri}"
+           class="group bg-white rounded-2xl overflow-hidden premium-card-shadow cursor-pointer">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">description</span>
+          </div>
+          <h4 class="font-body-md text-body-md font-black text-primary line-clamp-2 group-hover:text-primary/70 transition-colors"
+              th:text="${materi.judul}">Judul Materi</h4>
+          <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-2 line-clamp-3"
+             th:text="${materi.deskripsi ?: 'Tidak ada deskripsi'}">Deskripsi</p>
+          <div class="flex items-center justify-between mt-4 pt-4 border-t border-surface-container-high">
+            <span class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-wider"
+                  th:text="${materi.mataPelajaran ?: 'Umum'}">Kategori</span>
+            <button class="px-3 py-1.5 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity">
+              Pelajari
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Empty State -->
+  <section th:if="${daftarMateri == null or daftarMateri.isEmpty()}" class="text-center py-20">
+    <div class="w-20 h-20 rounded-2xl bg-primary/5 flex items-center justify-center text-primary/30 mx-auto mb-6">
+      <span class="material-symbols-outlined text-5xl">menu_book</span>
+    </div>
+    <h3 class="font-headline-md text-headline-md font-black text-primary mb-2">Belum Ada Materi</h3>
+    <p class="text-on-surface-variant max-w-md mx-auto">Mentor kamu belum mengunggah materi. Pantau terus halaman ini untuk mendapatkan materi terbaru.</p>
+    <a th:href="@{/mentoring/sesi}"
+       class="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-primary text-on-primary rounded-xl font-label-sm text-label-sm hover:opacity-90 transition-opacity">
+      <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+      Jadwalkan Sesi
+    </a>
+  </section>
+
+</div>
+</main>
+
+</body>
+</html>

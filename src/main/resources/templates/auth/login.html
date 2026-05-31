@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Masuk | Jejak Ilmu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-background": "#191c1d", "background": "#f8f9fa", "on-secondary": "#ffffff",
+        "primary-container": "#061748", "secondary": "#855300", "on-surface-variant": "#45464f",
+        "surface-container-lowest": "#ffffff", "error-crimson": "#ba1a1a",
+        "primary-fixed-dim": "#b6c4fe", "primary": "#000000", "warning-gold": "#fea619",
+        "error-container": "#ffdad6", "primary-fixed": "#dce1ff",
+        "sidebar-gradient-end": "#001b0f", "error": "#ba1a1a", "on-primary": "#ffffff",
+        "secondary-fixed-dim": "#fdb965", "on-background": "#191c1d",
+        "surface-container": "#edeeef", "surface-container-low": "#f3f4f5",
+        "on-surface": "#191c1d", "surface": "#f8f9fa", "outline-variant": "#c6c6d0",
+        "on-primary-fixed-variant": "#364475", "on-primary-fixed": "#061748",
+        "on-primary-container": "#7382b7", "success-green": "#10b981",
+        "outline": "#767680", "on-error-container": "#93000a",
+        "surface-container-high": "#e7e8e9"
+      },
+      fontFamily: { "body-lg": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "caption-xs": ["Inter"], "display-lg": ["Inter"] },
+      fontSize: {
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001b0f); }
+</style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+<main class="w-full h-full flex overflow-hidden bg-white">
+
+  <!-- Kiri: Branding -->
+  <section class="hidden md:flex flex-col w-[45%] sidebar-gradient relative p-12 justify-between overflow-hidden">
+    <div class="flex items-center gap-3 z-10">
+      <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+        <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+      </div>
+      <h1 class="font-headline-md text-headline-md font-black text-white">Jejak Ilmu</h1>
+    </div>
+    <div class="z-10 max-w-md">
+      <div class="w-12 h-1 bg-warning-gold mb-8"></div>
+      <h2 class="font-display-lg text-display-lg text-white mb-6">Jejak Masa Depan Dimulai dari Sini.</h2>
+      <p class="font-body-lg text-body-lg text-primary-fixed-dim/80">
+        "Mentorship bukan sekadar berbagi pengetahuan, tetapi mewariskan visi dan membimbing langkah menuju puncak pencapaian akademik tertinggi."
+      </p>
+      <div class="mt-12 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">person</span>
+        </div>
+        <div>
+          <p class="font-body-md text-body-md font-bold text-white">Prof. Dr. Aris Munandar</p>
+          <p class="font-caption-xs text-caption-xs text-primary-fixed-dim uppercase tracking-widest">Lead Academic Mentor</p>
+        </div>
+      </div>
+    </div>
+    <div class="z-10">
+      <p class="font-caption-xs text-caption-xs text-white/40 uppercase tracking-[0.3em]">Elite Mentorship Ecosystem</p>
+    </div>
+    <div class="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_80%_20%,rgba(253,185,101,0.15),transparent_60%)]"></div>
+  </section>
+
+  <!-- Kanan: Form Login -->
+  <section class="w-full md:w-[55%] flex flex-col justify-center items-center px-6 md:px-24 py-12 bg-white overflow-y-auto">
+    <div class="w-full max-w-[440px]">
+
+      <!-- Mobile Header -->
+      <div class="md:hidden flex items-center gap-3 mb-12">
+        <div class="w-10 h-10 rounded-xl sidebar-gradient flex items-center justify-center">
+          <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+        </div>
+        <h1 class="font-headline-md text-headline-md font-black text-primary-container">Jejak Ilmu</h1>
+      </div>
+
+      <div class="mb-10">
+        <h2 class="font-headline-md text-headline-md text-on-background mb-2">Selamat Datang Kembali</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Masuk untuk melanjutkan perjalanan akademik Anda bersama para ahli.</p>
+      </div>
+
+      <!-- Alert Error -->
+      <div th:if="${error} or ${param.error}"
+           class="mb-6 flex items-center gap-3 rounded-xl border border-error bg-error-container px-4 py-3">
+        <span class="material-symbols-outlined text-on-error-container text-[20px]">error</span>
+        <p class="font-label-sm text-label-sm text-on-error-container"
+           th:text="${error} ?: 'Email atau kata sandi salah.'">Email atau kata sandi salah.</p>
+      </div>
+
+      <!-- Alert Logout -->
+      <div th:if="${param.logout}"
+           class="mb-6 flex items-center gap-3 rounded-xl border border-success-green bg-success-green/10 px-4 py-3">
+        <span class="material-symbols-outlined text-success-green text-[20px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        <p class="font-label-sm text-label-sm text-success-green">Anda telah berhasil keluar.</p>
+      </div>
+
+      <!-- Alert Registrasi Berhasil -->
+      <div th:if="${sukses} or ${param.registered}"
+           class="mb-6 flex items-center gap-3 rounded-xl border border-success-green bg-success-green/10 px-4 py-3">
+        <span class="material-symbols-outlined text-success-green text-[20px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        <p class="font-label-sm text-label-sm text-success-green"
+           th:text="${sukses} ?: 'Akun berhasil dibuat! Silakan login.'">Akun berhasil dibuat! Silakan login.</p>
+      </div>
+
+      <!-- Form -->
+      <form th:action="@{/login}" method="post" class="space-y-6">
+
+        <!-- Email -->
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider ml-1" for="email">Email Institusi</label>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors">mail</span>
+            <input class="w-full h-[56px] pl-12 pr-4 bg-surface-container-low border border-outline-variant rounded-2xl font-body-md text-body-md focus:ring-2 focus:ring-primary-fixed focus:border-primary-container transition-all outline-none"
+                   id="email" name="email" placeholder="nama@universitas.ac.id" required type="email"/>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center px-1">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="password">Kata Sandi</label>
+            <a class="font-label-sm text-label-sm text-on-primary-container hover:text-primary-container transition-colors" href="#">Lupa Kata Sandi?</a>
+          </div>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors">lock</span>
+            <input class="w-full h-[56px] pl-12 pr-12 bg-surface-container-low border border-outline-variant rounded-2xl font-body-md text-body-md focus:ring-2 focus:ring-primary-fixed focus:border-primary-container transition-all outline-none"
+                   id="password" name="kataSandi" placeholder="••••••••" required type="password"/>
+            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button" id="togglePwd">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="flex items-center">
+          <input class="w-5 h-5 rounded border-outline-variant text-primary-container focus:ring-primary-fixed" id="remember" name="remember" type="checkbox"/>
+          <label class="ml-3 font-body-md text-body-md text-on-surface-variant cursor-pointer" for="remember">Ingat Saya</label>
+        </div>
+
+        <!-- Submit -->
+        <button class="w-full h-[56px] bg-[#001142] text-white rounded-2xl font-label-sm text-label-sm uppercase tracking-[0.2em] font-black hover:opacity-90 transition-all active:scale-[0.98] shadow-lg flex items-center justify-center gap-2" type="submit">
+          Masuk ke Platform
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="relative my-10">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-outline-variant"></div></div>
+        <div class="relative flex justify-center">
+          <span class="px-4 bg-white font-label-sm text-label-sm text-outline uppercase tracking-widest">atau</span>
+        </div>
+      </div>
+
+      <!-- Google -->
+      <button class="w-full h-[56px] bg-white border border-outline-variant rounded-2xl flex items-center justify-center gap-3 font-body-md text-body-md font-bold text-on-surface hover:bg-surface-container-low transition-all active:scale-[0.98]">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Masuk dengan Google
+      </button>
+
+      <!-- Register Link -->
+      <p class="mt-10 text-center font-body-md text-body-md text-on-surface-variant">
+        Belum punya akun?
+        <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register/mentor}">Daftar di sini</a>
+      </p>
+
+      <div class="mt-8 text-center">
+        <p class="font-caption-xs text-caption-xs text-outline uppercase tracking-widest">© 2024 Jejak Ilmu. Empowering Academic Excellence.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<script>
+  document.getElementById('togglePwd').addEventListener('click', function() {
+    const input = document.getElementById('password');
+    const icon = this.querySelector('.material-symbols-outlined');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+  });
+</script>
+</body>
+</html>

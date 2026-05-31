@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Materi Saya - ' + ${mentor.namaLengkap}">Jejak Ilmu - Materi Saya</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  .premium-card-shadow { box-shadow: 0 4px 6px -1px rgba(0,17,66,0.04), 0 2px 4px -1px rgba(0,17,66,0.03); }
+  .premium-card-shadow:hover { box-shadow: 0 20px 25px -5px rgba(0,17,66,0.1), 0 10px 10px -5px rgba(0,17,66,0.04); }
+  body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+  .filter-pill.active { background: #001142; color: white; }
+  .filter-pill { transition: all 0.2s; }
+  .materi-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .materi-card:hover { transform: translateY(-3px); }
+</style>
+</head>
+<body class="font-body-md text-on-background">
+
+<!-- ==================== SIDEBAR (Materi active) ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/dashboard/mentorship}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <!-- ACTIVE: Materi -->
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">school</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">library_books</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari materi..." type="text" id="searchInput" oninput="filterMateri()"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center" th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+      </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span></div><div><p class="text-[13px] font-bold">Sesi Divalidasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span></div><div><p class="text-[13px] font-bold">Rating Baru Diterima</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">person_add</span></div><div><p class="text-[13px] font-bold">Permintaan Mentoring Baru</p><p class="text-[12px] text-on-surface-variant mt-0.5">1 permintaan baru menunggu konfirmasi Anda.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">1 hari yang lalu</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
+      </div>
+    </div>
+    <div class="relative">
+      <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-on-surface-variant">mail</span></button>
+      <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div class="px-5 py-4 flex gap-3 bg-primary/5 cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">AT</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Andi Pratama</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:30</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Kak, boleh saya tanya soal materi integral?</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#1a3a8c] flex items-center justify-center text-white font-black text-xs flex-shrink-0">RS</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Rina Sari</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Terima kasih kak sudah bantu saya memahami materi!</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#4e5c8f] flex items-center justify-center text-white font-black text-xs flex-shrink-0">BW</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Budi Wijaya</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Kak, apakah sesi minggu depan bisa dipindah ke Selasa?</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
+      </div>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right"><p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p></div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[72px] min-h-screen">
+<div class="p-margin-desktop  space-y-8">
+
+  <!-- Page Header -->
+  <div class="flex justify-between items-end">
+    <div>
+      <h2 class="font-headline-md text-headline-md font-black text-primary">Materi Saya</h2>
+      <p class="text-on-surface-variant mt-1">Kelola dan bagikan materi pembelajaran kepada mentee Anda.</p>
+    </div>
+    <button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
+      <span class="material-symbols-outlined">upload_file</span>
+      Unggah Materi Baru
+    </button>
+  </div>
+
+  <!-- Filter & View Toggle Bar -->
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-2 flex-wrap" id="filterPills">
+      <button data-filter="semua" onclick="setFilterFromBtn(this)"
+              class="filter-pill active px-4 py-2 rounded-full text-[12px] font-bold border border-outline-variant bg-primary text-white transition-all">
+        Semua
+      </button>
+      <!-- Dynamic category pills from data -->
+      <button th:each="kat : ${kategoriList}"
+              th:text="${kat}"
+              th:attr="data-filter=${kat}"
+              onclick="setFilterFromBtn(this)"
+              class="filter-pill px-4 py-2 rounded-full text-[12px] font-bold border border-outline-variant bg-white text-on-surface-variant hover:bg-surface-container transition-all">Kategori</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnGrid" onclick="setView('grid')"
+              class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center transition-all">
+        <span class="material-symbols-outlined text-[18px]">grid_view</span>
+      </button>
+      <button id="btnList" onclick="setView('list')"
+              class="w-9 h-9 rounded-lg bg-white border border-outline-variant text-on-surface-variant flex items-center justify-center hover:bg-surface-container transition-all">
+        <span class="material-symbols-outlined text-[18px]">view_list</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Materi Grid -->
+  <div id="materiGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" th:if="${not #lists.isEmpty(daftarMateri)}">
+
+    <div th:each="materi : ${daftarMateri}"
+         class="materi-card bg-white rounded-2xl overflow-hidden premium-card-shadow border border-surface-container-high"
+         th:attr="data-mapel=${materi.mataPelajaran}, data-judul=${materi.judul}">
+
+      <!-- Thumbnail Placeholder (no external images) -->
+      <div class="h-36 relative flex items-center justify-center overflow-hidden"
+           th:classappend="${materi.jenisMateri == 'DOKUMEN'} ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
+                           (${materi.jenisMateri == 'PRESENTASI'} ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
+                           (${materi.jenisMateri == 'CATATAN'} ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' :
+                           'bg-gradient-to-br from-orange-500 to-orange-700'))">
+        <span class="material-symbols-outlined text-white/30" style="font-size:72px; font-variation-settings:'FILL' 1;"
+              th:text="${materi.jenisMateri == 'DOKUMEN'} ? 'description' :
+                       (${materi.jenisMateri == 'PRESENTASI'} ? 'slideshow' :
+                       (${materi.jenisMateri == 'CATATAN'} ? 'edit_note' : 'link'))">description</span>
+        <!-- Category badge -->
+        <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-[11px] font-bold uppercase tracking-wide"
+              th:text="${materi.mataPelajaran != null and !materi.mataPelajaran.isEmpty()} ? ${materi.mataPelajaran} : 'Umum'">Umum</span>
+        <!-- Format badge -->
+        <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/30 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-widest"
+              th:text="${materi.jenisMateri != null} ? ${materi.jenisMateri} : 'FILE'">FILE</span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="p-5">
+        <h3 class="font-bold text-primary text-[15px] leading-snug mb-2 line-clamp-2"
+            th:text="${materi.judul}">Judul Materi</h3>
+        <p class="text-on-surface-variant text-[13px] leading-relaxed line-clamp-2 mb-4"
+           th:text="${materi.deskripsi != null and !materi.deskripsi.isEmpty()} ? ${materi.deskripsi} : 'Tidak ada deskripsi.'">
+          Deskripsi materi.</p>
+
+        <!-- Meta row -->
+        <div class="flex items-center justify-between pt-4 border-t border-surface-container-high">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-on-surface-variant text-[12px] font-semibold">
+              <span class="material-symbols-outlined text-[14px]">download</span>
+              <span th:text="${materi.jumlahUnduhan}">0</span>
+            </span>
+            <span class="flex items-center gap-1 text-on-surface-variant text-[12px] font-semibold"
+                  th:if="${materi.tanggalUnggah != null}">
+              <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+              <span th:text="${#temporals.format(materi.tanggalUnggah, 'd MMM yyyy')}">1 Jan 2025</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
+                    title="Bagikan">
+              <span class="material-symbols-outlined text-on-surface-variant text-[16px]">share</span>
+            </button>
+            <button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
+                    title="Edit">
+              <span class="material-symbols-outlined text-on-surface-variant text-[16px]">edit</span>
+            </button>
+            <button class="w-8 h-8 rounded-lg bg-error-container flex items-center justify-center hover:bg-red-200 transition-colors"
+                    title="Hapus">
+              <span class="material-symbols-outlined text-error text-[16px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New Card (dashed) -->
+    <button class="materi-card border-2 border-dashed border-outline-variant rounded-2xl h-full min-h-[280px] flex flex-col items-center justify-center gap-3 text-on-surface-variant hover:border-primary hover:text-primary hover:bg-primary/5 transition-all group">
+      <div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+        <span class="material-symbols-outlined text-[28px]">add</span>
+      </div>
+      <p class="font-bold text-[14px]">Tambah Modul Baru</p>
+      <p class="text-[12px] text-center max-w-[160px] leading-relaxed">Unggah dokumen, presentasi, atau catatan</p>
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div th:if="${#lists.isEmpty(daftarMateri)}"
+       class="flex flex-col items-center justify-center py-20 gap-5">
+    <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
+      <span class="material-symbols-outlined text-on-surface-variant text-[40px]" style="font-variation-settings:'FILL' 1;">folder_open</span>
+    </div>
+    <div class="text-center">
+      <h3 class="font-bold text-primary text-[18px] mb-2">Belum Ada Materi</h3>
+      <p class="text-on-surface-variant text-[14px] max-w-sm leading-relaxed">Mulai bagikan pengetahuan Anda dengan mengunggah materi pertama untuk mentee.</p>
+    </div>
+    <button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
+      <span class="material-symbols-outlined">upload_file</span>
+      Unggah Materi Pertama
+    </button>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-surface-container-high mt-16 px-margin-desktop py-8">
+  <div class=" flex justify-between items-center text-on-surface-variant text-[12px]">
+    <span>© 2025 Jejak Ilmu · Elite Mentorship Platform</span>
+    <div class="flex gap-6">
+      <a href="#" class="hover:text-primary transition-colors">Syarat Layanan</a>
+      <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
+      <a href="#" class="hover:text-primary transition-colors">Bantuan</a>
+    </div>
+  </div>
+</footer>
+</main>
+
+<script>
+  let activeFilter = 'semua';
+  let activeView = 'grid';
+
+  function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-pill').forEach(p => {
+      p.classList.remove('active', 'bg-primary', 'text-white');
+      p.classList.add('bg-white', 'text-on-surface-variant');
+    });
+    btn.classList.add('active', 'bg-primary', 'text-white');
+    btn.classList.remove('bg-white', 'text-on-surface-variant');
+    applyFilters();
+  }
+
+  function setFilterFromBtn(btn) {
+    setFilter(btn.dataset.filter, btn);
+  }
+
+  function applyFilters() {
+    const searchVal = (document.getElementById('searchInput').value || '').toLowerCase();
+    document.querySelectorAll('#materiGrid .materi-card[data-judul]').forEach(card => {
+      const mapel = (card.dataset.mapel || '').toLowerCase();
+      const judul = (card.dataset.judul || '').toLowerCase();
+      const matchFilter = activeFilter === 'semua' || mapel === activeFilter.toLowerCase();
+      const matchSearch = !searchVal || judul.includes(searchVal) || mapel.includes(searchVal);
+      card.style.display = (matchFilter && matchSearch) ? '' : 'none';
+    });
+  }
+
+  function filterMateri() {
+    applyFilters();
+  }
+
+  function setView(view) {
+    activeView = view;
+    const grid = document.getElementById('materiGrid');
+    const btnGrid = document.getElementById('btnGrid');
+    const btnList = document.getElementById('btnList');
+    if (view === 'grid') {
+      grid.className = grid.className.replace(/flex flex-col gap-4/, '').trim();
+      grid.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-gutter');
+      grid.classList.remove('flex', 'flex-col');
+      btnGrid.classList.add('bg-primary', 'text-white');
+      btnGrid.classList.remove('bg-white', 'border', 'border-outline-variant', 'text-on-surface-variant');
+      btnList.classList.remove('bg-primary', 'text-white');
+      btnList.classList.add('bg-white', 'border', 'border-outline-variant', 'text-on-surface-variant');
+    } else {
+      grid.classList.remove('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+      grid.classList.add('flex', 'flex-col', 'gap-4');
+      btnList.classList.add('bg-primary', 'text-white');
+      btnList.classList.remove('bg-white', 'border', 'border-outline-variant', 'text-on-surface-variant');
+      btnGrid.classList.remove('bg-primary', 'text-white');
+      btnGrid.classList.add('bg-white', 'border', 'border-outline-variant', 'text-on-surface-variant');
+    }
+  }
+</script>
+
+<script>
+function togglePopup(id, event) {
+  event.stopPropagation();
+  document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+  document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click', function() {
+  document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+});
+</script>
+</body>
+</html>

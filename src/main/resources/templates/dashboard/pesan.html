@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Pesan - ' + ${mentor.namaLengkap}">Jejak Ilmu - Pesan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px", "topbar-height": "72px", "base": "8px",
+        "margin-desktop": "32px", "container-max": "1280px",
+        "sidebar-width": "280px", "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"],
+        "label-sm": ["Inter"], "caption-xs": ["Inter"], "display-lg": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+        "body-lg": ["18px", {"lineHeight":"1.6","fontWeight":"500"}],
+        "body-md": ["14px", {"lineHeight":"1.5","fontWeight":"400"}],
+        "label-sm": ["12px", {"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+        "caption-xs": ["10px", {"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}],
+        "display-lg": ["48px", {"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #c6c6d0; }
+  .chat-bg { background-color: #f8f9fa; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<div class="flex h-screen overflow-hidden">
+
+<!-- ==================== SIDEBAR (Pesan active) ==================== -->
+<nav class="w-[280px] h-screen flex-shrink-0 flex flex-col py-8 px-6 shadow-2xl z-50" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/dashboard/mentorship}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <!-- ACTIVE: Pesan -->
+    <a th:href="@{/dashboard/pesan}" class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/materi}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">school</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">library_books</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}" class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="flex-1 flex flex-col h-screen relative bg-surface-container-low overflow-hidden">
+
+  <!-- TOPBAR -->
+  <header class="h-[72px] flex-shrink-0 bg-white/60 backdrop-blur-md border-b border-glass-border shadow-sm flex items-center gap-4 px-gutter z-40">
+    <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+      <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+      <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari percakapan atau mentee..." type="text"/>
+    </div>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <div class="relative">
+        <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+          <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+          <span th:if="${notifBelumDibaca > 0}" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center" th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+        </button>
+        <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+          <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+            <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
+            <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span></div><div><p class="text-[13px] font-bold">Sesi Divalidasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
+            <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span></div><div><p class="text-[13px] font-bold">Rating Baru Diterima</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p></div></div>
+          </div>
+          <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
+        </div>
+      </div>
+      <div class="relative">
+        <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-on-surface-variant">mail</span></button>
+        <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+          <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+            <div class="px-5 py-4 flex gap-3 bg-primary/5 cursor-pointer"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">BS</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Budi Santoso</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:42</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Baik pak, revisi bab 3 sudah saya unggah...</p></div></div>
+            <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#1a3a8c] flex items-center justify-center text-white font-black text-xs flex-shrink-0">LA</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Lia Amalia</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">09:15</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Terima kasih atas sarannya, Dok!</p></div></div>
+          </div>
+          <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
+        </div>
+      </div>
+      <div class="h-8 w-[1px] bg-outline-variant"></div>
+      <div class="flex items-center gap-3 cursor-pointer">
+        <div class="text-right">
+          <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
+          <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MESSAGE CENTER LAYOUT -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- CONVERSATION LIST -->
+    <section class="w-[380px] flex-shrink-0 border-r border-outline-variant bg-white flex flex-col overflow-hidden">
+      <div class="px-6 py-5 border-b border-outline-variant flex justify-between items-center">
+        <h2 class="font-headline-md text-headline-md text-primary">Pesan</h2>
+        <button class="p-2 bg-primary text-white rounded-xl hover:bg-primary-container transition-all active:scale-95 shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">edit_square</span>
+        </button>
+      </div>
+      <!-- Filter tabs -->
+      <div class="flex gap-2 px-5 py-3 overflow-x-auto border-b border-outline-variant/40">
+        <button class="px-4 py-1.5 bg-primary-container text-primary-fixed-dim rounded-full font-label-sm text-label-sm whitespace-nowrap text-[11px]">Semua</button>
+        <button class="px-4 py-1.5 bg-surface-container text-on-surface-variant rounded-full font-label-sm text-label-sm whitespace-nowrap hover:bg-surface-container-high transition-colors text-[11px]">Belum Dibaca</button>
+        <button class="px-4 py-1.5 bg-surface-container text-on-surface-variant rounded-full font-label-sm text-label-sm whitespace-nowrap hover:bg-surface-container-high transition-colors text-[11px]">Grup</button>
+        <button class="px-4 py-1.5 bg-surface-container text-on-surface-variant rounded-full font-label-sm text-label-sm whitespace-nowrap hover:bg-surface-container-high transition-colors text-[11px]">Arsip</button>
+      </div>
+      <!-- List -->
+      <div class="flex-1 overflow-y-auto divide-y divide-surface-container-high/50">
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(percakapan)}" class="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <span class="material-symbols-outlined text-outline mb-3" style="font-size:40px;">chat_bubble_outline</span>
+          <p class="font-bold text-on-surface-variant text-[14px]">Belum ada percakapan</p>
+          <p class="text-[12px] text-outline mt-1 leading-relaxed">Percakapan akan muncul setelah ada sesi mentoring bersama mentee.</p>
+        </div>
+
+        <!-- Conversation items (dari backend) -->
+        <div th:each="conv,i : ${percakapan}"
+             th:class="${i.index == 0} ? 'conversation-item-active px-5 py-4 border-l-4 border-primary bg-primary/5 cursor-pointer flex gap-4' : 'px-5 py-4 border-l-4 border-transparent hover:bg-surface-container-low cursor-pointer flex gap-4 transition-all'"
+             th:attr="onclick=|selectConversation(this, '[[${conv.mentee.namaLengkap}]]', '[[${#strings.substring(conv.mentee.namaLengkap, 0, 2).toUpperCase()}]]', '#001142')|">
+          <div class="relative flex-shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-[#001142] flex items-center justify-center text-white font-black"
+                 th:text="${#strings.substring(conv.mentee.namaLengkap, 0, 2).toUpperCase()}">??</div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-success-green border-2 border-white rounded-full"></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-baseline mb-1">
+              <h3 th:class="${i.index == 0} ? 'font-bold text-primary text-[14px] truncate' : 'font-bold text-primary text-[14px] truncate'"
+                  th:text="${conv.mentee.namaLengkap}">Mentee</h3>
+              <span th:class="${i.index == 0} ? 'text-[11px] font-bold text-primary flex-shrink-0 ml-2' : 'text-[11px] font-medium text-on-surface-variant flex-shrink-0 ml-2'"
+                    th:text="${conv.sesiTerakhir != null and conv.sesiTerakhir.waktuMulai != null ? #temporals.format(conv.sesiTerakhir.waktuMulai, 'dd MMM') : '-'}">-</span>
+            </div>
+            <p th:class="${i.index == 0} ? 'text-[13px] text-on-surface-variant font-bold truncate' : 'text-[13px] text-on-surface-variant truncate'"
+               th:text="${conv.sesiTerakhir != null ? conv.sesiTerakhir.topikPembahasan : 'Klik untuk memulai percakapan'}">...</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CHAT WINDOW -->
+    <section class="flex-1 flex flex-col bg-surface-container-lowest overflow-hidden">
+
+      <!-- Chat Header -->
+      <div class="h-[72px] flex-shrink-0 border-b border-outline-variant px-7 flex justify-between items-center bg-white/60 backdrop-blur-sm shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 rounded-2xl bg-[#001142] flex items-center justify-center text-white font-black" id="chatAvatar"
+               th:text="${!#lists.isEmpty(percakapan) ? #strings.substring(percakapan[0].mentee.namaLengkap, 0, 2).toUpperCase() : '??'}">??</div>
+          <div>
+            <h2 class="font-bold text-primary leading-tight" id="chatName"
+                th:text="${!#lists.isEmpty(percakapan) ? percakapan[0].mentee.namaLengkap : 'Pilih Percakapan'}">Pilih Percakapan</h2>
+            <div class="flex items-center gap-1.5" th:if="${!#lists.isEmpty(percakapan)}">
+              <span class="w-2 h-2 bg-success-green rounded-full"></span>
+              <p class="text-[11px] text-success-green font-bold uppercase tracking-wider">Online Sekarang</p>
+            </div>
+            <p th:unless="${!#lists.isEmpty(percakapan)}" class="text-[11px] text-on-surface-variant">Belum ada mentee</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">videocam</span>
+          </button>
+          <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">call</span>
+          </button>
+          <div class="w-[1px] h-6 bg-outline-variant mx-1"></div>
+          <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">info</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 overflow-y-auto p-7 space-y-6 chat-bg" id="chatMessages">
+        <div class="flex justify-center">
+          <span class="px-4 py-1 bg-surface-container text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-widest">Senin, 14 Oktober</span>
+        </div>
+
+        <!-- Incoming -->
+        <div class="flex gap-3 max-w-2xl">
+          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
+          <div>
+            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm">
+              <p class="text-[14px] leading-relaxed text-on-surface">Selamat siang. Mohon maaf mengganggu waktunya. Saya ingin menanyakan terkait progres penelitian saya untuk bab 3.</p>
+            </div>
+            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">09:30</span>
+          </div>
+        </div>
+
+        <div class="flex gap-3 max-w-2xl">
+          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
+          <div>
+            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm">
+              <p class="text-[14px] leading-relaxed text-on-surface">Apakah ada waktu untuk diskusi singkat via Zoom besok sore?</p>
+            </div>
+            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">09:31</span>
+          </div>
+        </div>
+
+        <!-- Outgoing (mentor) -->
+        <div class="flex flex-row-reverse gap-3 max-w-2xl ml-auto">
+          <div class="w-9 h-9 rounded-xl bg-primary flex-shrink-0 mt-1 flex items-center justify-center" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+          <div class="flex flex-col items-end">
+            <div class="bg-primary-container text-white p-4 rounded-2xl rounded-tr-none shadow-md">
+              <p class="text-[14px] leading-relaxed">Selamat siang. Progres penelitianmu sejauh ini sudah cukup bagus. Saya ada waktu jam 15.00 WIB besok.</p>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              <span class="text-[10px] text-on-surface-variant font-medium">10:05</span>
+              <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings:'FILL' 1;">done_all</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-row-reverse gap-3 max-w-2xl ml-auto">
+          <div class="w-9 h-9 rounded-xl bg-primary flex-shrink-0 mt-1 flex items-center justify-center" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+          <div class="flex flex-col items-end">
+            <div class="bg-primary-container text-white p-4 rounded-2xl rounded-tr-none shadow-md">
+              <p class="text-[14px] leading-relaxed">Coba fokuskan lagi pada metodologi pengambilan sampelnya ya.</p>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              <span class="text-[10px] text-on-surface-variant font-medium">10:06</span>
+              <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings:'FILL' 1;">done_all</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Incoming with quote -->
+        <div class="flex gap-3 max-w-2xl">
+          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
+          <div>
+            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm border-l-4 border-l-secondary-container">
+              <p class="text-[13px] leading-relaxed text-on-surface italic bg-surface-container-low p-2 rounded-lg mb-2 border-l-2 border-primary/20">"Saya ada waktu jam 15.00 WIB besok."</p>
+              <p class="text-[14px] leading-relaxed text-on-surface">Baik pak, revisi bab 3 sudah saya unggah di portal. Sampai jumpa besok jam 3 sore!</p>
+            </div>
+            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">10:42 · Terkirim</span>
+          </div>
+        </div>
+
+        <div class="h-2"></div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="flex-shrink-0 px-7 py-4 bg-white border-t border-outline-variant">
+        <div class="flex items-end gap-3">
+          <div class="flex items-center gap-2 pb-1.5">
+            <button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[22px]">add_circle</span>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[22px]">image</span>
+            </button>
+          </div>
+          <div class="flex-1 relative rounded-2xl shadow-sm">
+            <textarea class="w-full bg-surface-container-low border-none rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary-fixed resize-none overflow-hidden max-h-32 font-body-md text-body-md outline-none" id="messageInput"
+                      th:placeholder="${!#lists.isEmpty(percakapan) ? 'Tulis pesan untuk ' + percakapan[0].mentee.namaLengkap + '...' : 'Tulis pesan...'}"
+                      placeholder="Tulis pesan..." rows="1"></textarea>
+            <button class="absolute right-3 bottom-3 text-on-surface-variant hover:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">sentiment_satisfied</span>
+            </button>
+          </div>
+          <button class="bg-primary text-white w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex-shrink-0">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">send</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="flex-shrink-0 bg-white border-t border-outline-variant py-2.5 px-7 flex justify-between items-center">
+    <p class="font-caption-xs text-caption-xs text-on-surface-variant">© 2025 JEJAK ILMU ACADEMIC FOUNDATION.</p>
+    <div class="flex gap-6">
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors" href="#">KEBIJAKAN PRIVASI</a>
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors" href="#">SYARAT &amp; KETENTUAN</a>
+      <a class="font-caption-xs text-caption-xs text-on-surface-variant hover:text-primary transition-colors" href="#">HUBUNGI KAMI</a>
+    </div>
+  </footer>
+</main>
+</div>
+
+<script>
+  const textarea = document.getElementById('messageInput');
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+  });
+
+  const chatMessages = document.getElementById('chatMessages');
+  window.onload = () => { chatMessages.scrollTop = chatMessages.scrollHeight; };
+
+  function selectConversation(el, name, initials, color) {
+    document.querySelectorAll('.conversation-item-active').forEach(e => {
+      e.classList.remove('conversation-item-active', 'border-primary', 'bg-primary/5');
+      e.classList.add('border-transparent');
+    });
+    el.classList.add('conversation-item-active', 'border-primary', 'bg-primary/5');
+    el.classList.remove('border-transparent');
+    document.getElementById('chatName').textContent = name;
+    document.getElementById('chatAvatar').textContent = initials;
+    document.getElementById('chatAvatar').style.backgroundColor = color;
+    document.getElementById('messageInput').placeholder = 'Tulis pesan untuk ' + name + '...';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function togglePopup(id, event) {
+    event.stopPropagation();
+    document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+    document.getElementById(id).classList.toggle('hidden');
+  }
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+  });
+</script>
+
+</body>
+</html>

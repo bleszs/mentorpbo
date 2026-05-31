@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Sumber Daya - ' + ${mentor.namaLengkap}">Jejak Ilmu - Sumber Daya</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"],
+        "display-lg": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}],
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .premium-card { border-left: 4px solid; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .premium-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,17,66,0.1); }
+  .tab-btn.active { color: #000; border-bottom-color: #000; font-weight: 700; }
+  .tab-btn { transition: all 0.2s; }
+</style>
+</head>
+<body class="bg-background text-on-surface">
+
+<!-- ==================== SIDEBAR (Sumber Daya active) ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+
+  <div class="space-y-2 flex-1">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/dashboard/mentorship}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">school</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <!-- ACTIVE: Sumber Daya -->
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">library_books</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari dokumen, template, atau referensi..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center" th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+      </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span></div><div><p class="text-[13px] font-bold">Sesi Divalidasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span></div><div><p class="text-[13px] font-bold">Rating Baru Diterima</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">person_add</span></div><div><p class="text-[13px] font-bold">Permintaan Mentoring Baru</p><p class="text-[12px] text-on-surface-variant mt-0.5">1 permintaan baru menunggu konfirmasi Anda.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">1 hari yang lalu</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
+      </div>
+    </div>
+    <div class="relative">
+      <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-on-surface-variant">mail</span></button>
+      <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div class="px-5 py-4 flex gap-3 bg-primary/5 cursor-pointer"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">AT</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Andi Pratama</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:30</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Kak, boleh saya tanya soal materi integral?</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#1a3a8c] flex items-center justify-center text-white font-black text-xs flex-shrink-0">RS</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Rina Sari</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Terima kasih kak sudah bantu memahami materi!</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#4e5c8f] flex items-center justify-center text-white font-black text-xs flex-shrink-0">BW</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Budi Wijaya</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Kak, apakah sesi minggu depan bisa dipindah?</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
+      </div>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right"><p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p></div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[72px] min-h-screen flex flex-col">
+<div class="px-margin-desktop py-10 max-w-container-max w-full mx-auto flex-1">
+
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+    <div>
+      <span class="font-caption-xs text-caption-xs text-on-primary-fixed-variant mb-2 block">REPOSITORY</span>
+      <h2 class="font-display-lg text-display-lg text-primary tracking-tight">Resources</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mt-2">Akses repositori dokumen akademik, panduan mentorship, dan template eksklusif untuk mendukung kesuksesan mahasiswa Anda.</p>
+    </div>
+    <div class="flex gap-3">
+      <button class="flex items-center gap-2 px-6 py-3 bg-white border border-outline-variant/50 rounded-xl font-label-sm text-label-sm text-primary shadow-sm hover:shadow-md transition-all active:scale-95">
+        <span class="material-symbols-outlined">filter_list</span>
+        Filter
+      </button>
+      <button class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-label-sm text-label-sm font-black tracking-widest active:scale-95 transition-all shadow-lg hover:shadow-xl">
+        <span class="material-symbols-outlined">upload</span>
+        UNGGAH BARU
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="flex gap-8 mb-8 border-b border-outline-variant/30 overflow-x-auto pb-px" id="tabBar">
+    <button class="tab-btn active pb-4 border-b-2 border-primary text-primary font-bold font-body-md text-body-md whitespace-nowrap"
+            onclick="setTab(this, 'semua')">Semua</button>
+    <button class="tab-btn pb-4 border-b-2 border-transparent text-on-surface-variant font-medium font-body-md text-body-md hover:text-primary whitespace-nowrap transition-all"
+            onclick="setTab(this, 'dokumen')">Dokumen</button>
+    <button class="tab-btn pb-4 border-b-2 border-transparent text-on-surface-variant font-medium font-body-md text-body-md hover:text-primary whitespace-nowrap transition-all"
+            onclick="setTab(this, 'template')">Template</button>
+    <button class="tab-btn pb-4 border-b-2 border-transparent text-on-surface-variant font-medium font-body-md text-body-md hover:text-primary whitespace-nowrap transition-all"
+            onclick="setTab(this, 'referensi')">Referensi Link</button>
+    <button class="tab-btn pb-4 border-b-2 border-transparent text-on-surface-variant font-medium font-body-md text-body-md hover:text-primary whitespace-nowrap transition-all"
+            onclick="setTab(this, 'arsip')">Arsip Mentor</button>
+  </div>
+
+  <!-- Resource Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="resourceGrid">
+
+    <!-- Card: PDF Dokumen -->
+    <div class="premium-card bg-white p-7 rounded-2xl border-primary shadow-sm flex flex-col justify-between h-full group"
+         data-type="dokumen">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">description</span>
+          </div>
+          <span class="bg-primary/10 text-primary font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">PDF</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] text-primary mb-2 line-clamp-2">Pedoman Penulisan Jurnal Internasional 2024</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Panduan lengkap langkah demi langkah untuk publikasi di jurnal Q1–Q2 dengan standar IEEE.</p>
+      </div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="text-on-surface-variant/60 font-label-sm text-[11px]">12 Feb 2024 · 4.2 MB</span>
+        <button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+          <span class="material-symbols-outlined">download</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card: Template DOCX -->
+    <div class="premium-card bg-white p-7 rounded-2xl border-success-green shadow-sm flex flex-col justify-between h-full group"
+         data-type="template">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-11 h-11 bg-success-green/10 rounded-xl flex items-center justify-center text-success-green">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">article</span>
+          </div>
+          <span class="bg-success-green/10 text-success-green font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Template</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] text-primary mb-2 line-clamp-2">Template Proposal Tesis Eksklusif Jejak Ilmu</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Struktur proposal tesis yang telah dioptimalkan untuk kelulusan seleksi hibah penelitian.</p>
+      </div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="text-on-surface-variant/60 font-label-sm text-[11px]">05 Jan 2024 · DOCX</span>
+        <button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+          <span class="material-symbols-outlined">file_download</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card: Referensi Link -->
+    <div class="premium-card bg-white p-7 rounded-2xl border-warning-gold shadow-sm flex flex-col justify-between h-full group"
+         data-type="referensi">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-11 h-11 bg-warning-gold/10 rounded-xl flex items-center justify-center text-warning-gold">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">link</span>
+          </div>
+          <span class="bg-warning-gold/10 text-warning-gold font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Reference</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] text-primary mb-2 line-clamp-2">Kumpulan Library Open Access untuk Riset Sosial</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Daftar direktori website penyedia data statistik dan literatur gratis untuk bidang sosial-ekonomi.</p>
+      </div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="text-on-surface-variant/60 font-label-sm text-[11px]">External Link · 150+ Klik</span>
+        <button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+          <span class="material-symbols-outlined">open_in_new</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card: Video -->
+    <div class="premium-card bg-white p-7 rounded-2xl border-primary shadow-sm flex flex-col justify-between h-full group"
+         data-type="arsip">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">video_library</span>
+          </div>
+          <span class="bg-primary/10 text-primary font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Video</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] text-primary mb-2 line-clamp-2">Teknik Public Speaking untuk Sidang Akhir</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Rekaman workshop internal tentang cara menghadapi pertanyaan penguji dengan tenang dan taktis.</p>
+      </div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="text-on-surface-variant/60 font-label-sm text-[11px]">Durasi: 45 Menit · 1080p</span>
+        <button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+          <span class="material-symbols-outlined">play_circle</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card: Excel Template -->
+    <div class="premium-card bg-white p-7 rounded-2xl border-success-green shadow-sm flex flex-col justify-between h-full group"
+         data-type="template">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-11 h-11 bg-success-green/10 rounded-xl flex items-center justify-center text-success-green">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">table_chart</span>
+          </div>
+          <span class="bg-success-green/10 text-success-green font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Excel</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] text-primary mb-2 line-clamp-2">Logbook Mentorship &amp; Progress Tracker</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Template otomatis untuk melacak pencapaian bimbingan bulanan mahasiswa Anda secara terstruktur.</p>
+      </div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="text-on-surface-variant/60 font-label-sm text-[11px]">20 Jan 2024 · XLSX</span>
+        <button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+          <span class="material-symbols-outlined">download</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Featured Promo Card -->
+    <div class="relative overflow-hidden rounded-2xl bg-primary-container p-7 text-white flex flex-col justify-center min-h-[320px] shadow-2xl"
+         data-type="semua">
+      <div class="absolute inset-0 opacity-20 pointer-events-none">
+        <div class="w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(181,196,255,0.4)_0%,_transparent_70%)]"></div>
+      </div>
+      <span class="font-caption-xs text-caption-xs text-primary-fixed-dim/80 mb-4 block tracking-[0.3em]">REKOMENDASI BULAN INI</span>
+      <h3 class="font-headline-md text-headline-md mb-4 leading-tight">Kurikulum Mentorship Global 2024</h3>
+      <p class="font-body-md text-body-md text-primary-fixed-dim/90 mb-8 leading-relaxed">Dapatkan panduan kurikulum terbaru yang diselaraskan dengan standar pendidikan Ivy League.</p>
+      <button class="w-fit px-8 py-3 bg-white text-primary rounded-full font-label-sm text-label-sm font-black active:scale-95 transition-transform">
+        LIHAT SEKARANG
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Load More -->
+  <div class="mt-12 flex flex-col items-center">
+    <button class="group flex items-center gap-2 px-8 py-4 bg-white border border-outline-variant/30 rounded-2xl font-label-sm text-label-sm text-primary shadow-sm hover:shadow-lg transition-all active:scale-95">
+      MUAT LEBIH BANYAK
+      <span class="material-symbols-outlined group-hover:translate-y-1 transition-transform">expand_more</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-surface-container-high mt-16 px-margin-desktop py-8">
+  <div class=" flex flex-col md:flex-row justify-between items-center text-on-surface-variant text-[12px] gap-4">
+    <span>© 2025 Jejak Ilmu · Empowering Academic Excellence.</span>
+    <div class="flex flex-wrap justify-center gap-6">
+      <a href="#" class="hover:text-primary transition-colors">Privacy Policy</a>
+      <a href="#" class="hover:text-primary transition-colors">Terms of Service</a>
+      <a href="#" class="hover:text-primary transition-colors">Institutional Partners</a>
+      <a href="#" class="hover:text-primary transition-colors">Contact Support</a>
+    </div>
+  </div>
+</footer>
+</main>
+
+<script>
+  function setTab(btn, type) {
+    document.querySelectorAll('.tab-btn').forEach(t => {
+      t.classList.remove('active', 'border-primary', 'text-primary', 'font-bold');
+      t.classList.add('border-transparent', 'text-on-surface-variant', 'font-medium');
+    });
+    btn.classList.add('active', 'border-primary', 'text-primary', 'font-bold');
+    btn.classList.remove('border-transparent', 'text-on-surface-variant', 'font-medium');
+
+    document.querySelectorAll('#resourceGrid > div[data-type]').forEach(card => {
+      if (type === 'semua' || card.dataset.type === type) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  document.querySelectorAll('.premium-card').forEach(card => {
+    const iconEl = card.querySelector('.w-11 .material-symbols-outlined');
+    card.addEventListener('mouseenter', () => {
+      if (iconEl) { iconEl.style.transition = 'transform 0.3s ease'; iconEl.style.transform = 'scale(1.1) rotate(-5deg)'; }
+    });
+    card.addEventListener('mouseleave', () => {
+      if (iconEl) iconEl.style.transform = 'scale(1) rotate(0deg)';
+    });
+  });
+</script>
+
+<script>
+function togglePopup(id, event) {
+  event.stopPropagation();
+  document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+  document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click', function() {
+  document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+});
+</script>
+</body>
+</html>

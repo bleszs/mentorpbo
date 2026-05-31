@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Beranda - ' + ${mentor.namaLengkap}">Jejak Ilmu - Mentor Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "secondary-fixed": "#ffddb8",
+        "on-tertiary": "#ffffff",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "on-secondary": "#ffffff",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "secondary": "#855300",
+        "on-secondary-fixed": "#2a1700",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "on-error": "#ffffff",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "surface-tint": "#4e5c8f",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "active-glow": "rgba(181,196,255,0.4)",
+        "outline": "#767680",
+        "on-secondary-fixed-variant": "#653e00",
+        "primary": "#000000",
+        "inverse-surface": "#2e3132",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px",
+        "topbar-height": "72px",
+        "base": "8px",
+        "margin-desktop": "32px",
+        "container-max": "1280px",
+        "sidebar-width": "280px",
+        "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-sm": ["Inter"],
+        "caption-xs": ["Inter"],
+        "display-lg": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
+        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}],
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  .active-glow { box-shadow: 0 0 15px rgba(181,196,255,0.4); }
+  .premium-card-shadow { box-shadow: 0 4px 20px rgba(0,17,66,0.04); transition: all 0.3s ease; }
+  .premium-card-shadow:hover { box-shadow: 0 12px 30px rgba(0,17,66,0.1); transform: translateY(-2px); }
+  .glass-panel { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); }
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001c6b); }
+</style>
+</head>
+<body class="bg-background text-on-surface">
+
+<!-- ==================== SIDEBAR ==================== -->
+<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
+  <div class="mb-12 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+    </div>
+    <div>
+      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+    </div>
+  </div>
+  <div class="space-y-2 flex-1">
+    <!-- ACTIVE: Beranda -->
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
+      <span class="font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a th:href="@{/dashboard/mentorship}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="font-label-sm text-label-sm">Mentorship</span>
+    </a>
+    <a th:href="@{/dashboard/pesan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/materi}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">school</span>
+      <span class="font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">library_books</span>
+      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+  <div class="pt-8 border-t border-white/10 space-y-2">
+    <a th:href="@{/dashboard/bantuan}"
+       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+      <span class="material-symbols-outlined">help</span>
+      <span class="font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a th:href="@{/logout}"
+       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOP BAR ==================== -->
+<header class="h-[72px] fixed top-0 right-0 w-[calc(100%-280px)] bg-white/60 backdrop-blur-md border-b border-glass-border flex items-center gap-4 px-margin-desktop z-40 shadow-sm">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari sesi atau materi..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center" th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+      </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span></div><div><p class="text-[13px] font-bold">Sesi Divalidasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span></div><div><p class="text-[13px] font-bold">Rating Baru Diterima</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">person_add</span></div><div><p class="text-[13px] font-bold">Permintaan Mentoring Baru</p><p class="text-[12px] text-on-surface-variant mt-0.5">1 permintaan baru menunggu konfirmasi Anda.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">1 hari yang lalu</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
+      </div>
+    </div>
+    <div class="relative">
+      <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-on-surface-variant">mail</span></button>
+      <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div class="px-5 py-4 flex gap-3 bg-primary/5 cursor-pointer"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">AT</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Andi Pratama</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:30</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Kak, boleh saya tanya soal materi integral?</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#1a3a8c] flex items-center justify-center text-white font-black text-xs flex-shrink-0">RS</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Rina Sari</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Terima kasih kak sudah bantu memahami materi!</p></div></div>
+          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#4e5c8f] flex items-center justify-center text-white font-black text-xs flex-shrink-0">BW</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Budi Wijaya</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Kak, apakah sesi minggu depan bisa dipindah?</p></div></div>
+        </div>
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
+      </div>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-[280px] pt-[104px] pb-16 px-margin-desktop min-h-screen">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+  <!-- ===== LEFT COLUMN (8/12) ===== -->
+  <div class="lg:col-span-8 space-y-8">
+
+    <!-- Session Reminder Banner -->
+    <div th:if="${!#lists.isEmpty(sesiSedangBerlangsung)}"
+         class="p-6 bg-success-green/10 border border-success-green/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
+      <div class="flex items-center gap-4 z-10">
+        <div class="w-12 h-12 rounded-full bg-success-green flex items-center justify-center text-white animate-pulse">
+          <span class="material-symbols-outlined">radio_button_checked</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2 py-0.5 bg-success-green text-white font-caption-xs text-caption-xs rounded uppercase tracking-wider">SEDANG BERLANGSUNG</span>
+          </div>
+          <h4 class="font-headline-md text-[18px] text-primary"
+              th:text="${sesiSedangBerlangsung[0].topikPembahasan}">Topik</h4>
+          <p class="text-on-surface-variant text-sm"
+             th:text="${'Mentee: ' + sesiSedangBerlangsung[0].mentee.namaLengkap}">Mentee</p>
+        </div>
+      </div>
+      <a th:href="@{/mentoring/jadwal-sesi}"
+         class="z-10 px-8 py-3 bg-primary text-white font-black text-label-sm rounded-xl hover:bg-primary-container transition-all shadow-lg">LIHAT DETAIL</a>
+      <div class="absolute -right-4 -top-4 w-24 h-24 bg-success-green/5 rounded-full blur-2xl pointer-events-none"></div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(sesiSedangBerlangsung) and !#lists.isEmpty(sesiMendatangMentor)}"
+         class="p-6 bg-warning-gold/10 border border-warning-gold/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
+      <div class="flex items-center gap-4 z-10">
+        <div class="w-12 h-12 rounded-full bg-warning-gold flex items-center justify-center text-white animate-pulse">
+          <span class="material-symbols-outlined">alarm</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2 py-0.5 bg-warning-gold text-white font-caption-xs text-caption-xs rounded uppercase tracking-wider">SESI MENDATANG</span>
+            <span class="font-label-sm text-label-sm text-warning-gold font-bold"
+                  th:text="${#temporals.format(sesiMendatangMentor[0].waktuMulai, 'dd MMM, HH:mm')}">Waktu</span>
+          </div>
+          <h4 class="font-headline-md text-[18px] text-primary">
+            <span th:text="${sesiMendatangMentor[0].topikPembahasan}">Topik</span>
+            <span class="font-normal text-on-surface-variant"> • </span>
+            <span class="font-normal text-on-surface-variant"
+                  th:text="${sesiMendatangMentor[0].mentee.namaLengkap}">Mentee</span>
+          </h4>
+        </div>
+      </div>
+      <a th:href="@{/mentoring/jadwal-sesi}"
+         class="z-10 px-8 py-3 bg-primary text-white font-black text-label-sm rounded-xl hover:bg-primary-container transition-all shadow-lg">LIHAT JADWAL</a>
+      <div class="absolute -right-4 -top-4 w-24 h-24 bg-warning-gold/5 rounded-full blur-2xl pointer-events-none"></div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary"
+          th:text="'Selamat Datang, ' + ${mentor.namaLengkap} + '.'">Selamat Datang, Mentor.</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant">Berikut adalah ringkasan kinerja dan jadwal Anda hari ini.</p>
+    </section>
+
+    <!-- Stats Bento Grid (3 cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- IPK -->
+      <div class="bg-surface-container-lowest p-7 rounded-2xl border-t-4 border-primary shadow-md premium-card-shadow">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined">analytics</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline">IPK MENTOR</span>
+        </div>
+        <p class="font-display-lg text-display-lg text-primary"
+           th:text="${#numbers.formatDecimal(mentor.ipk, 1, 2, 'POINT')}">0.00</p>
+        <p class="text-success-green font-label-sm text-label-sm mt-2 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">trending_up</span>
+          <span th:text="${'Semester ' + mentor.semester}">Semester</span>
+        </p>
+      </div>
+      <!-- Total Poin -->
+      <div class="bg-surface-container-lowest p-7 rounded-2xl border-t-4 border-warning-gold shadow-md premium-card-shadow">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-11 h-11 rounded-xl bg-warning-gold/10 flex items-center justify-center text-warning-gold">
+            <span class="material-symbols-outlined">stars</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline">TOTAL POIN</span>
+        </div>
+        <p class="font-display-lg text-display-lg text-primary" th:text="${statistik.totalPoin}">0</p>
+        <p class="text-outline font-label-sm text-label-sm mt-2 uppercase tracking-wider"
+           th:text="${statistik.sesiDiselesaikan + ' Sesi Selesai'}">0 Sesi Selesai</p>
+      </div>
+      <!-- Rating -->
+      <div class="bg-surface-container-lowest p-7 rounded-2xl border-t-4 border-success-green shadow-md premium-card-shadow">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-11 h-11 rounded-xl bg-success-green/10 flex items-center justify-center text-success-green">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">thumb_up</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline">RATING MENTOR</span>
+        </div>
+        <p class="font-display-lg text-display-lg text-primary">
+          <span th:text="${#numbers.formatDecimal(statistik.rataRating, 1, 1, 'POINT')}">0.0</span><span class="text-headline-md text-outline">/5.0</span>
+        </p>
+        <div class="flex gap-1 mt-2">
+          <span class="material-symbols-outlined text-warning-gold text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined text-warning-gold text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined text-warning-gold text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined text-warning-gold text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined text-warning-gold text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Session Highlight -->
+    <section th:if="${!#lists.isEmpty(sesiSedangBerlangsung)}"
+             class="bg-primary-container text-on-primary rounded-2xl p-8 relative overflow-hidden shadow-xl active-glow">
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="flex h-2 w-2 rounded-full bg-success-green animate-pulse"></span>
+          <span class="font-caption-xs text-caption-xs text-on-primary-container tracking-[0.2em] uppercase">Sesi Sedang Berlangsung</span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-white mb-2"
+            th:text="${sesiSedangBerlangsung[0].topikPembahasan}">Topik Sesi</h3>
+        <p class="font-body-md text-body-md text-on-primary-container mb-6 max-w-md"
+           th:text="${'Mentee: ' + sesiSedangBerlangsung[0].mentee.namaLengkap + ' • Durasi: ' + sesiSedangBerlangsung[0].durasiMenit + ' Menit'}">Info sesi</p>
+        <div class="flex gap-4">
+          <a th:href="@{/mentoring/jadwal-sesi}"
+             class="px-6 py-3 bg-white text-primary-container font-black text-label-sm rounded-xl hover:bg-primary-fixed-dim transition-colors">LIHAT DETAIL</a>
+        </div>
+      </div>
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-teal-500/20 rounded-full blur-[80px] pointer-events-none"></div>
+      <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-secondary-container/10 rounded-full blur-[60px] pointer-events-none"></div>
+    </section>
+
+    <!-- Upcoming Sessions -->
+    <section>
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-headline-md text-headline-md text-primary">Sesi Mendatang</h3>
+        <a th:href="@{/mentoring/jadwal-sesi}"
+           class="text-primary font-label-sm text-label-sm underline">Lihat Semua Jadwal</a>
+      </div>
+
+      <!-- Empty state -->
+      <div th:if="${#lists.isEmpty(sesiMendatangMentor)}"
+           class="bg-surface-container-lowest p-10 rounded-2xl premium-card-shadow text-center">
+        <span class="material-symbols-outlined text-outline" style="font-size:48px;">event_busy</span>
+        <p class="font-black text-primary mt-3">Belum ada sesi mendatang</p>
+        <p class="text-on-surface-variant text-body-md mt-1">Jadwalkan sesi baru untuk mulai membimbing.</p>
+        <a th:href="@{/mentoring/jadwalkan-sesi}"
+           class="mt-5 inline-block px-6 py-2.5 bg-primary text-white font-black text-label-sm rounded-xl">JADWALKAN SEKARANG</a>
+      </div>
+
+      <div class="space-y-4">
+        <div th:each="sesi,stat : ${sesiMendatangMentor}" th:if="${stat.index < 4}"
+             class="bg-surface-container-lowest p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 premium-card-shadow border-l-4 border-primary">
+          <div class="flex items-center gap-4">
+            <div class="text-center px-4 border-r border-outline-variant min-w-[60px]">
+              <p class="font-headline-md text-headline-md text-primary"
+                 th:text="${#temporals.format(sesi.waktuMulai, 'dd')}">14</p>
+              <p class="font-caption-xs text-caption-xs text-outline uppercase"
+                 th:text="${#temporals.format(sesi.waktuMulai, 'MMM')}">Okt</p>
+            </div>
+            <div>
+              <p class="font-body-lg text-body-lg text-primary"
+                 th:text="${sesi.topikPembahasan}">Topik Sesi</p>
+              <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">schedule</span>
+                <span th:text="${#temporals.format(sesi.waktuMulai, 'HH:mm') + ' • ' + sesi.mentee.namaLengkap}">Waktu • Mentee</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3 flex-shrink-0">
+            <a th:href="@{/mentoring/jadwal-sesi}"
+               class="px-5 py-2.5 bg-surface-container text-on-surface font-bold text-label-sm rounded-lg hover:bg-surface-container-high transition-colors">DETAIL</a>
+            <a th:href="@{/mentoring/jadwalkan-sesi}"
+               class="px-5 py-2.5 bg-primary text-on-primary font-bold text-label-sm rounded-lg hover:opacity-90 transition-opacity">KELOLA</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== RIGHT COLUMN (4/12) ===== -->
+  <div class="lg:col-span-4 space-y-8">
+
+    <!-- Profile Card -->
+    <section class="bg-surface-container-lowest p-8 rounded-2xl premium-card-shadow border-t-4 border-secondary-container">
+      <div class="text-center mb-8">
+        <div class="relative inline-block">
+          <!-- Avatar initials -->
+          <div class="w-32 h-32 rounded-full mx-auto border-4 border-surface shadow-md bg-[#001142] flex items-center justify-center text-white font-black text-4xl"
+               th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+          <div th:if="${mentor.asdos}"
+               class="absolute bottom-1 right-1 w-8 h-8 bg-success-green rounded-full border-4 border-surface-container-lowest flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">verified</span>
+          </div>
+        </div>
+        <h4 class="font-headline-md text-headline-md text-primary mt-4"
+            th:text="${mentor.namaLengkap}">Nama Mentor</h4>
+        <p class="font-body-md text-body-md text-on-surface-variant"
+           th:text="${mentor.programStudi + ', ' + mentor.universitas}">Program Studi</p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Keahlian tags (split mataKuliahKeahlian by comma) -->
+        <div th:if="${mentor.mataKuliahKeahlian != null and !mentor.mataKuliahKeahlian.isEmpty()}">
+          <p class="font-caption-xs text-caption-xs text-outline mb-2 uppercase tracking-widest">Keahlian</p>
+          <div class="flex flex-wrap gap-2">
+            <span th:each="mk : ${mentor.mataKuliahKeahlian.split(',')}"
+                  class="px-3 py-1 bg-primary-fixed-dim/20 text-on-primary-fixed-variant font-label-sm text-label-sm rounded-full"
+                  th:text="${#strings.trim(mk)}">Keahlian</span>
+          </div>
+        </div>
+        <!-- Bio / Topik Keahlian -->
+        <div th:if="${mentor.topikKeahlian != null and !mentor.topikKeahlian.isEmpty()}">
+          <p class="font-caption-xs text-caption-xs text-outline mb-2 uppercase tracking-widest">Bio Singkat</p>
+          <p class="font-body-md text-body-md text-on-surface-variant italic"
+             th:text="${mentor.topikKeahlian}">Deskripsi keahlian.</p>
+        </div>
+        <!-- NIM & Semester -->
+        <div class="flex justify-between pt-4 border-t border-outline-variant">
+          <div>
+            <p class="font-caption-xs text-caption-xs text-outline uppercase tracking-widest">NIM</p>
+            <p class="font-label-sm text-label-sm text-primary mt-1" th:text="${mentor.nim}">NIM</p>
+          </div>
+          <div class="text-right">
+            <p class="font-caption-xs text-caption-xs text-outline uppercase tracking-widest">Semester</p>
+            <p class="font-label-sm text-label-sm text-primary mt-1" th:text="${mentor.semester}">0</p>
+          </div>
+        </div>
+      </div>
+
+      <a th:href="@{/dashboard/pengaturan(tab='profil')}"
+         class="block w-full mt-8 py-3 bg-primary text-white font-black text-label-sm rounded-xl hover:bg-primary-container transition-all text-center">EDIT PROFIL</a>
+    </section>
+
+    <!-- Permintaan Baru (replaces Portfolio) -->
+    <section class="bg-surface-container-lowest p-8 rounded-2xl premium-card-shadow">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Permintaan Baru</h3>
+        <span th:if="${!#lists.isEmpty(sesiMenungguKonfirmasi)}"
+              class="px-2 py-1 bg-error text-white font-caption-xs text-caption-xs rounded-full"
+              th:text="${#lists.size(sesiMenungguKonfirmasi)}">0</span>
+      </div>
+
+      <!-- Empty state -->
+      <div th:if="${#lists.isEmpty(sesiMenungguKonfirmasi)}" class="text-center py-6">
+        <span class="material-symbols-outlined text-outline" style="font-size:40px;">check_circle</span>
+        <p class="text-on-surface-variant font-bold text-body-md mt-2">Semua permintaan ditangani</p>
+        <p class="text-[11px] text-outline mt-1">Tidak ada permintaan masuk.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div th:each="sesi,stat : ${sesiMenungguKonfirmasi}" th:if="${stat.index < 3}">
+          <div th:if="${!stat.first}" class="border-t border-outline-variant mb-4"></div>
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-sm flex-shrink-0"
+                   th:text="${#strings.substring(sesi.mentee.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+              <div>
+                <p class="font-body-md text-body-md font-bold text-primary"
+                   th:text="${sesi.mentee.namaLengkap}">Nama</p>
+                <p class="font-caption-xs text-caption-xs text-outline mt-0.5 truncate max-w-[140px]"
+                   th:text="${sesi.topikPembahasan}">Topik</p>
+              </div>
+            </div>
+            <span class="text-warning-gold font-caption-xs text-caption-xs bg-warning-gold/10 px-2 py-0.5 rounded flex-shrink-0">BARU</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <a th:href="@{/mentoring/jadwal-sesi}"
+               class="py-2 bg-surface-container text-primary font-bold text-[11px] rounded-lg hover:bg-error-container hover:text-error transition-all text-center">TOLAK</a>
+            <a th:href="@{/mentoring/jadwalkan-sesi(menteeId=${sesi.mentee.id})}"
+               class="py-2 bg-primary text-white font-bold text-[11px] rounded-lg hover:shadow-lg transition-all text-center">TERIMA</a>
+          </div>
+        </div>
+      </div>
+
+      <a th:href="@{/mentoring/jadwalkan-sesi}"
+         class="block w-full mt-8 py-3 border border-outline-variant text-primary font-black text-label-sm rounded-xl hover:bg-surface-container transition-all uppercase tracking-widest text-center">Jadwalkan Sesi Baru</a>
+    </section>
+
+  </div><!-- /RIGHT -->
+</div><!-- /grid -->
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="ml-[280px] w-[calc(100%-280px)] py-8 px-margin-desktop bg-surface-container-lowest border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-4">
+  <div class="flex flex-col md:flex-row items-center gap-6">
+    <span class="font-label-sm text-label-sm font-black text-primary uppercase">Jejak Ilmu</span>
+    <p class="font-caption-xs text-caption-xs text-outline">© 2024 Jejak Ilmu. Academic Excellence through Elite Mentorship.</p>
+  </div>
+  <div class="flex gap-6">
+    <a class="font-caption-xs text-caption-xs text-outline hover:text-primary transition-colors" href="#">Bantuan</a>
+    <a class="font-caption-xs text-caption-xs text-outline hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
+    <a class="font-caption-xs text-caption-xs text-outline hover:text-primary transition-colors" href="#">Ketentuan Layanan</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.premium-card-shadow').forEach(card => {
+    card.addEventListener('mouseenter', () => card.classList.add('scale-[1.01]'));
+    card.addEventListener('mouseleave', () => card.classList.remove('scale-[1.01]'));
+  });
+</script>
+
+<script>
+function togglePopup(id, event) {
+  event.stopPropagation();
+  document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+  document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click', function() {
+  document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+});
+</script>
+</body>
+</html>

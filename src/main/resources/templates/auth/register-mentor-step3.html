@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pendaftaran Mentor - Motivasi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00288e", "primary-container": "#1e40af",
+                        "on-primary": "#ffffff", "on-primary-container": "#a8b8ff",
+                        "secondary": "#006c4a", "secondary-container": "#82f5c1",
+                        "on-secondary": "#ffffff", "on-secondary-container": "#00714e",
+                        "surface": "#f8f9ff", "background": "#f8f9ff",
+                        "on-surface": "#0d1c2f", "on-surface-variant": "#444653",
+                        "outline": "#757684", "outline-variant": "#c4c5d5",
+                        "surface-container-low": "#eff4ff", "surface-container-high": "#dde9ff",
+                        "surface-container-highest": "#d5e3fd", "error": "#ba1a1a",
+                        "error-container": "#ffdad6", "on-error-container": "#93000a"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<header class="bg-white border-t-4 border-primary shadow-sm sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-xl mx-auto">
+        <span class="text-2xl font-bold text-primary">MentorSiswa</span>
+        <a th:href="@{/login}" class="text-sm text-on-surface-variant hover:text-primary">Batal</a>
+    </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+        <!-- Sidebar Steps -->
+        <aside class="lg:col-span-4">
+            <div class="bg-surface-container-low border border-outline-variant p-6 rounded-xl">
+                <h2 class="text-2xl font-bold text-on-surface mb-2">Daftar Jadi Mentor</h2>
+                <p class="text-on-surface-variant mb-8">Langkah terakhir! Ceritakan motivasimu.</p>
+                <div class="flex flex-col gap-4 mb-10">
+                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
+                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                        <span class="text-sm font-medium line-through opacity-60">1. Data Pribadi</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
+                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                        <span class="text-sm font-medium line-through opacity-60">2. Profil Akademik</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-primary-container text-on-primary-container rounded-xl px-4 py-3 font-bold">
+                        <span class="material-symbols-outlined">psychology</span>
+                        <span class="text-sm">3. Motivasi</span>
+                    </div>
+                </div>
+
+                <!-- Ringkasan data -->
+                <div class="bg-surface-container-highest rounded-xl p-4 border border-outline-variant text-sm space-y-2">
+                    <h4 class="text-xs font-bold text-primary uppercase tracking-widest mb-3">Ringkasan Pendaftaran</h4>
+                    <p class="text-on-surface-variant">
+                        <span class="font-semibold text-on-surface" th:text="${dto.namaLengkap}">Nama</span>
+                    </p>
+                    <p class="text-on-surface-variant" th:text="${dto.email}">email</p>
+                    <p class="text-on-surface-variant" th:text="${dto.tingkatPendidikan}">Tingkat</p>
+                    <p class="text-on-surface-variant" th:text="${dto.institusi}">Institusi</p>
+                    <p class="text-on-surface-variant">
+                        Keahlian: <span class="font-semibold text-on-surface" th:text="${dto.keahlian}">-</span>
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Form Section -->
+        <section class="lg:col-span-8">
+            <div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+                <!-- Progress bar: 3/3 -->
+                <div class="h-2 w-full bg-slate-200">
+                    <div class="h-full bg-secondary transition-all duration-500" style="width: 100%"></div>
+                </div>
+
+                <div class="p-10">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold text-on-surface">Langkah 3: Motivasi</h3>
+                        <p class="text-on-surface-variant">Mengapa kamu ingin menjadi mentor? Ini yang pertama dilihat mentee.</p>
+                    </div>
+
+                    <div th:if="${error}" class="mb-6 p-3 bg-error-container text-on-error-container rounded-lg flex items-center gap-2 text-sm">
+                        <span class="material-symbols-outlined text-sm">error</span>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/register/mentor/step3}" method="post" class="space-y-6">
+
+                        <div>
+                            <label class="block text-sm font-bold text-on-surface-variant mb-1">
+                                Motivasi Menjadi Mentor *
+                            </label>
+                            <textarea name="motivasi" required rows="6"
+                                      placeholder="Ceritakan mengapa kamu ingin membantu sesama belajar, apa pengalaman yang mendorongmu, dan bagaimana caramu mengajar..."
+                                      class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
+                                      th:text="${dto.motivasi}"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">Minimal 50 karakter. Tulis dengan jujur dan personal.</p>
+                        </div>
+
+                        <!-- Persetujuan -->
+                        <div class="bg-surface-container-low rounded-xl p-4 border border-outline-variant">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" required class="mt-0.5 h-4 w-4 accent-primary"/>
+                                <span class="text-sm text-on-surface-variant">
+                                    Saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan saya bersedia mengikuti
+                                    <span class="text-primary font-medium">Pedoman Mentor EduMentor</span>.
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="pt-6 flex justify-between items-center">
+                            <a th:href="@{/register/mentor/step2}" class="px-8 py-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Kembali
+                            </a>
+                            <button type="submit" class="px-10 py-3 bg-secondary text-on-secondary text-sm font-medium rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                                Selesaikan Pendaftaran
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
