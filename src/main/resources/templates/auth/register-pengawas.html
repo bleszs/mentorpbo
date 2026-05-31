@@ -161,13 +161,44 @@ tailwind.config = {
             </div>
           </div>
 
+          <!-- Tipe Institusi -->
           <div class="space-y-2">
-            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Email Institusi (@univ.ac.id atau @sekolah.sch.id)</label>
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Tipe Institusi</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center gap-3 p-4 border-2 border-outline-variant rounded-xl cursor-pointer hover:border-primary-container transition-all has-[:checked]:border-primary-container has-[:checked]:bg-primary-fixed/10">
+                <input type="radio" th:field="*{tipeInstitusi}" value="KAMPUS" class="text-primary-container focus:ring-primary-fixed"/>
+                <div>
+                  <p class="font-bold text-[13px]">Kampus / Universitas</p>
+                  <p class="text-[11px] text-on-surface-variant">Dosen / Lektor</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-4 border-2 border-outline-variant rounded-xl cursor-pointer hover:border-primary-container transition-all has-[:checked]:border-primary-container has-[:checked]:bg-primary-fixed/10">
+                <input type="radio" th:field="*{tipeInstitusi}" value="SEKOLAH" class="text-primary-container focus:ring-primary-fixed"/>
+                <div>
+                  <p class="font-bold text-[13px]">Sekolah</p>
+                  <p class="text-[11px] text-on-surface-variant">Guru / Pengajar</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Email Institusi</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
               <input th:field="*{email}" required type="email"
                      class="w-full pl-12 pr-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
                      placeholder="budi.santoso@universitas.ac.id"/>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Kata Sandi</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+              <input th:field="*{kataSandi}" required type="password" minlength="6"
+                     class="w-full pl-12 pr-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
+                     placeholder="Minimal 6 karakter"/>
             </div>
           </div>
         </div>
@@ -194,15 +225,27 @@ tailwind.config = {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-2">
               <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">NIDN / NIP</label>
-              <input th:field="*{nidnNip}" required type="text"
+              <input th:field="*{nidnNip}" type="text"
                      class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
                      placeholder="Nomor Identitas Dosen/Guru"/>
             </div>
             <div class="space-y-2">
-              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Departemen / Fakultas</label>
-              <input th:field="*{departemen}" required type="text"
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Departemen / Mata Pelajaran</label>
+              <input th:field="*{departemen}" type="text"
                      class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
-                     placeholder="Contoh: Teknik Informatika"/>
+                     placeholder="Contoh: Teknik Informatika / Matematika"/>
+            </div>
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Jabatan / Kepangkatan</label>
+              <input th:field="*{jabatan}" type="text"
+                     class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
+                     placeholder="Contoh: Lektor Kepala / Guru Madya"/>
+            </div>
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Minat Riset / Bidang Keahlian</label>
+              <input th:field="*{minatRiset}" type="text"
+                     class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
+                     placeholder="Contoh: Machine Learning, Aljabar"/>
             </div>
           </div>
         </div>

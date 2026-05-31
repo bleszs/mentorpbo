@@ -177,10 +177,35 @@ public class MentoringController {
 
         model.addAttribute("sesi", sesi);
 
+        // Tambahkan pengguna yang sedang login agar template bisa cek aksi yang diizinkan
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+
         List<ReviewRating> reviews = mentoringService.getReviewUntukPengguna(sesi.getMentor().getId());
         model.addAttribute("reviews", reviews);
 
+        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
+        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
+
         return "mentoring/detail-sesi";
+    }
+
+    /**
+     * Mentor mengkonfirmasi permintaan sesi dari mentee.
+     */
+    @PostMapping("/sesi/{id}/konfirmasi")
+    public String konfirmasiSesi(@PathVariable Long id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            mentoringService.konfirmasiSesi(id, penggunaId);
+            redirectAttributes.addFlashAttribute("sukses", "Sesi berhasil dikonfirmasi dan dijadwalkan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/mentoring/sesi/" + id;
     }
 
     /**
@@ -292,12 +317,20 @@ public class MentoringController {
         model.addAttribute("mentor", pengguna);
         if (menteeId != null) model.addAttribute("selectedMenteeId", menteeId);
 
-        List<Mahasiswa> daftarMentee = penggunaService
-            .getPenggunaByRole(com.mentorpbo.model.enums.RolePengguna.MAHASISWA).stream()
-            .filter(p -> p instanceof Mahasiswa)
-            .map(p -> (Mahasiswa) p)
-            .filter(m -> !m.isMentor())
-            .collect(Collectors.toList());
+        // Daftar mentee: Mahasiswa non-mentor untuk mentor Mahasiswa,
+        // Siswa non-mentor untuk mentor Siswa, semua jika lainnya
+        List<Pengguna> daftarMentee;
+        if (pengguna instanceof Siswa) {
+            daftarMentee = penggunaService
+                .getPenggunaByRole(com.mentorpbo.model.enums.RolePengguna.SISWA).stream()
+                .filter(p -> p instanceof Siswa s && !s.isMentor())
+                .collect(Collectors.toList());
+        } else {
+            daftarMentee = penggunaService
+                .getPenggunaByRole(com.mentorpbo.model.enums.RolePengguna.MAHASISWA).stream()
+                .filter(p -> p instanceof Mahasiswa m && !m.isMentor())
+                .collect(Collectors.toList());
+        }
         model.addAttribute("daftarMentee", daftarMentee);
 
         List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentor(penggunaId);
@@ -321,6 +354,7 @@ public class MentoringController {
 
     /**
      * Halaman form mentee meminta sesi ke mentor tertentu.
+     * Mendukung Mahasiswa mentee → Mahasiswa mentor, dan Siswa mentee → Siswa mentor.
      */
     @GetMapping("/minta-sesi")
     public String mintaSesi(@RequestParam Long mentorId,
@@ -331,15 +365,20 @@ public class MentoringController {
 
         Pengguna pengguna = penggunaService.getPenggunaById(penggunaId).orElse(null);
         if (pengguna == null) return "redirect:/login";
-        if (!(pengguna instanceof Mahasiswa mahasiswa)) return "redirect:/dashboard";
 
         Pengguna mentorPengguna = penggunaService.getPenggunaById(mentorId).orElse(null);
-        if (!(mentorPengguna instanceof Mahasiswa mentorMahasiswa) || !mentorMahasiswa.isMentor()) {
-            return "redirect:/mentoring/cari-mentor";
-        }
+        if (mentorPengguna == null) return "redirect:/mentoring/cari-mentor";
 
-        model.addAttribute("mahasiswa", mahasiswa);
-        model.addAttribute("mentorPilihan", mentorMahasiswa);
+        // Validasi: mentor harus aktif sebagai mentor
+        boolean mentorValid = (mentorPengguna instanceof Mahasiswa m && m.isMentor())
+                           || (mentorPengguna instanceof Siswa s && s.isMentor());
+        if (!mentorValid) return "redirect:/mentoring/cari-mentor";
+
+        model.addAttribute("mentee", pengguna);
+        model.addAttribute("mentorPilihan", mentorPengguna);
+
+        // Kompatibilitas: tambahkan mahasiswa juga jika tipe Mahasiswa
+        if (pengguna instanceof Mahasiswa mahasiswa) model.addAttribute("mahasiswa", mahasiswa);
 
         long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
         model.addAttribute("notifBelumDibaca", notifBelumDibaca);
@@ -380,10 +419,14 @@ public class MentoringController {
 
             if (!catatan.isBlank()) sesi.setDeskripsi(catatan);
 
+            // Set status MENUNGGU_KONFIRMASI agar mentor perlu konfirmasi dulu
+            sesi.jadwalkanSesi(waktuMulai, durasiMenit);
+            sesi.setStatusSesi(StatusSesi.MENUNGGU_KONFIRMASI);
+
             mentoringService.buatDanJadwalkanSesi(sesi, waktuMulai, durasiMenit);
 
             redirectAttributes.addFlashAttribute("sukses",
-                "Permintaan sesi \"" + topikPembahasan + "\" berhasil dikirim ke mentor!");
+                "Permintaan sesi \"" + topikPembahasan + "\" berhasil dikirim! Menunggu konfirmasi mentor.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {

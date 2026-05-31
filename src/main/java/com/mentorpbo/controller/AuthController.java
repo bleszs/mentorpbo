@@ -316,84 +316,75 @@ public class AuthController {
     }
 
     /**
-     * Memproses form pendaftaran Pengawas Akademik dengan upload file.
+     * Memproses form pendaftaran Pengawas Akademik (Guru/Dosen) — menyimpan ke database.
      */
     @PostMapping("/register-pengawas")
     public String prosesRegisterPengawas(
             @ModelAttribute("pengawasDto") com.mentorpbo.dto.PengawasRegistrationDTO pengawasDto,
             @RequestParam(value = "dokumenVerifikasi", required = false) MultipartFile file,
             RedirectAttributes redirectAttributes) {
-        
+
         try {
-            // Validasi data
             if (pengawasDto.getNamaLengkap() == null || pengawasDto.getNamaLengkap().trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Nama lengkap harus diisi!");
                 return "redirect:/register-pengawas";
             }
-
             if (pengawasDto.getEmail() == null || pengawasDto.getEmail().trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Email harus diisi!");
                 return "redirect:/register-pengawas";
             }
-
+            if (pengawasDto.getKataSandi() == null || pengawasDto.getKataSandi().length() < 6) {
+                redirectAttributes.addFlashAttribute("error", "Kata sandi minimal 6 karakter!");
+                return "redirect:/register-pengawas";
+            }
             if (!pengawasDto.isSetujuSyaratKetentuan()) {
                 redirectAttributes.addFlashAttribute("error", "Anda harus menyetujui Syarat dan Ketentuan!");
                 return "redirect:/register-pengawas";
             }
 
-            // Proses upload file jika ada
-            String namaFileTersimpan = null;
-            if (file != null && !file.isEmpty()) {
-                // Validasi ukuran file (max 5MB)
-                if (file.getSize() > 5 * 1024 * 1024) {
-                    redirectAttributes.addFlashAttribute("error", "Ukuran file maksimal 5MB!");
-                    return "redirect:/register-pengawas";
-                }
+            // Tentukan tipe: Guru (sekolah) atau Dosen (kampus) berdasarkan tipeInstitusi
+            String tipe = pengawasDto.getTipeInstitusi();
+            boolean isGuru = "SEKOLAH".equalsIgnoreCase(tipe);
 
-                // Validasi tipe file
-                String contentType = file.getContentType();
-                if (contentType == null || 
-                    (!contentType.equals("image/jpeg") && 
-                     !contentType.equals("image/png") && 
-                     !contentType.equals("application/pdf"))) {
-                    redirectAttributes.addFlashAttribute("error", "Format file harus JPG, PNG, atau PDF!");
-                    return "redirect:/register-pengawas";
-                }
-
-                // Simpan file (untuk demo, kita hanya log nama file)
-                String originalFilename = file.getOriginalFilename();
-                namaFileTersimpan = System.currentTimeMillis() + "_" + originalFilename;
-                
-                // Dalam implementasi nyata, simpan ke folder uploads
-                // Path uploadPath = Paths.get("uploads/dokumen-verifikasi");
-                // Files.createDirectories(uploadPath);
-                // Path filePath = uploadPath.resolve(namaFileTersimpan);
-                // Files.copy(file.getInputStream(), filePath);
-                
-                System.out.println("File uploaded: " + namaFileTersimpan);
+            if (isGuru) {
+                com.mentorpbo.model.Guru guru = new com.mentorpbo.model.Guru(
+                    pengawasDto.getNamaLengkap(),
+                    pengawasDto.getEmail(),
+                    pengawasDto.getKataSandi(),
+                    pengawasDto.getNidnNip() != null ? pengawasDto.getNidnNip() : "",
+                    pengawasDto.getNamaInstitusi() != null ? pengawasDto.getNamaInstitusi() : "",
+                    pengawasDto.getDepartemen() != null ? pengawasDto.getDepartemen() : ""
+                );
+                if (pengawasDto.getJabatan() != null) guru.setBidangKeahlian(pengawasDto.getJabatan());
+                if (pengawasDto.getGelarAkademik() != null)
+                    guru.setBio("Gelar: " + pengawasDto.getGelarAkademik());
+                penggunaService.daftarGuru(guru);
+            } else {
+                com.mentorpbo.model.Dosen dosen = new com.mentorpbo.model.Dosen(
+                    pengawasDto.getNamaLengkap(),
+                    pengawasDto.getEmail(),
+                    pengawasDto.getKataSandi(),
+                    pengawasDto.getNidnNip() != null ? pengawasDto.getNidnNip() : "",
+                    pengawasDto.getDepartemen() != null ? pengawasDto.getDepartemen() : "",
+                    "", // fakultas
+                    pengawasDto.getNamaInstitusi() != null ? pengawasDto.getNamaInstitusi() : ""
+                );
+                if (pengawasDto.getJabatan() != null) dosen.setJabatanFungsional(pengawasDto.getJabatan());
+                if (pengawasDto.getMinatRiset() != null) dosen.setBidangRiset(pengawasDto.getMinatRiset());
+                if (pengawasDto.getGelarAkademik() != null)
+                    dosen.setBio("Gelar: " + pengawasDto.getGelarAkademik());
+                penggunaService.daftarDosen(dosen);
             }
 
-            // Log data pendaftaran (dalam implementasi nyata, simpan ke database)
-            System.out.println("=== Pendaftaran Pengawas Akademik ===");
-            System.out.println("Nama: " + pengawasDto.getNamaLengkap());
-            System.out.println("Gelar: " + pengawasDto.getGelarAkademik());
-            System.out.println("Email: " + pengawasDto.getEmail());
-            System.out.println("Institusi: " + pengawasDto.getNamaInstitusi());
-            System.out.println("NIDN/NIP: " + pengawasDto.getNidnNip());
-            System.out.println("Departemen: " + pengawasDto.getDepartemen());
-            System.out.println("Dokumen: " + namaFileTersimpan);
-            System.out.println("=====================================");
+            redirectAttributes.addFlashAttribute("sukses",
+                "Akun " + (isGuru ? "Guru" : "Dosen") + " berhasil dibuat! Silakan login.");
+            return "redirect:/login-pengawas?registered";
 
-            redirectAttributes.addFlashAttribute("sukses", 
-                "Pendaftaran berhasil dikirim! Tim kami akan meninjau aplikasi Anda dalam 1-3 hari kerja. " +
-                "Anda akan menerima email konfirmasi di " + pengawasDto.getEmail());
-            
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/register-pengawas";
-
         } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", 
-                "Terjadi kesalahan saat memproses pendaftaran: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Terjadi kesalahan: " + e.getMessage());
             return "redirect:/register-pengawas";
         }
     }

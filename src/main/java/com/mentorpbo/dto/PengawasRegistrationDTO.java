@@ -5,13 +5,18 @@ package com.mentorpbo.dto;
  * Digunakan untuk menangkap data dari form registrasi pengawas.
  */
 public class PengawasRegistrationDTO {
-    
+
     private String namaLengkap;
     private String gelarAkademik;
     private String email;
+    private String kataSandi;
     private String namaInstitusi;
     private String nidnNip;
     private String departemen;
+    private String jabatan;
+    private String minatRiset;
+    private String pengalaman;
+    private String tipeInstitusi; // "SEKOLAH" atau "KAMPUS"
     private boolean setujuSyaratKetentuan;
 
     // Constructors
@@ -77,11 +82,21 @@ public class PengawasRegistrationDTO {
         this.departemen = departemen;
     }
 
-    public boolean isSetujuSyaratKetentuan() {
-        return setujuSyaratKetentuan;
-    }
+    public String getKataSandi() { return kataSandi; }
+    public void setKataSandi(String kataSandi) { this.kataSandi = kataSandi; }
 
-    public void setSetujuSyaratKetentuan(boolean setujuSyaratKetentuan) {
-        this.setujuSyaratKetentuan = setujuSyaratKetentuan;
-    }
+    public String getJabatan() { return jabatan; }
+    public void setJabatan(String jabatan) { this.jabatan = jabatan; }
+
+    public String getMinatRiset() { return minatRiset; }
+    public void setMinatRiset(String minatRiset) { this.minatRiset = minatRiset; }
+
+    public String getPengalaman() { return pengalaman; }
+    public void setPengalaman(String pengalaman) { this.pengalaman = pengalaman; }
+
+    public String getTipeInstitusi() { return tipeInstitusi; }
+    public void setTipeInstitusi(String tipeInstitusi) { this.tipeInstitusi = tipeInstitusi; }
+
+    public boolean isSetujuSyaratKetentuan() { return setujuSyaratKetentuan; }
+    public void setSetujuSyaratKetentuan(boolean setujuSyaratKetentuan) { this.setujuSyaratKetentuan = setujuSyaratKetentuan; }
 }

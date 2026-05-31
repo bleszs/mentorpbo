@@ -158,6 +158,35 @@ public class MentoringService {
     }
 
     /**
+     * Mentor mengkonfirmasi permintaan sesi dari mentee (MENUNGGU_KONFIRMASI → DIJADWALKAN).
+     */
+    public SesiMentoring konfirmasiSesi(Long sesiId, Long mentorId) {
+        SesiMentoring sesi = sesiRepository.findById(sesiId)
+            .orElseThrow(() -> new NoSuchElementException("Sesi tidak ditemukan: " + sesiId));
+
+        if (sesi.getMentor() == null || !sesi.getMentor().getId().equals(mentorId)) {
+            throw new IllegalStateException("Hanya mentor dari sesi ini yang bisa mengkonfirmasi.");
+        }
+        if (sesi.getStatusSesi() != StatusSesi.MENUNGGU_KONFIRMASI) {
+            throw new IllegalStateException("Sesi ini tidak dalam status menunggu konfirmasi.");
+        }
+
+        sesi.setStatusSesi(StatusSesi.DIJADWALKAN);
+
+        // Notifikasi ke mentee
+        Notifikasi notif = new Notifikasi(
+            "Sesi Dikonfirmasi",
+            "Mentor " + sesi.getMentor().getNamaLengkap() + " telah mengkonfirmasi sesi '"
+                + sesi.getTopikPembahasan() + "'.",
+            "JADWAL",
+            sesi.getMentee()
+        );
+        notifikasiRepository.save(notif);
+
+        return sesiRepository.save(sesi);
+    }
+
+    /**
      * Mengubah jadwal sesi mentoring yang sudah ada.
      */
     public SesiMentoring ubahJadwalSesi(Long sesiId, LocalDateTime waktuBaru) {
