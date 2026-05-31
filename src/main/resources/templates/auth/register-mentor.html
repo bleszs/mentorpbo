@@ -171,9 +171,13 @@ tailwind.config = {
             </div>
             <div class="space-y-2">
               <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Sekolah / Perguruan Tinggi</label>
-              <input th:field="*{institusi}" required type="text"
-                     class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
-                     placeholder="misal, Universitas Indonesia"/>
+              <div class="relative">
+                <input th:field="*{institusi}" required type="text" id="institusiInput" autocomplete="off"
+                       class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md"
+                       placeholder="Ketik nama universitas / sekolah..."/>
+                <div id="institusiDropdown"
+                     class="hidden absolute z-50 w-full bg-white rounded-xl border border-outline-variant shadow-xl mt-1 max-h-56 overflow-y-auto"></div>
+              </div>
             </div>
           </div>
 
@@ -241,5 +245,43 @@ tailwind.config = {
     </div>
   </section>
 </main>
+<script>
+(function() {
+  const input = document.getElementById('institusiInput');
+  const dropdown = document.getElementById('institusiDropdown');
+  if (!input || !dropdown) return;
+  let list = [];
+
+  fetch('/data/universitas-indonesia.json')
+    .then(r => r.json())
+    .then(d => { list = d; });
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    dropdown.innerHTML = '';
+    if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+    const hits = list.filter(u => u.toLowerCase().includes(q)).slice(0, 8);
+    if (!hits.length) { dropdown.classList.add('hidden'); return; }
+    hits.forEach(u => {
+      const item = document.createElement('div');
+      item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 text-sm text-gray-800 border-b border-gray-100 last:border-0 transition-colors';
+      item.textContent = u;
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = u;
+        dropdown.classList.add('hidden');
+      });
+      dropdown.appendChild(item);
+    });
+    dropdown.classList.remove('hidden');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.add('hidden');
+    }
+  });
+})();
+</script>
 </body>
 </html>

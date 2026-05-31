@@ -1,174 +1,243 @@
 <!DOCTYPE html>
-<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Pendaftaran Mentor - Profil Akademik</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#00288e", "primary-container": "#1e40af",
-                        "on-primary": "#ffffff", "on-primary-container": "#a8b8ff",
-                        "secondary": "#006c4a", "secondary-container": "#82f5c1",
-                        "on-secondary-container": "#00714e",
-                        "surface": "#f8f9ff", "background": "#f8f9ff",
-                        "on-surface": "#0d1c2f", "on-surface-variant": "#444653",
-                        "outline": "#757684", "outline-variant": "#c4c5d5",
-                        "surface-container-low": "#eff4ff", "surface-container-high": "#dde9ff",
-                        "surface-container-highest": "#d5e3fd", "error": "#ba1a1a",
-                        "error-container": "#ffdad6", "on-error-container": "#93000a"
-                    }
-                }
-            }
-        }
-    </script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pendaftaran Mentor – Profil Akademik | Jejak Ilmu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "surface-bright":"#f8f9fa","success-green":"#10b981","primary-fixed-dim":"#b6c4fe",
+      "on-primary":"#ffffff","outline":"#767680","glass-border":"rgba(255,255,255,0.4)",
+      "error-container":"#ffdad6","outline-variant":"#c6c6d0","secondary-container":"#fdb965",
+      "primary-container":"#061748","warning-gold":"#fea619","error":"#ba1a1a",
+      "on-secondary-container":"#754900","on-primary-container":"#7382b7",
+      "on-primary-fixed":"#061748","surface-container-low":"#f3f4f5","surface":"#f8f9fa",
+      "on-background":"#191c1d","on-surface-variant":"#45464f","secondary-fixed":"#ffddb8",
+      "surface-container-lowest":"#ffffff","surface-container":"#edeeef","on-surface":"#191c1d",
+      "primary":"#000000","primary-fixed":"#dce1ff","on-error-container":"#93000a",
+      "on-primary-fixed-variant":"#364475","secondary":"#855300"
+    },
+    fontFamily: { "label-sm":["Inter"],"body-md":["Inter"],"headline-md":["Inter"],"display-lg":["Inter"],"body-lg":["Inter"],"caption-xs":["Inter"] },
+    fontSize: {
+      "label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+      "body-md":["14px",{"lineHeight":"1.5","fontWeight":"400"}],
+      "headline-md":["24px",{"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+      "display-lg":["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
+      "body-lg":["18px",{"lineHeight":"1.6","fontWeight":"500"}],
+      "caption-xs":["10px",{"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}]
+    }
+  }}
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .mesh-gradient {
+    background-color: #001142;
+    background-image: radial-gradient(at 0% 0%, hsla(225,100%,13%,1) 0,transparent 50%),
+      radial-gradient(at 50% 0%, hsla(155,100%,10%,1) 0,transparent 50%),
+      radial-gradient(at 100% 0%, hsla(225,100%,15%,1) 0,transparent 50%);
+  }
+</style>
 </head>
-<body class="bg-background text-on-surface min-h-screen">
-<header class="bg-white border-t-4 border-primary shadow-sm sticky top-0 z-50">
-    <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-xl mx-auto">
-        <span class="text-2xl font-bold text-primary">MentorSiswa</span>
+<body class="bg-surface-bright min-h-screen flex flex-col font-body-md text-on-surface">
+
+<main class="flex-grow flex flex-col md:flex-row min-h-screen overflow-hidden">
+
+  <!-- ===== LEFT PANEL ===== -->
+  <section class="hidden md:flex md:w-5/12 mesh-gradient p-12 flex-col justify-between relative overflow-hidden">
+    <div class="relative z-10">
+      <!-- Logo -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+            <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+          </div>
+          <h1 class="font-headline-md text-headline-md font-black text-white">Jejak Ilmu</h1>
+        </div>
+        <div class="h-1 w-12 bg-secondary-fixed"></div>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="font-display-lg text-[40px] font-black text-white leading-tight mb-4">Profil Akademik<br/>Anda</h2>
+      <p class="font-body-lg text-body-lg text-primary-fixed-dim/80 max-w-md mb-10">
+        Ceritakan keahlian akademik dan latar belakang pendidikan Anda agar mentee dapat menemukan mentor yang tepat.
+      </p>
+
+      <!-- Step indicators -->
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-success-green flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="text-white/60 text-[13px] line-through">Langkah 1: Data Pribadi</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center flex-shrink-0">
+            <span class="text-on-secondary-container text-[12px] font-black">2</span>
+          </div>
+          <span class="text-white font-bold text-[13px]">Langkah 2: Profil Akademik</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 border border-white/20">
+            <span class="text-white/60 text-[12px] font-bold">3</span>
+          </div>
+          <span class="text-white/50 text-[13px]">Langkah 3: Motivasi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar visual -->
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20">
+        <div class="flex-1">
+          <p class="text-white/60 text-[11px] uppercase tracking-widest mb-2">Kemajuan Pendaftaran</p>
+          <div class="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+            <div class="h-full bg-secondary-container rounded-full" style="width: 66.7%"></div>
+          </div>
+        </div>
+        <span class="font-black text-secondary-container text-[20px]">66%</span>
+      </div>
+    </div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-primary-fixed-dim/10 rounded-full blur-3xl pointer-events-none"></div>
+  </section>
+
+  <!-- ===== RIGHT PANEL: Form ===== -->
+  <section class="w-full md:w-7/12 overflow-y-auto bg-surface-bright flex items-start justify-center p-6 md:p-12 lg:p-16">
+    <div class="w-full max-w-2xl py-8">
+
+      <!-- Mobile header -->
+      <div class="md:hidden mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">school</span>
+          </div>
+          <span class="font-headline-md font-black text-primary-container">Jejak Ilmu</span>
+        </div>
         <a th:href="@{/login}" class="text-sm text-on-surface-variant hover:text-primary">Batal</a>
-    </div>
-</header>
+      </div>
 
-<main class="max-w-screen-xl mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Header -->
+      <header class="mb-10">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="font-caption-xs text-caption-xs text-secondary uppercase tracking-widest">Aplikasi Mentor · Langkah 2 dari 3</span>
+        </div>
+        <!-- Mobile progress bar -->
+        <div class="md:hidden mb-6 w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+          <div class="h-full bg-primary-container rounded-full" style="width:66.7%"></div>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-primary-container mb-2">Profil Akademik Anda</h3>
+        <p class="text-on-surface-variant font-body-md">Informasi ini membantu mentee menemukan mentor dengan keahlian yang sesuai.</p>
+      </header>
 
-        <!-- Sidebar Steps -->
-        <aside class="lg:col-span-4">
-            <div class="bg-surface-container-low border border-outline-variant p-6 rounded-xl">
-                <h2 class="text-2xl font-bold text-on-surface mb-2">Daftar Jadi Mentor</h2>
-                <p class="text-on-surface-variant mb-8">Bergabunglah dengan komunitas pengajar hebat kami.</p>
-                <div class="flex flex-col gap-4 mb-10">
-                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
-                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
-                        <span class="text-sm font-medium line-through opacity-60">1. Data Pribadi</span>
-                    </div>
-                    <div class="flex items-center gap-4 bg-primary-container text-on-primary-container rounded-xl px-4 py-3 font-bold">
-                        <span class="material-symbols-outlined">school</span>
-                        <span class="text-sm">2. Profil Akademik</span>
-                    </div>
-                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
-                        <span class="material-symbols-outlined">psychology</span>
-                        <span class="text-sm">3. Motivasi</span>
-                    </div>
-                </div>
-                <div class="bg-surface-container-highest rounded-xl p-4 border border-outline-variant">
-                    <h4 class="text-xs font-bold text-primary mb-2 uppercase tracking-widest">Tips</h4>
-                    <p class="text-sm text-on-surface-variant">Semakin detail keahlian yang kamu tulis, semakin mudah mentee menemukan kamu.</p>
-                </div>
+      <!-- Error -->
+      <div th:if="${error}" class="mb-8 flex items-center gap-3 rounded-xl border border-error bg-error-container px-4 py-3">
+        <span class="material-symbols-outlined text-on-error-container text-[20px]">error</span>
+        <span class="font-label-sm text-label-sm text-on-error-container" th:text="${error}"></span>
+      </div>
+
+      <form th:action="@{/register/mentor/step2}" method="post" class="space-y-6">
+
+        <!-- Keahlian Utama -->
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Mata Pelajaran / Mata Kuliah yang Dikuasai *</label>
+          <input type="text" name="keahlian" required th:value="${dto.keahlian}"
+                 placeholder="misal: Matematika, Fisika, Pemrograman Java"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none"/>
+          <p class="text-[11px] text-on-surface-variant">Pisahkan dengan koma jika lebih dari satu.</p>
+        </div>
+
+        <!-- Topik Spesifik -->
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Topik Spesifik (Opsional)</label>
+          <input type="text" name="topikKeahlian" th:value="${dto.topikKeahlian}"
+                 placeholder="misal: Integral, Mekanika Klasik, OOP, Algoritma"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none"/>
+        </div>
+
+        <!-- Siswa: Kelas & Jurusan -->
+        <div th:if="${dto.isSiswa()}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Kelas *</label>
+            <select name="kelas" required
+                    class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none appearance-none">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="10" th:selected="${dto.kelas == '10'}">Kelas 10</option>
+              <option value="11" th:selected="${dto.kelas == '11'}">Kelas 11</option>
+              <option value="12" th:selected="${dto.kelas == '12'}">Kelas 12</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Jurusan (Opsional)</label>
+            <input type="text" name="programStudi" th:value="${dto.programStudi}"
+                   placeholder="misal: IPA, IPS, Bahasa"
+                   class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md outline-none"/>
+          </div>
+        </div>
+
+        <!-- Mahasiswa: Program Studi, Semester, Fakultas -->
+        <div th:if="${!dto.isSiswa()}" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Program Studi *</label>
+              <input type="text" name="programStudi" required th:value="${dto.programStudi}"
+                     placeholder="misal: Teknik Informatika"
+                     class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none"/>
             </div>
-        </aside>
-
-        <!-- Form Section -->
-        <section class="lg:col-span-8">
-            <div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-                <!-- Progress bar: 2/3 -->
-                <div class="h-2 w-full bg-slate-200">
-                    <div class="h-full bg-secondary transition-all duration-500" style="width: 66.7%"></div>
-                </div>
-
-                <div class="p-10">
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-semibold text-on-surface">Langkah 2: Profil Akademik</h3>
-                        <p class="text-on-surface-variant">Ceritakan keahlian akademik dan latar belakang pendidikanmu.</p>
-                    </div>
-
-                    <div th:if="${error}" class="mb-6 p-3 bg-error-container text-on-error-container rounded-lg flex items-center gap-2 text-sm">
-                        <span class="material-symbols-outlined text-sm">error</span>
-                        <span th:text="${error}"></span>
-                    </div>
-
-                    <form th:action="@{/register/mentor/step2}" method="post" class="space-y-6">
-
-                        <!-- Keahlian Utama -->
-                        <div>
-                            <label class="block text-sm font-bold text-on-surface-variant mb-1">Mata Pelajaran / Mata Kuliah yang Dikuasai *</label>
-                            <input type="text" name="keahlian" required th:value="${dto.keahlian}"
-                                   placeholder="misal: Matematika, Fisika, Pemrograman Java"
-                                   class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"/>
-                            <p class="text-xs text-on-surface-variant mt-1">Pisahkan dengan koma jika lebih dari satu.</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-on-surface-variant mb-1">Topik Spesifik (Opsional)</label>
-                            <input type="text" name="topikKeahlian" th:value="${dto.topikKeahlian}"
-                                   placeholder="misal: Integral, Mekanika Klasik, OOP, Algoritma"
-                                   class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"/>
-                        </div>
-
-                        <!-- Kondisional: Siswa SMA -->
-                        <div th:if="${dto.isSiswa()}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-on-surface-variant mb-1">Kelas *</label>
-                                <select name="kelas" required class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none">
-                                    <option value="">-- Pilih Kelas --</option>
-                                    <option value="10" th:selected="${dto.kelas == '10'}">Kelas 10</option>
-                                    <option value="11" th:selected="${dto.kelas == '11'}">Kelas 11</option>
-                                    <option value="12" th:selected="${dto.kelas == '12'}">Kelas 12</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-on-surface-variant mb-1">Program / Jurusan (Opsional)</label>
-                                <input type="text" name="programStudi" th:value="${dto.programStudi}"
-                                       placeholder="misal: IPA, IPS, Bahasa"
-                                       class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"/>
-                            </div>
-                        </div>
-
-                        <!-- Kondisional: Mahasiswa -->
-                        <div th:if="${!dto.isSiswa()}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-on-surface-variant mb-1">Program Studi *</label>
-                                <input type="text" name="programStudi" required th:value="${dto.programStudi}"
-                                       placeholder="misal: Teknik Informatika"
-                                       class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"/>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-on-surface-variant mb-1">Semester Aktif *</label>
-                                <select name="semester" required class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none">
-                                    <option value="">-- Pilih Semester --</option>
-                                    <option th:each="s : ${#numbers.sequence(1,8)}" th:value="${s}"
-                                            th:text="'Semester ' + ${s}"
-                                            th:selected="${dto.semester != null and dto.semester == s.toString()}">Semester</option>
-                                    <option value="alumni" th:selected="${dto.semester == 'alumni'}">Alumni / Lulus</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div th:if="${!dto.isSiswa()}">
-                            <label class="block text-sm font-bold text-on-surface-variant mb-1">Fakultas (Opsional)</label>
-                            <input type="text" name="fakultas" th:value="${dto.fakultas}"
-                                   placeholder="misal: Fakultas Teknik"
-                                   class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"/>
-                        </div>
-
-                        <!-- Hidden fields for siswa path -->
-                        <input th:if="${dto.isSiswa()}" type="hidden" name="semester" value=""/>
-                        <input th:if="${dto.isSiswa()}" type="hidden" name="fakultas" value=""/>
-                        <input th:if="${!dto.isSiswa()}" type="hidden" name="kelas" value=""/>
-
-                        <div class="pt-6 flex justify-between items-center">
-                            <a th:href="@{/register/mentor}" class="px-8 py-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Kembali
-                            </a>
-                            <button type="submit" class="px-10 py-3 bg-primary text-on-primary text-sm font-medium rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
-                                Langkah Selanjutnya
-                                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div class="space-y-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Semester Aktif *</label>
+              <select name="semester" required
+                      class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none appearance-none">
+                <option value="">-- Pilih Semester --</option>
+                <option th:each="s : ${#numbers.sequence(1,8)}" th:value="${s}"
+                        th:text="'Semester ' + ${s}"
+                        th:selected="${dto.semester != null and dto.semester == s.toString()}">Semester</option>
+                <option value="alumni" th:selected="${dto.semester == 'alumni'}">Alumni / Lulus</option>
+              </select>
             </div>
-        </section>
+          </div>
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Fakultas (Opsional)</label>
+            <input type="text" name="fakultas" th:value="${dto.fakultas}"
+                   placeholder="misal: Fakultas Teknik"
+                   class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container transition-all text-body-md outline-none"/>
+          </div>
+        </div>
+
+        <!-- Hidden fields -->
+        <input th:if="${dto.isSiswa()}" type="hidden" name="semester" value=""/>
+        <input th:if="${dto.isSiswa()}" type="hidden" name="fakultas" value=""/>
+        <input th:if="${!dto.isSiswa()}" type="hidden" name="kelas" value=""/>
+
+        <!-- Info tip -->
+        <div class="flex items-center gap-3 p-4 bg-primary-fixed/30 rounded-xl">
+          <span class="material-symbols-outlined text-primary-container text-[18px] flex-shrink-0">tips_and_updates</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">Semakin detail keahlian yang Anda isi, semakin mudah mentee menemukan Anda.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between items-center pt-4">
+          <a th:href="@{/register/mentor}"
+             class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container rounded-xl transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            Kembali
+          </a>
+          <button type="submit"
+                  class="px-8 py-4 bg-primary-container text-white rounded-2xl font-label-sm text-label-sm uppercase tracking-[0.15em] hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg">
+            Langkah Selanjutnya
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+
+      </form>
     </div>
+  </section>
+
 </main>
 </body>
 </html>

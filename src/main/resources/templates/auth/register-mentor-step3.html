@@ -1,139 +1,238 @@
 <!DOCTYPE html>
-<html class="light" lang="id" xmlns:th="http://www.thymeleaf.org">
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Pendaftaran Mentor - Motivasi</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#00288e", "primary-container": "#1e40af",
-                        "on-primary": "#ffffff", "on-primary-container": "#a8b8ff",
-                        "secondary": "#006c4a", "secondary-container": "#82f5c1",
-                        "on-secondary": "#ffffff", "on-secondary-container": "#00714e",
-                        "surface": "#f8f9ff", "background": "#f8f9ff",
-                        "on-surface": "#0d1c2f", "on-surface-variant": "#444653",
-                        "outline": "#757684", "outline-variant": "#c4c5d5",
-                        "surface-container-low": "#eff4ff", "surface-container-high": "#dde9ff",
-                        "surface-container-highest": "#d5e3fd", "error": "#ba1a1a",
-                        "error-container": "#ffdad6", "on-error-container": "#93000a"
-                    }
-                }
-            }
-        }
-    </script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pendaftaran Mentor – Motivasi | Jejak Ilmu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "surface-bright":"#f8f9fa","success-green":"#10b981","primary-fixed-dim":"#b6c4fe",
+      "on-primary":"#ffffff","outline":"#767680","glass-border":"rgba(255,255,255,0.4)",
+      "error-container":"#ffdad6","outline-variant":"#c6c6d0","secondary-container":"#fdb965",
+      "primary-container":"#061748","warning-gold":"#fea619","error":"#ba1a1a",
+      "on-secondary-container":"#754900","on-primary-container":"#7382b7",
+      "on-primary-fixed":"#061748","surface-container-low":"#f3f4f5","surface":"#f8f9fa",
+      "on-background":"#191c1d","on-surface-variant":"#45464f","secondary-fixed":"#ffddb8",
+      "surface-container-lowest":"#ffffff","surface-container":"#edeeef","on-surface":"#191c1d",
+      "primary":"#000000","primary-fixed":"#dce1ff","on-error-container":"#93000a",
+      "on-primary-fixed-variant":"#364475","secondary":"#855300"
+    },
+    fontFamily: { "label-sm":["Inter"],"body-md":["Inter"],"headline-md":["Inter"],"display-lg":["Inter"],"body-lg":["Inter"],"caption-xs":["Inter"] },
+    fontSize: {
+      "label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+      "body-md":["14px",{"lineHeight":"1.5","fontWeight":"400"}],
+      "headline-md":["24px",{"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+      "display-lg":["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
+      "body-lg":["18px",{"lineHeight":"1.6","fontWeight":"500"}],
+      "caption-xs":["10px",{"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}]
+    }
+  }}
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .mesh-gradient {
+    background-color: #001142;
+    background-image: radial-gradient(at 0% 0%, hsla(225,100%,13%,1) 0,transparent 50%),
+      radial-gradient(at 50% 0%, hsla(155,100%,10%,1) 0,transparent 50%),
+      radial-gradient(at 100% 0%, hsla(225,100%,15%,1) 0,transparent 50%);
+  }
+</style>
 </head>
-<body class="bg-background text-on-surface min-h-screen">
-<header class="bg-white border-t-4 border-primary shadow-sm sticky top-0 z-50">
-    <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-xl mx-auto">
-        <span class="text-2xl font-bold text-primary">MentorSiswa</span>
+<body class="bg-surface-bright min-h-screen flex flex-col font-body-md text-on-surface">
+
+<main class="flex-grow flex flex-col md:flex-row min-h-screen overflow-hidden">
+
+  <!-- ===== LEFT PANEL ===== -->
+  <section class="hidden md:flex md:w-5/12 mesh-gradient p-12 flex-col justify-between relative overflow-hidden">
+    <div class="relative z-10">
+      <!-- Logo -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+            <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
+          </div>
+          <h1 class="font-headline-md text-headline-md font-black text-white">Jejak Ilmu</h1>
+        </div>
+        <div class="h-1 w-12 bg-secondary-fixed"></div>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="font-display-lg text-[40px] font-black text-white leading-tight mb-4">Langkah<br/>Terakhir!</h2>
+      <p class="font-body-lg text-body-lg text-primary-fixed-dim/80 max-w-md mb-10">
+        Ceritakan motivasi Anda. Ini adalah hal pertama yang dilihat mentee ketika menemukan profil Anda.
+      </p>
+
+      <!-- Step indicators -->
+      <div class="space-y-3 mb-10">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-success-green flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="text-white/60 text-[13px] line-through">Langkah 1: Data Pribadi</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-success-green flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="text-white/60 text-[13px] line-through">Langkah 2: Profil Akademik</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center flex-shrink-0">
+            <span class="text-on-secondary-container text-[12px] font-black">3</span>
+          </div>
+          <span class="text-white font-bold text-[13px]">Langkah 3: Motivasi</span>
+        </div>
+      </div>
+
+      <!-- Ringkasan -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 space-y-2" th:if="${dto != null}">
+        <p class="text-white/50 text-[10px] uppercase tracking-widest font-bold mb-3">Ringkasan Pendaftaran</p>
+        <p class="font-black text-white text-[15px]" th:text="${dto.namaLengkap}">Nama</p>
+        <p class="text-white/70 text-[13px]" th:text="${dto.email}">Email</p>
+        <p class="text-white/70 text-[13px]" th:text="${dto.tingkatPendidikan}">Tingkat</p>
+        <p class="text-white/70 text-[13px]" th:text="${dto.institusi}">Institusi</p>
+        <p class="text-white/70 text-[13px]">Keahlian: <span class="text-secondary-container font-bold" th:text="${dto.keahlian}">-</span></p>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20">
+        <div class="flex-1">
+          <p class="text-white/60 text-[11px] uppercase tracking-widest mb-2">Kemajuan Pendaftaran</p>
+          <div class="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+            <div class="h-full bg-secondary-container rounded-full" style="width: 100%"></div>
+          </div>
+        </div>
+        <span class="font-black text-secondary-container text-[20px]">100%</span>
+      </div>
+    </div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-primary-fixed-dim/10 rounded-full blur-3xl pointer-events-none"></div>
+  </section>
+
+  <!-- ===== RIGHT PANEL: Form ===== -->
+  <section class="w-full md:w-7/12 overflow-y-auto bg-surface-bright flex items-start justify-center p-6 md:p-12 lg:p-16">
+    <div class="w-full max-w-2xl py-8">
+
+      <!-- Mobile header -->
+      <div class="md:hidden mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">school</span>
+          </div>
+          <span class="font-headline-md font-black text-primary-container">Jejak Ilmu</span>
+        </div>
         <a th:href="@{/login}" class="text-sm text-on-surface-variant hover:text-primary">Batal</a>
-    </div>
-</header>
+      </div>
 
-<main class="max-w-screen-xl mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Success state -->
+      <div th:if="${sukses}" class="text-center py-16">
+        <div class="w-20 h-20 rounded-2xl bg-success-green/10 flex items-center justify-center mx-auto mb-6">
+          <span class="material-symbols-outlined text-success-green text-5xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-3">Pendaftaran Berhasil!</h2>
+        <p class="text-on-surface-variant font-body-md mb-2" th:text="${sukses}">Berhasil</p>
+        <p class="text-on-surface-variant font-body-md mb-8">Tim akademik kami akan meninjau profil Anda. Cek email untuk konfirmasi.</p>
+        <a th:href="@{/login?registered}"
+           class="inline-flex items-center gap-2 px-8 py-4 bg-primary-container text-white rounded-2xl font-label-sm text-label-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-lg">
+          Masuk ke Akun
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </a>
+      </div>
 
-        <!-- Sidebar Steps -->
-        <aside class="lg:col-span-4">
-            <div class="bg-surface-container-low border border-outline-variant p-6 rounded-xl">
-                <h2 class="text-2xl font-bold text-on-surface mb-2">Daftar Jadi Mentor</h2>
-                <p class="text-on-surface-variant mb-8">Langkah terakhir! Ceritakan motivasimu.</p>
-                <div class="flex flex-col gap-4 mb-10">
-                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
-                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
-                        <span class="text-sm font-medium line-through opacity-60">1. Data Pribadi</span>
-                    </div>
-                    <div class="flex items-center gap-4 text-on-surface-variant px-4 py-3">
-                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
-                        <span class="text-sm font-medium line-through opacity-60">2. Profil Akademik</span>
-                    </div>
-                    <div class="flex items-center gap-4 bg-primary-container text-on-primary-container rounded-xl px-4 py-3 font-bold">
-                        <span class="material-symbols-outlined">psychology</span>
-                        <span class="text-sm">3. Motivasi</span>
-                    </div>
-                </div>
+      <!-- Form -->
+      <div th:if="${sukses == null}">
+        <header class="mb-10">
+          <span class="font-caption-xs text-caption-xs text-secondary uppercase tracking-widest mb-2 block">Aplikasi Mentor · Langkah 3 dari 3</span>
+          <!-- Mobile progress -->
+          <div class="md:hidden mb-6 w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-primary-container rounded-full w-full"></div>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary-container mb-2">Motivasi Anda</h3>
+          <p class="text-on-surface-variant font-body-md">Mengapa Anda ingin menjadi mentor? Ini yang pertama dilihat mentee.</p>
+        </header>
 
-                <!-- Ringkasan data -->
-                <div class="bg-surface-container-highest rounded-xl p-4 border border-outline-variant text-sm space-y-2">
-                    <h4 class="text-xs font-bold text-primary uppercase tracking-widest mb-3">Ringkasan Pendaftaran</h4>
-                    <p class="text-on-surface-variant">
-                        <span class="font-semibold text-on-surface" th:text="${dto.namaLengkap}">Nama</span>
-                    </p>
-                    <p class="text-on-surface-variant" th:text="${dto.email}">email</p>
-                    <p class="text-on-surface-variant" th:text="${dto.tingkatPendidikan}">Tingkat</p>
-                    <p class="text-on-surface-variant" th:text="${dto.institusi}">Institusi</p>
-                    <p class="text-on-surface-variant">
-                        Keahlian: <span class="font-semibold text-on-surface" th:text="${dto.keahlian}">-</span>
-                    </p>
-                </div>
+        <!-- Error -->
+        <div th:if="${error}" class="mb-8 flex items-center gap-3 rounded-xl border border-error bg-error-container px-4 py-3">
+          <span class="material-symbols-outlined text-on-error-container text-[20px]">error</span>
+          <span class="font-label-sm text-label-sm text-on-error-container" th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/register/mentor/step3}" method="post" class="space-y-6" id="step3Form">
+
+          <!-- Motivasi -->
+          <div class="space-y-2">
+            <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Motivasi Menjadi Mentor *</label>
+            <textarea name="motivasi" required rows="7" minlength="10" id="motivasiText"
+                      placeholder="Ceritakan mengapa Anda ingin membantu sesama belajar, apa pengalaman yang mendorong Anda, dan bagaimana cara Anda mengajar..."
+                      class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all text-body-md outline-none resize-none"
+                      th:text="${dto?.motivasi}"></textarea>
+            <div class="flex justify-between items-center">
+              <p class="text-[11px] text-on-surface-variant">Minimal 10 karakter. Tulis dengan jujur dan personal.</p>
+              <span id="charCount" class="text-[11px] text-on-surface-variant font-bold">0 karakter</span>
             </div>
-        </aside>
+          </div>
 
-        <!-- Form Section -->
-        <section class="lg:col-span-8">
-            <div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-                <!-- Progress bar: 3/3 -->
-                <div class="h-2 w-full bg-slate-200">
-                    <div class="h-full bg-secondary transition-all duration-500" style="width: 100%"></div>
-                </div>
+          <!-- Persetujuan -->
+          <div class="bg-primary-fixed/20 rounded-xl p-5 border border-primary-fixed/40">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" required id="agreeCheck"
+                     class="mt-0.5 h-5 w-5 rounded border-outline-variant accent-primary-container flex-shrink-0"/>
+              <span class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan saya bersedia mengikuti
+                <span class="text-primary-container font-bold cursor-pointer hover:underline">Pedoman Mentor Jejak Ilmu</span>.
+              </span>
+            </label>
+          </div>
 
-                <div class="p-10">
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-semibold text-on-surface">Langkah 3: Motivasi</h3>
-                        <p class="text-on-surface-variant">Mengapa kamu ingin menjadi mentor? Ini yang pertama dilihat mentee.</p>
-                    </div>
+          <!-- Actions -->
+          <div class="flex justify-between items-center pt-4">
+            <a th:href="@{/register/mentor/step2}"
+               class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container rounded-xl transition-all flex items-center gap-1">
+              <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+              Kembali
+            </a>
+            <button type="submit" id="submitBtn"
+                    class="px-8 py-4 bg-primary-container text-white rounded-2xl font-label-sm text-label-sm uppercase tracking-[0.15em] hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg">
+              <span class="material-symbols-outlined text-[18px]">send</span>
+              Ajukan Registrasi Mentor
+            </button>
+          </div>
 
-                    <div th:if="${error}" class="mb-6 p-3 bg-error-container text-on-error-container rounded-lg flex items-center gap-2 text-sm">
-                        <span class="material-symbols-outlined text-sm">error</span>
-                        <span th:text="${error}"></span>
-                    </div>
+        </form>
 
-                    <form th:action="@{/register/mentor/step3}" method="post" class="space-y-6">
+      </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-on-surface-variant mb-1">
-                                Motivasi Menjadi Mentor *
-                            </label>
-                            <textarea name="motivasi" required rows="6"
-                                      placeholder="Ceritakan mengapa kamu ingin membantu sesama belajar, apa pengalaman yang mendorongmu, dan bagaimana caramu mengajar..."
-                                      class="w-full px-4 py-3 bg-white border border-outline rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
-                                      th:text="${dto.motivasi}"></textarea>
-                            <p class="text-xs text-on-surface-variant mt-1">Minimal 50 karakter. Tulis dengan jujur dan personal.</p>
-                        </div>
-
-                        <!-- Persetujuan -->
-                        <div class="bg-surface-container-low rounded-xl p-4 border border-outline-variant">
-                            <label class="flex items-start gap-3 cursor-pointer">
-                                <input type="checkbox" required class="mt-0.5 h-4 w-4 accent-primary"/>
-                                <span class="text-sm text-on-surface-variant">
-                                    Saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan saya bersedia mengikuti
-                                    <span class="text-primary font-medium">Pedoman Mentor EduMentor</span>.
-                                </span>
-                            </label>
-                        </div>
-
-                        <div class="pt-6 flex justify-between items-center">
-                            <a th:href="@{/register/mentor/step2}" class="px-8 py-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Kembali
-                            </a>
-                            <button type="submit" class="px-10 py-3 bg-secondary text-on-secondary text-sm font-medium rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
-                                Selesaikan Pendaftaran
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
     </div>
+  </section>
+
 </main>
+
+<script>
+  const textarea = document.getElementById('motivasiText');
+  const counter = document.getElementById('charCount');
+  if (textarea) {
+    const update = () => { if (counter) counter.textContent = textarea.value.length + ' karakter'; };
+    textarea.addEventListener('input', update);
+    update();
+  }
+
+  // Prevent double-submit
+  const form = document.getElementById('step3Form');
+  const btn = document.getElementById('submitBtn');
+  if (form && btn) {
+    form.addEventListener('submit', () => {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Mengirim...';
+    });
+  }
+</script>
 </body>
 </html>

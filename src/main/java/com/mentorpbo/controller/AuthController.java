@@ -4,6 +4,7 @@ import com.mentorpbo.dto.MentorRegistrationDTO;
 import com.mentorpbo.model.Mahasiswa;
 import com.mentorpbo.model.Pengguna;
 import com.mentorpbo.model.Siswa;
+import com.mentorpbo.service.EmailService;
 import com.mentorpbo.service.PenggunaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,12 @@ import java.util.Optional;
 public class AuthController {
 
     private final PenggunaService penggunaService;
+    private final EmailService emailService;
 
     @Autowired
-    public AuthController(PenggunaService penggunaService) {
+    public AuthController(PenggunaService penggunaService, EmailService emailService) {
         this.penggunaService = penggunaService;
+        this.emailService = emailService;
     }
 
     /**
@@ -230,9 +233,20 @@ public class AuthController {
             }
 
             session.removeAttribute("mentorRegDto");
+
+            // Kirim email notifikasi ke admin + konfirmasi ke mentor (async, tidak blocking)
+            try {
+                emailService.kirimNotifikasiPendaftaranMentor(
+                    dto.getNamaLengkap(), dto.getEmail(),
+                    dto.getInstitusi() != null ? dto.getInstitusi() : "-",
+                    dto.getKeahlian() != null ? dto.getKeahlian() : "-"
+                );
+                emailService.kirimKonfirmasiKeMentor(dto.getNamaLengkap(), dto.getEmail());
+            } catch (Exception ignored) { /* email gagal tidak batalkan registrasi */ }
+
             redirectAttributes.addFlashAttribute("sukses",
-                "Selamat! Akun mentor berhasil dibuat. Silakan login dengan email dan kata sandi Anda.");
-            return "redirect:/login?registered";
+                "Selamat! Akun mentor berhasil dibuat. Cek email Anda untuk konfirmasi.");
+            return "redirect:/register/mentor/step3";
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
