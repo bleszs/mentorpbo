@@ -65,8 +65,12 @@ tailwind.config = {
       <div class="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] rounded-full bg-sidebar-gradient-end blur-[100px]"></div>
     </div>
     <div class="relative z-10 space-y-4">
-      <div class="mb-6">
-        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;"/>
+      <div class="mb-6 flex items-center gap-4">
+        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:88px;width:auto;flex-shrink:0;"/>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:21px;color:#fff;letter-spacing:-0.02em;line-height:1.1;">Jejak Ilmu</div>
+          <div style="font-family:'Inter',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.02em;margin-top:3px;">Platform Mentoring Akademik</div>
+        </div>
       </div>
       <h1 class="font-headline-md text-headline-md text-white">Mulai Langkah Prestasimu.</h1>
       <p class="font-body-md text-body-md text-white/70">
@@ -228,28 +232,44 @@ tailwind.config = {
   </div>
 </main>
 <script>
+// Autocomplete via API — deteksi SMA atau Universitas berdasarkan tingkat pendidikan
 (function() {
   const input = document.getElementById('institusiMentee');
   const dropdown = document.getElementById('institusiMenteeDropdown');
+  const tingkat = document.getElementById('tingkatPendidikan');
   if (!input || !dropdown) return;
-  let list = [];
-  fetch('/data/universitas-indonesia.json').then(r => r.json()).then(d => { list = d; });
+  let timer;
+
+  function getApiPath() {
+    const val = tingkat ? tingkat.value : '';
+    return val.startsWith('SMA') ? '/api/cari/sekolah' : '/api/cari/universitas';
+  }
+
   input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
+    clearTimeout(timer);
+    const q = input.value.trim();
     dropdown.innerHTML = '';
     if (q.length < 2) { dropdown.classList.add('hidden'); return; }
-    const hits = list.filter(u => u.toLowerCase().includes(q)).slice(0, 8);
-    if (!hits.length) { dropdown.classList.add('hidden'); return; }
-    hits.forEach(u => {
-      const item = document.createElement('div');
-      item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 text-sm text-gray-800 border-b border-gray-100 last:border-0 transition-colors';
-      item.textContent = u;
-      item.addEventListener('mousedown', (e) => { e.preventDefault(); input.value = u; dropdown.classList.add('hidden'); });
-      dropdown.appendChild(item);
-    });
-    dropdown.classList.remove('hidden');
+    timer = setTimeout(() => {
+      fetch(getApiPath() + '?q=' + encodeURIComponent(q))
+        .then(r => r.json())
+        .then(list => {
+          dropdown.innerHTML = '';
+          if (!list.length) { dropdown.classList.add('hidden'); return; }
+          list.forEach(u => {
+            const item = document.createElement('div');
+            item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 text-sm text-gray-800 border-b border-gray-100 last:border-0 transition-colors';
+            item.textContent = u;
+            item.addEventListener('mousedown', e => { e.preventDefault(); input.value = u; dropdown.classList.add('hidden'); });
+            dropdown.appendChild(item);
+          });
+          dropdown.classList.remove('hidden');
+        })
+        .catch(() => dropdown.classList.add('hidden'));
+    }, 350);
   });
-  document.addEventListener('click', (e) => {
+
+  document.addEventListener('click', e => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
   });
 })();

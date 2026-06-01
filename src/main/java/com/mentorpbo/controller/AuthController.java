@@ -38,6 +38,11 @@ public class AuthController {
         this.emailService = emailService;
     }
 
+    private String encode(String s) {
+        if (s == null) return "";
+        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
     /**
      * Google Client ID yang valid selalu berakhir dengan .apps.googleusercontent.com.
      * Ini memastikan hanya credentials asli dari Google Cloud Console yang diterima.
@@ -98,8 +103,8 @@ public class AuthController {
 
             if (!user.isEmailVerified()) {
                 redirectAttributes.addFlashAttribute("error",
-                    "Email belum diverifikasi. Cek inbox " + user.getEmail() + " dan klik link verifikasi (berlaku 24 jam).");
-                return "redirect:/login";
+                    "Email belum diverifikasi. Masukkan kode OTP yang dikirim ke " + user.getEmail() + ".");
+                return "redirect:/verify-otp?email=" + java.net.URLEncoder.encode(user.getEmail(), java.nio.charset.StandardCharsets.UTF_8);
             }
 
             session.setAttribute("penggunaLogin", user);
@@ -113,8 +118,70 @@ public class AuthController {
         return "redirect:/login?error";
     }
 
+    // ============================================================
+    // OTP VERIFICATION ENDPOINTS
+    // ============================================================
+
     /**
-     * Verifikasi email melalui link yang dikirim ke email pengguna.
+     * Halaman input kode OTP setelah registrasi.
+     * Email pengguna dikirim via query param agar halaman bisa menampilkan
+     * "Kode dikirim ke xxx@gmail.com".
+     */
+    @GetMapping("/verify-otp")
+    public String halamanVerifyOtp(@RequestParam(required = false) String email,
+                                   Model model) {
+        String emailVal = email != null ? email : "";
+        model.addAttribute("email", emailVal);
+        // Tampilkan OTP aktif di halaman (dev mode — bantu user yang tidak menerima email)
+        model.addAttribute("devOtp", penggunaService.getOtpForDev(emailVal));
+        return "auth/verify-otp";
+    }
+
+    /**
+     * Proses verifikasi OTP yang dimasukkan user secara manual.
+     * Jika benar → akun aktif → redirect ke login dengan pesan sukses.
+     * Jika salah/expired → kembali ke halaman OTP dengan pesan error.
+     */
+    @PostMapping("/verify-otp")
+    public String prosesVerifyOtp(@RequestParam String email,
+                                   @RequestParam String otp,
+                                   RedirectAttributes redirectAttributes) {
+        if (email == null || email.isBlank() || otp == null || otp.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Email dan kode OTP harus diisi.");
+            return "redirect:/verify-otp?email=" + encode(email);
+        }
+
+        boolean berhasil = penggunaService.verifikasiOtp(email, otp.replaceAll("\\s", ""));
+        if (berhasil) {
+            redirectAttributes.addFlashAttribute("sukses",
+                "Email berhasil diverifikasi! Silakan login sekarang.");
+            return "redirect:/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error",
+                "Kode OTP salah atau sudah kedaluwarsa (15 menit). Klik 'Kirim Ulang' untuk kode baru.");
+            return "redirect:/verify-otp?email=" + encode(email);
+        }
+    }
+
+    /**
+     * Kirim ulang OTP baru ke email yang sama.
+     */
+    @PostMapping("/verify-otp/resend")
+    public String kirimUlangOtp(@RequestParam String email,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            String otp = penggunaService.kirimUlangOtp(email);
+            emailService.kirimEmailVerifikasi("", email, otp);
+            redirectAttributes.addFlashAttribute("sukses",
+                "Kode baru berhasil dikirim ke " + email + ". Cek inbox (berlaku 15 menit).");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/verify-otp?email=" + encode(email);
+    }
+
+    /**
+     * Verifikasi email lama via link token (backwards-compat untuk email lama di inbox).
      */
     @GetMapping("/verify-email")
     public String verifyEmail(@RequestParam(required = false) String token,
@@ -129,7 +196,7 @@ public class AuthController {
                 "Email berhasil diverifikasi! Silakan login sekarang.");
         } else {
             redirectAttributes.addFlashAttribute("error",
-                "Link verifikasi tidak valid atau sudah kedaluwarsa (24 jam). Daftar ulang untuk mendapat link baru.");
+                "Link tidak valid atau kedaluwarsa. Gunakan halaman verifikasi kode OTP.");
         }
         return "redirect:/login";
     }
@@ -298,18 +365,16 @@ public class AuthController {
 
             session.removeAttribute("mentorRegDto");
 
-            // Generate token verifikasi dan kirim email
-            String token = penggunaService.generateTokenVerifikasi(savedUser);
-            emailService.kirimEmailVerifikasi(dto.getNamaLengkap(), dto.getEmail(), token);
+            // Generate OTP dan kirim ke email mentor
+            String otp = penggunaService.generateTokenVerifikasi(savedUser);
+            emailService.kirimEmailVerifikasi(dto.getNamaLengkap(), dto.getEmail(), otp);
             try { emailService.kirimNotifikasiPendaftaranMentor(
                     dto.getNamaLengkap(), dto.getEmail(),
                     dto.getInstitusi() != null ? dto.getInstitusi() : "-",
                     dto.getKeahlian() != null ? dto.getKeahlian() : "-"); }
             catch (Exception ignored) {}
 
-            redirectAttributes.addFlashAttribute("sukses",
-                "Akun mentor berhasil dibuat! Cek email " + dto.getEmail() + " untuk verifikasi (berlaku 24 jam).");
-            return "redirect:/login";
+            return "redirect:/verify-otp?email=" + encode(dto.getEmail());
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -373,13 +438,11 @@ public class AuthController {
                 user = penggunaService.daftarMahasiswa(mhs);
             }
 
-            // Generate token dan kirim email verifikasi
-            String token = penggunaService.generateTokenVerifikasi(user);
-            emailService.kirimEmailVerifikasi(namaLengkap, email, token);
+            // Generate OTP dan kirim ke email mentee
+            String otp = penggunaService.generateTokenVerifikasi(user);
+            emailService.kirimEmailVerifikasi(namaLengkap, email, otp);
 
-            redirectAttributes.addFlashAttribute("sukses",
-                "Akun berhasil dibuat! Cek email " + email + " untuk verifikasi (berlaku 24 jam).");
-            return "redirect:/login";
+            return "redirect:/verify-otp?email=" + encode(email);
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -462,14 +525,11 @@ public class AuthController {
                 savedUser = penggunaService.daftarDosen(dosen);
             }
 
-            // Generate token verifikasi dan kirim email
-            String token = penggunaService.generateTokenVerifikasi(savedUser);
-            emailService.kirimEmailVerifikasi(pengawasDto.getNamaLengkap(), pengawasDto.getEmail(), token);
+            // Generate OTP dan kirim ke email pengawas
+            String otp = penggunaService.generateTokenVerifikasi(savedUser);
+            emailService.kirimEmailVerifikasi(pengawasDto.getNamaLengkap(), pengawasDto.getEmail(), otp);
 
-            redirectAttributes.addFlashAttribute("sukses",
-                "Akun " + (isGuru ? "Guru" : "Dosen") + " berhasil dibuat! Cek email " +
-                pengawasDto.getEmail() + " untuk verifikasi (berlaku 24 jam).");
-            return "redirect:/login";
+            return "redirect:/verify-otp?email=" + encode(pengawasDto.getEmail());
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

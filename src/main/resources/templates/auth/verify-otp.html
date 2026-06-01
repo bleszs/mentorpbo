@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verifikasi Kode OTP | Jejak Ilmu</title>
+<link rel="icon" href="/favicon.ico"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary-container": "#061748", "primary-fixed": "#dce1ff",
+        "primary-fixed-dim": "#b6c4fe", "outline-variant": "#c6c6d0",
+        "surface-container-low": "#f3f4f5", "on-surface-variant": "#45464f",
+        "on-surface": "#191c1d", "on-primary": "#ffffff",
+        "on-primary-container": "#7382b7", "on-background": "#191c1d",
+        "error": "#ba1a1a", "error-container": "#ffdad6",
+        "on-error-container": "#93000a", "success-green": "#10b981",
+        "warning-gold": "#fea619", "outline": "#767680",
+        "secondary-container": "#fdb965"
+      },
+      fontFamily: { "body-md": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "caption-xs": ["Inter"] },
+      fontSize: {
+        "display-lg": ["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
+        "headline-md": ["24px",{"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+        "body-md": ["14px",{"lineHeight":"1.5","fontWeight":"400"}],
+        "label-sm": ["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+        "caption-xs": ["10px",{"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001b0f); }
+
+  /* Kotak OTP */
+  .otp-box {
+    width: 52px; height: 64px;
+    text-align: center; font-size: 28px; font-weight: 900;
+    border: 2px solid #c6c6d0; border-radius: 14px;
+    background: #f3f4f5; color: #061748;
+    transition: all 0.15s ease;
+    outline: none;
+    caret-color: #061748;
+  }
+  .otp-box:focus {
+    border-color: #061748;
+    background: #dce1ff;
+    box-shadow: 0 0 0 3px rgba(6,23,72,0.12);
+  }
+  .otp-box.filled {
+    border-color: #061748;
+    background: #fff;
+  }
+
+  /* Countdown */
+  @keyframes countdown { from { width: 100%; } to { width: 0%; } }
+  .countdown-bar { animation: countdown 60s linear forwards; }
+</style>
+</head>
+<body class="h-screen overflow-hidden flex bg-white">
+
+<main class="w-full h-full flex overflow-hidden">
+
+  <!-- Kiri: Branding -->
+  <section class="hidden md:flex flex-col w-[45%] sidebar-gradient relative p-12 justify-between overflow-hidden">
+    <div class="flex items-center gap-4 z-10">
+      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:88px;width:auto;flex-shrink:0;"/>
+      <div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:22px;color:#fff;letter-spacing:-0.02em;line-height:1.1;">Jejak Ilmu</div>
+        <div style="font-family:'Inter',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.02em;margin-top:3px;">Platform Mentoring Akademik</div>
+      </div>
+    </div>
+
+    <div class="z-10 max-w-md">
+      <div class="w-12 h-1 bg-warning-gold mb-8"></div>
+      <h2 class="font-display-lg text-display-lg text-white mb-6 leading-[1.1]">Satu Langkah Lagi Menuju Platform.</h2>
+      <p class="text-primary-fixed-dim/80 text-[18px] font-medium leading-relaxed">
+        Kode 6 digit sudah dikirim ke email Anda. Masukkan kode itu di sini untuk mengaktifkan akun dan mulai belajar.
+      </p>
+      <div class="mt-10 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">mark_email_read</span>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-white">Cek folder Inbox atau Spam</p>
+          <p class="text-[11px] text-primary-fixed-dim/60 uppercase tracking-widest">Kode berlaku 15 menit</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="z-10"></div>
+    <div class="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_80%_20%,rgba(253,185,101,0.15),transparent_60%)]"></div>
+  </section>
+
+  <!-- Kanan: Form OTP -->
+  <section class="w-full md:w-[55%] flex flex-col justify-center items-center px-6 md:px-24 py-12 bg-white overflow-y-auto">
+    <div class="w-full max-w-[440px]">
+
+      <!-- Mobile Header -->
+      <div class="md:hidden flex items-center gap-3 mb-10">
+        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:52px;width:auto;"/>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;color:#061748;">Jejak Ilmu</div>
+        </div>
+      </div>
+
+      <!-- Icon -->
+      <div class="w-16 h-16 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6">
+        <span class="material-symbols-outlined text-primary-container text-[32px]" style="font-variation-settings:'FILL' 1;">verified</span>
+      </div>
+
+      <h2 class="font-headline-md text-headline-md text-on-background mb-1">Masukkan Kode Verifikasi</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-2">
+        Kode 6 digit sudah dikirim ke
+      </p>
+      <p class="font-bold text-primary-container mb-6 text-[15px]" th:text="${email}">email@example.com</p>
+
+      <!-- ============ BANNER OTP DEV MODE ============ -->
+      <!-- Tampil jika email SMTP gagal dikirim — user bisa salin kode dari sini -->
+      <div th:if="${devOtp != null and !devOtp.isEmpty()}"
+           class="mb-6 rounded-2xl border-2 border-warning-gold bg-[#fffbeb] px-5 py-4">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined text-[18px]" style="color:#92400e;font-variation-settings:'FILL' 1;">bolt</span>
+          <span class="font-label-sm text-label-sm uppercase tracking-wider" style="color:#92400e;">Kode Anda (email SMTP)</span>
+        </div>
+        <p class="font-body-md text-body-md mb-3" style="color:#78350f;">
+          Email tidak sampai? Gunakan kode ini langsung:
+        </p>
+        <!-- Kotak OTP besar yang bisa diklik untuk auto-isi -->
+        <div class="flex gap-2 justify-center my-3 cursor-pointer" id="devOtpBoxes"
+             th:attr="data-otp=${devOtp}" onclick="autoFillOtp(this.dataset.otp)">
+          <th:block th:each="i : ${#numbers.sequence(0,5)}">
+            <span style="display:inline-flex;align-items:center;justify-content:center;
+                         width:44px;height:52px;font-size:26px;font-weight:900;
+                         background:#fef3c7;border:2px solid #fea619;border-radius:10px;
+                         color:#92400e;"
+                  th:text="${#strings.substring(devOtp, i, i+1)}"></span>
+          </th:block>
+        </div>
+        <p class="text-center font-caption-xs text-caption-xs mt-2" style="color:#a16207;">
+          KLIK KODE DI ATAS UNTUK MENGISI OTOMATIS
+        </p>
+      </div>
+
+      <!-- Alert Error -->
+      <div th:if="${error}"
+           class="mb-6 flex items-start gap-3 rounded-xl border border-error bg-error-container px-4 py-3">
+        <span class="material-symbols-outlined text-on-error-container text-[20px] mt-0.5 flex-shrink-0">error</span>
+        <p class="font-label-sm text-label-sm text-on-error-container" th:text="${error}"></p>
+      </div>
+
+      <!-- Alert Sukses -->
+      <div th:if="${sukses}"
+           class="mb-6 flex items-start gap-3 rounded-xl border border-success-green bg-success-green/10 px-4 py-3">
+        <span class="material-symbols-outlined text-success-green text-[20px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        <p class="font-label-sm text-label-sm text-success-green" th:text="${sukses}"></p>
+      </div>
+
+      <!-- Form OTP -->
+      <form th:action="@{/verify-otp}" method="post" id="otpForm" class="space-y-8">
+        <input type="hidden" name="email" th:value="${email}"/>
+
+        <!-- 6 kotak OTP -->
+        <div>
+          <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-4">Kode Verifikasi</label>
+          <div class="flex gap-2 justify-between" id="otpInputs">
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" autocomplete="one-time-code" data-idx="0"/>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-idx="1"/>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-idx="2"/>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-idx="3"/>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-idx="4"/>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-idx="5"/>
+          </div>
+          <!-- Hidden input yang dikirim ke server -->
+          <input type="hidden" name="otp" id="otpValue"/>
+        </div>
+
+        <!-- Progress bar waktu tersisa -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-wider">Waktu tersisa</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant" id="timerLabel">15:00</span>
+          </div>
+          <div class="h-1.5 bg-surface-container-low rounded-full overflow-hidden">
+            <div class="h-full bg-primary-container rounded-full transition-all duration-1000" id="timerBar" style="width:100%"></div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submitBtn"
+                class="w-full h-[56px] bg-primary-container text-white rounded-2xl font-label-sm text-label-sm uppercase tracking-[0.2em] font-black hover:opacity-90 transition-all active:scale-[0.98] shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+          <span class="material-symbols-outlined text-[20px]">verified_user</span>
+          Verifikasi Akun
+        </button>
+      </form>
+
+      <!-- Kirim ulang kode -->
+      <div class="mt-8 text-center">
+        <p class="font-body-md text-body-md text-on-surface-variant mb-3">Tidak menerima kode?</p>
+        <form th:action="@{/verify-otp/resend}" method="post" id="resendForm">
+          <input type="hidden" name="email" th:value="${email}"/>
+          <button type="submit" id="resendBtn"
+                  class="font-label-sm text-label-sm text-on-primary-container font-black hover:underline uppercase tracking-wider disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed">
+            Kirim Ulang Kode
+          </button>
+        </form>
+        <p class="font-caption-xs text-caption-xs text-outline mt-1" id="resendCountdown" style="display:none">
+          Kirim ulang tersedia dalam <span id="resendSec">60</span> detik
+        </p>
+      </div>
+
+      <p class="mt-8 text-center font-body-md text-body-md text-on-surface-variant">
+        Salah akun?
+        <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register}">Daftar ulang</a>
+        &nbsp;·&nbsp;
+        <a class="text-on-primary-container font-bold hover:underline" th:href="@{/login}">Kembali login</a>
+      </p>
+
+    </div>
+  </section>
+</main>
+
+<script>
+// ============================================================
+// AUTO-FILL dari banner dev mode
+// ============================================================
+function autoFillOtp(otp) {
+  if (!otp || otp.length !== 6) return;
+  otp.split('').forEach((ch, i) => {
+    if (inputs[i]) inputs[i].value = ch;
+  });
+  syncOtp();
+  inputs[5].focus();
+  // Animasi flash
+  document.getElementById('devOtpBoxes').style.opacity = '0.5';
+  setTimeout(() => { document.getElementById('devOtpBoxes').style.opacity = '1'; }, 300);
+}
+
+// ============================================================
+// LOGIKA 6 KOTAK OTP
+// ============================================================
+const inputs = document.querySelectorAll('.otp-box');
+const otpValue = document.getElementById('otpValue');
+const submitBtn = document.getElementById('submitBtn');
+
+function syncOtp() {
+  const val = Array.from(inputs).map(i => i.value).join('');
+  otpValue.value = val;
+  submitBtn.disabled = (val.length !== 6);
+  inputs.forEach(i => {
+    i.classList.toggle('filled', i.value !== '');
+  });
+}
+
+inputs.forEach((input, idx) => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && input.value === '' && idx > 0) {
+      inputs[idx - 1].focus();
+    }
+  });
+
+  input.addEventListener('input', e => {
+    // Hanya izinkan angka
+    input.value = input.value.replace(/[^0-9]/g, '').slice(-1);
+    syncOtp();
+    if (input.value && idx < 5) {
+      inputs[idx + 1].focus();
+    }
+  });
+
+  input.addEventListener('paste', e => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+    pasted.split('').forEach((ch, i) => {
+      if (inputs[i]) inputs[i].value = ch;
+    });
+    syncOtp();
+    const nextEmpty = Array.from(inputs).findIndex(i => !i.value);
+    (inputs[nextEmpty] || inputs[5]).focus();
+  });
+});
+
+// Auto-focus kotak pertama
+inputs[0].focus();
+syncOtp();
+
+// ============================================================
+// TIMER 15 MENIT
+// ============================================================
+let totalSeconds = 15 * 60;
+const timerLabel = document.getElementById('timerLabel');
+const timerBar   = document.getElementById('timerBar');
+
+const timerInterval = setInterval(() => {
+  totalSeconds--;
+  if (totalSeconds <= 0) {
+    clearInterval(timerInterval);
+    timerLabel.textContent = 'Kedaluwarsa';
+    timerBar.style.width = '0%';
+    timerBar.classList.remove('bg-primary-container');
+    timerBar.classList.add('bg-error');
+    submitBtn.disabled = true;
+    return;
+  }
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  timerLabel.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  timerBar.style.width = (totalSeconds / (15*60) * 100) + '%';
+  // Warnai merah saat < 2 menit
+  if (totalSeconds < 120) {
+    timerBar.classList.replace('bg-primary-container', 'bg-error');
+  }
+}, 1000);
+
+// ============================================================
+// COUNTDOWN KIRIM ULANG (60 DETIK)
+// ============================================================
+let resendSeconds = 60;
+const resendBtn       = document.getElementById('resendBtn');
+const resendCountdown = document.getElementById('resendCountdown');
+const resendSec       = document.getElementById('resendSec');
+
+resendBtn.disabled = true;
+resendCountdown.style.display = 'block';
+
+const resendInterval = setInterval(() => {
+  resendSeconds--;
+  resendSec.textContent = resendSeconds;
+  if (resendSeconds <= 0) {
+    clearInterval(resendInterval);
+    resendBtn.disabled = false;
+    resendCountdown.style.display = 'none';
+  }
+}, 1000);
+</script>
+</body>
+</html>

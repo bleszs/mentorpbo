@@ -47,6 +47,48 @@ public class DashboardController {
     }
 
     /**
+     * Menyiapkan data UMUM yang dibutuhkan SEMUA halaman dashboard:
+     * - notifBelumDibaca (count badge)
+     * - daftarNotifikasi (list 5 terbaru — menggantikan hardcode di popup)
+     * - inboxPercakapan (list partner chat dari sesi — menggantikan hardcode di inbox popup)
+     * - preferences (UserPreferences dari H2)
+     */
+    private void siapkanDataUmum(Long penggunaId, Pengguna pengguna, Model model) {
+        // Notifikasi
+        long notifCount = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
+        model.addAttribute("notifBelumDibaca", notifCount);
+        model.addAttribute("daftarNotifikasi", penggunaService.getDaftarNotifikasi(penggunaId));
+
+        // Inbox: ambil percakapan unik dari sesi (mentor ↔ mentee)
+        List<Map<String, Object>> inboxList = new ArrayList<>();
+        List<SesiMentoring> semuaSesiUser = mentoringService.getSemuaSesiPengguna(penggunaId);
+        Set<Long> sudahTambah = new LinkedHashSet<>();
+        for (SesiMentoring s : semuaSesiUser.stream()
+                .sorted(Comparator.comparing(SesiMentoring::getTanggalDibuat).reversed())
+                .toList()) {
+            Pengguna partner = null;
+            if (s.getMentor() != null && !s.getMentor().getId().equals(penggunaId)) {
+                partner = s.getMentor();
+            } else if (s.getMentee() != null && !s.getMentee().getId().equals(penggunaId)) {
+                partner = s.getMentee();
+            }
+            if (partner != null && sudahTambah.add(partner.getId())) {
+                Map<String, Object> entry = new LinkedHashMap<>();
+                entry.put("partner", partner);
+                entry.put("topik", s.getTopikPembahasan());
+                entry.put("waktu", s.getWaktuMulai());
+                inboxList.add(entry);
+                if (inboxList.size() >= 5) break;
+            }
+        }
+        model.addAttribute("inboxPercakapan", inboxList);
+        model.addAttribute("jumlahPesan", inboxList.size());
+
+        // Preferences dari H2
+        model.addAttribute("preferences", penggunaService.getOrCreatePreferences(penggunaId));
+    }
+
+    /**
      * Endpoint utama dashboard. Menentukan dashboard yang ditampilkan
      * berdasarkan role pengguna yang login (Polymorphism via getDashboardView()).
      */
@@ -65,9 +107,7 @@ public class DashboardController {
         Pengguna pengguna = optPengguna.get();
         model.addAttribute("pengguna", pengguna);
 
-        // Hitung notifikasi belum dibaca
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
         // Tentukan dashboard berdasarkan role menggunakan polimorfisme
         String roleStr = pengguna.getRole().name();
@@ -259,11 +299,8 @@ public class DashboardController {
         }
 
         model.addAttribute("pengguna", pengguna);
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
-
+        siapkanDataUmum(penggunaId, pengguna, model);
         siapkanDashboardMahasiswa(pengguna, model);
-
         return "dashboard/mentorship";
     }
 
@@ -283,58 +320,44 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
-        if (!(pengguna instanceof Mahasiswa mahasiswa)) {
-            return "redirect:/dashboard";
-        }
+        model.addAttribute("pengguna", pengguna);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
+        // Materi sendiri yang diunggah
+        List<MateriBelajar> daftarMateri = mentoringService.getMateriByPengguna(penggunaId);
+        model.addAttribute("daftarMateri", daftarMateri);
+        model.addAttribute("totalMateri", daftarMateri.size());
+        model.addAttribute("kategoriList", daftarMateri.stream()
+            .map(MateriBelajar::getMataPelajaran)
+            .filter(mp -> mp != null && !mp.isEmpty())
+            .distinct().sorted().toList());
 
-        if (mahasiswa.isMentor()) {
-            // === MENTOR: tampilkan materi yang diunggah ===
-            model.addAttribute("pengguna", pengguna);
-            model.addAttribute("mentor", pengguna);
-
-            List<MateriBelajar> daftarMateri = mentoringService.getMateriByPengguna(penggunaId);
-            model.addAttribute("daftarMateri", daftarMateri);
-
-            List<String> kategoriList = daftarMateri.stream()
-                .map(MateriBelajar::getMataPelajaran)
-                .filter(mp -> mp != null && !mp.isEmpty())
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
-            model.addAttribute("kategoriList", kategoriList);
-
-            return "dashboard/materi";
-        } else {
-            // === MENTEE: tampilkan materi dari mentor ===
+        if (pengguna instanceof Mahasiswa mahasiswa) {
             model.addAttribute("mahasiswa", mahasiswa);
-
-            List<SesiMentoring> semuaSesi = mentoringService.getSemuaSesiPengguna(penggunaId);
-
-            List<Pengguna> mentorUnik = semuaSesi.stream()
-                .map(SesiMentoring::getMentor)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
-            model.addAttribute("mentorSaya", mentorUnik.isEmpty() ? null : mentorUnik.get(0));
-
-            List<MateriBelajar> daftarMateri = mentorUnik.stream()
-                .flatMap(m -> mentoringService.getMateriByPengguna(m.getId()).stream())
-                .distinct()
-                .collect(Collectors.toList());
-            model.addAttribute("daftarMateri", daftarMateri);
-            model.addAttribute("totalMateri", daftarMateri.size());
-
-            model.addAttribute("totalPoin", mahasiswa.getTotalPoinProgres());
-            model.addAttribute("rataRating", mahasiswa.hitungRataRataRating());
-
-            List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentee(penggunaId);
-            model.addAttribute("sesiMendatang", sesiMendatang);
-
-            return "dashboard/materi-mentee";
+            if (mahasiswa.isMentor()) {
+                model.addAttribute("mentor", pengguna);
+                return "dashboard/materi";
+            } else {
+                // Mentee: gabungkan materi dari semua mentor yang pernah sesi
+                List<Pengguna> mentorList = mentoringService.getSemuaSesiPengguna(penggunaId)
+                    .stream().map(SesiMentoring::getMentor).filter(Objects::nonNull)
+                    .distinct().toList();
+                model.addAttribute("mentorSaya", mentorList.isEmpty() ? null : mentorList.get(0));
+                List<MateriBelajar> materiMentor = mentorList.stream()
+                    .flatMap(m -> mentoringService.getMateriByPengguna(m.getId()).stream())
+                    .distinct().toList();
+                model.addAttribute("daftarMateri", materiMentor);
+                model.addAttribute("totalMateri", materiMentor.size());
+                model.addAttribute("totalPoin", mahasiswa.getTotalPoinProgres());
+                model.addAttribute("sesiMendatang", mentoringService.getSesiMendatangMentee(penggunaId));
+                return "dashboard/materi-mentee";
+            }
+        } else if (pengguna instanceof Siswa siswa) {
+            model.addAttribute("siswa", siswa);
+            model.addAttribute("mentor", pengguna);
+            return siswa.isMentor() ? "dashboard/materi" : "dashboard/materi-mentee";
         }
+        return "dashboard/materi";
     }
 
     /**
@@ -353,21 +376,28 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
-        if (!(pengguna instanceof Mahasiswa mahasiswa)) {
-            return "redirect:/dashboard";
-        }
+        model.addAttribute("pengguna", pengguna);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
+        // Sumber daya menggunakan MateriBelajar dengan jenisMateri SUMBER_DAYA
+        List<MateriBelajar> semuaMateri = mentoringService.getMateriByPengguna(penggunaId);
+        model.addAttribute("daftarSumberDaya", semuaMateri);
+        model.addAttribute("daftarMateri", semuaMateri);
 
-        if (mahasiswa.isMentor()) {
-            model.addAttribute("pengguna", pengguna);
-            model.addAttribute("mentor", pengguna);
-            return "dashboard/sumber-daya";
-        } else {
+        if (pengguna instanceof Mahasiswa mahasiswa) {
             model.addAttribute("mahasiswa", mahasiswa);
+            if (mahasiswa.isMentor()) {
+                model.addAttribute("mentor", pengguna);
+                return "dashboard/sumber-daya";
+            }
             return "dashboard/sumber-daya-mentee";
+        } else if (pengguna instanceof Siswa siswa) {
+            model.addAttribute("siswa", siswa);
+            model.addAttribute("mentor", pengguna);
+            return siswa.isMentor() ? "dashboard/sumber-daya" : "dashboard/sumber-daya-mentee";
         }
+        model.addAttribute("mentor", pengguna);
+        return "dashboard/sumber-daya";
     }
 
     /**
@@ -386,21 +416,29 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
-        if (!(pengguna instanceof Mahasiswa mahasiswa)) {
-            return "redirect:/dashboard";
-        }
+        model.addAttribute("pengguna", pengguna);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
-
-        if (mahasiswa.isMentor()) {
-            model.addAttribute("pengguna", pengguna);
-            model.addAttribute("mentor", pengguna);
-            return "dashboard/pengaturan";
-        } else {
+        if (pengguna instanceof Mahasiswa mahasiswa) {
             model.addAttribute("mahasiswa", mahasiswa);
+            if (mahasiswa.isMentor()) {
+                model.addAttribute("mentor", pengguna);
+                return "dashboard/pengaturan";
+            }
             return "dashboard/pengaturan-mentee";
+        } else if (pengguna instanceof Guru guru) {
+            model.addAttribute("guru", guru);
+            model.addAttribute("supervisor", pengguna);
+            return "supervisor/pengaturan";
+        } else if (pengguna instanceof Dosen dosen) {
+            model.addAttribute("dosen", dosen);
+            model.addAttribute("supervisor", pengguna);
+            return "supervisor/pengaturan";
+        } else if (pengguna instanceof Siswa siswa) {
+            model.addAttribute("siswa", siswa);
+            return siswa.isMentor() ? "dashboard/pengaturan" : "dashboard/pengaturan-mentee";
         }
+        return "dashboard/pengaturan";
     }
 
     /**
@@ -419,21 +457,18 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
-        if (!(pengguna instanceof Mahasiswa mahasiswa)) {
-            return "redirect:/dashboard";
-        }
+        model.addAttribute("pengguna", pengguna);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
-
-        if (mahasiswa.isMentor()) {
-            model.addAttribute("pengguna", pengguna);
-            model.addAttribute("mentor", pengguna);
-            return "dashboard/bantuan";
-        } else {
+        if (pengguna instanceof Mahasiswa mahasiswa) {
             model.addAttribute("mahasiswa", mahasiswa);
+            if (mahasiswa.isMentor()) { model.addAttribute("mentor", pengguna); return "dashboard/bantuan"; }
             return "dashboard/bantuan-mentee";
+        } else if (pengguna instanceof Guru || pengguna instanceof Dosen) {
+            return "dashboard/bantuan-dosen";
         }
+        model.addAttribute("mentor", pengguna);
+        return "dashboard/bantuan";
     }
 
     /**
@@ -457,8 +492,7 @@ public class DashboardController {
         }
 
         model.addAttribute("pengguna", pengguna);
-        long notifBelumDibaca = penggunaService.hitungNotifikasiBelumDibaca(penggunaId);
-        model.addAttribute("notifBelumDibaca", notifBelumDibaca);
+        siapkanDataUmum(penggunaId, pengguna, model);
 
         if (mahasiswa.isMentor()) {
             // ===== MENTOR: percakapan = mentee unik dari sesi =====

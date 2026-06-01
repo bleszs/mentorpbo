@@ -78,8 +78,12 @@ tailwind.config = {
 <header class="fixed top-0 w-full h-[72px] glass-header z-50 transition-all duration-300" id="topbar">
   <div class="flex justify-between items-center px-margin-desktop h-full w-full max-w-container-max mx-auto">
     <div class="flex items-center gap-10">
-      <a th:href="@{/}">
-        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:52px;width:auto;"/>
+      <a th:href="@{/}" class="flex items-center gap-3">
+        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:64px;width:auto;flex-shrink:0;"/>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:#061748;letter-spacing:-0.02em;line-height:1.1;">Jejak Ilmu</div>
+          <div style="font-family:'Inter',sans-serif;font-size:10px;color:#767680;letter-spacing:0.05em;margin-top:2px;text-transform:uppercase;">Platform Mentoring Akademik</div>
+        </div>
       </a>
       <nav class="hidden md:flex items-center gap-8">
         <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md">Beranda</a>
@@ -100,11 +104,11 @@ tailwind.config = {
   <div class="hero-overlay pointer-events-none"></div>
   <div class="container mx-auto px-margin-desktop relative z-10 max-w-container-max py-20">
     <div class="max-w-4xl">
-      <span class="inline-block py-1 px-3 mb-6 rounded-full bg-white/10 border border-white/20 text-white font-label-sm text-label-sm tracking-widest uppercase shadow-sm">Elite Mentorship Platform</span>
+      <span class="inline-block py-1 px-3 mb-6 rounded-full bg-white/10 border border-white/20 text-white font-label-sm text-label-sm tracking-widest uppercase shadow-sm">Mentoring Akademik Indonesia</span>
       <h1 class="font-display-lg text-display-lg text-white mb-6 leading-[1.1]">
-        Jejak Ilmu: Akselerasi Akademik melalui <span class="text-secondary-container">Peer-Mentoring Elit</span>
+        Belajar dari Teman yang <span class="text-secondary-container">Sudah Pernah Kesulitan di Sana.</span>
       </h1>
-      <p class="font-body-lg text-body-lg text-white/80 mb-10 max-w-2xl">Platform eksklusif bagi mahasiswa berprestasi untuk berbagi pengetahuan. Belajar langsung dari teman sejawat yang telah menguasai bidangnya, atau jadilah mentor untuk mengasah kepemimpinan akademik Anda.</p>
+      <p class="font-body-lg text-body-lg text-white/80 mb-10 max-w-2xl">Di Jejak Ilmu, kamu belajar dari mahasiswa yang pernah struggle di materi yang sama—lebih relevan dari modul, lebih cepat dari les privat. Bagikan caramu berhasil, atau temukan mentor yang tepat.</p>
       <div class="flex flex-col sm:flex-row gap-4">
         <a th:href="@{/register}" class="px-10 py-5 rounded-2xl bg-secondary-container text-on-secondary-container font-body-md text-[16px] font-black uppercase tracking-wider hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3">
           Daftar Sekarang <span class="material-symbols-outlined">arrow_forward</span>
@@ -121,7 +125,7 @@ tailwind.config = {
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-white font-black text-caption-xs mb-4 uppercase tracking-widest">Keunggulan Platform</span>
       <h2 class="font-headline-md text-headline-md text-white mb-4">Mengapa Memilih Jejak Ilmu?</h2>
-      <p class="font-body-md text-body-md text-white/70 max-w-xl mx-auto">Ekosistem terstruktur yang dirancang untuk memaksimalkan potensi akademik melalui kolaborasi dan dukungan komunitas.</p>
+      <p class="font-body-md text-body-md text-white/70 max-w-xl mx-auto">Bukan sekadar grup belajar. Ini lebih terstruktur, lebih terlacak, dan lebih berdampak nyata.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
       <div class="md:col-span-2 bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-primary">
@@ -189,9 +193,9 @@ tailwind.config = {
 <section class="py-24 mesh-gradient" id="role">
   <div class="container mx-auto px-margin-desktop max-w-container-max">
     <div class="text-center mb-16">
-      <span class="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-black text-caption-xs mb-4 uppercase tracking-widest">Pilih Jalur</span>
-      <h2 class="font-headline-md text-headline-md text-primary mb-4">Pilih Jalur Kesuksesanmu</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant">Apakah Anda ingin berbagi ilmu atau mengakselerasi pemahaman Anda?</p>
+      <span class="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-black text-caption-xs mb-4 uppercase tracking-widest">Pilih Peran</span>
+      <h2 class="font-headline-md text-headline-md text-primary mb-4">Kamu Mau Ngajar atau Belajar?</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Pilih peranmu sekarang. Keduanya bisa kamu tukar kapan saja.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
       <div class="group relative overflow-hidden rounded-2xl bg-white premium-card-shadow">
@@ -261,8 +265,8 @@ tailwind.config = {
   <div class="container mx-auto px-margin-desktop max-w-container-max relative z-10">
     <div class="flex flex-col md:flex-row items-center justify-between gap-12 bg-white/5 backdrop-blur-md p-12 rounded-[2rem] border border-white/10">
       <div class="max-w-xl">
-        <h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg mb-6">Siap Mengukir Jejak Akademikmu?</h2>
-        <p class="font-body-lg text-body-lg opacity-80">Bergabunglah dengan ribuan mahasiswa lainnya yang telah bertransformasi bersama Jejak Ilmu.</p>
+        <h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg mb-6">Mulai Belajar Lebih Cepat, Sekarang.</h2>
+        <p class="font-body-lg text-body-lg opacity-80">Masukkan email kampusmu dan kami hubungkan dengan mentor yang tepat untuk materimu.</p>
       </div>
       <div class="w-full md:w-auto flex flex-col gap-4">
         <div class="flex flex-col sm:flex-row gap-3">

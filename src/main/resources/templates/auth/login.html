@@ -45,7 +45,10 @@ tailwind.config = {
 <style>
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001b0f); }
+  .sidebar-gradient {
+    background: linear-gradient(to bottom, rgba(0, 17, 66, 0.88), rgba(0, 27, 15, 0.88)), url('/images/background login.jpg') center/cover no-repeat;
+    background-blend-mode: multiply;
+  }
 </style>
 </head>
 <body class="h-screen overflow-hidden flex">

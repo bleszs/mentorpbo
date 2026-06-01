@@ -57,18 +57,12 @@ public class EmailService {
     }
 
     /**
-     * Kirim email verifikasi ke pengguna yang baru mendaftar (mentor/mentee/pengawas).
-     * Link verifikasi berlaku 24 jam.
-     * Jika SMTP gagal, link dicetak ke console sebagai fallback development.
+     * Kirim kode OTP 6 digit ke email pengguna yang baru mendaftar.
+     * OTP berlaku 15 menit. Jika SMTP gagal, OTP dicetak ke console (dev fallback).
      */
-    public void kirimEmailVerifikasi(String namaUser, String emailUser, String token) {
-        String link = "http://localhost:8080/verify-email?token=" + token;
-
+    public void kirimEmailVerifikasi(String namaUser, String emailUser, String otp) {
         if (mailSender == null) {
-            System.out.println("=== [DEV] EMAIL TIDAK DIKONFIGURASI ===");
-            System.out.println("Link verifikasi untuk " + emailUser + ":");
-            System.out.println(link);
-            System.out.println("=======================================");
+            System.out.println("=== [DEV] SMTP tidak dikonfigurasi — OTP untuk " + emailUser + ": " + otp + " ===");
             return;
         }
 
@@ -78,20 +72,14 @@ public class EmailService {
 
             helper.setFrom(fromEmail, "Jejak Ilmu");
             helper.setTo(emailUser);
-            helper.setSubject("Verifikasi Email Akun Jejak Ilmu Anda");
+            helper.setSubject("Kode Verifikasi Akun Jejak Ilmu: " + otp);
 
-            String html = buildVerificationEmail(namaUser, token);
-            helper.setText(html, true);
-
+            helper.setText(buildOtpEmail(namaUser, otp), true);
             mailSender.send(message);
-            System.out.println("[EMAIL TERKIRIM] Verifikasi ke: " + emailUser);
+            System.out.println("[EMAIL OTP TERKIRIM] ke: " + emailUser + " | OTP: " + otp);
         } catch (Exception e) {
-            System.err.println("=== [ERROR] EMAIL GAGAL DIKIRIM ===");
-            System.err.println("Penyebab : " + e.getMessage());
-            System.err.println("Tujuan   : " + emailUser);
-            System.err.println("Link fallback (buka manual di browser):");
-            System.err.println(link);
-            System.err.println("===================================");
+            System.err.println("=== [ERROR] Email OTP gagal dikirim ke " + emailUser
+                + " | OTP fallback: " + otp + " | Penyebab: " + e.getMessage() + " ===");
         }
     }
 
@@ -118,48 +106,33 @@ public class EmailService {
         }
     }
 
-    private String buildVerificationEmail(String nama, String token) {
-        String link = "http://localhost:8080/verify-email?token=" + token;
-        return """
-            <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8f9fa;padding:32px;">
-              <div style="background:#061748;padding:28px 32px;border-radius:16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
-                <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:900;letter-spacing:-0.5px;">Jejak Ilmu</h1>
-              </div>
-              <div style="background:#ffffff;padding:36px;border-radius:16px;border:1px solid #e5e7eb;">
-                <div style="text-align:center;margin-bottom:28px;">
-                  <div style="width:64px;height:64px;background:#dce1ff;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;">
-                    <span style="font-size:32px;">✉️</span>
-                  </div>
-                  <h2 style="color:#061748;margin:0 0 8px 0;font-size:22px;font-weight:900;">Verifikasi Email Anda</h2>
-                  <p style="color:#6b7280;margin:0;font-size:14px;">Halo, <strong>""" + nama + """
-                  </strong>! Selamat bergabung.</p>
-                </div>
-                <p style="color:#374151;line-height:1.7;font-size:14px;margin-bottom:24px;">
-                  Terima kasih telah mendaftar di <strong>Jejak Ilmu</strong>. Untuk mengaktifkan akun dan mulai menggunakan platform,
-                  klik tombol verifikasi di bawah ini.
-                </p>
-                <div style="text-align:center;margin:32px 0;">
-                  <a href=\"""" + link + """
-                  \"
-                     style="display:inline-block;padding:16px 40px;background:#061748;color:#ffffff;text-decoration:none;border-radius:12px;font-weight:900;font-size:14px;letter-spacing:0.05em;">
-                    VERIFIKASI EMAIL SEKARANG
-                  </a>
-                </div>
-                <div style="background:#fef3c7;padding:14px 18px;border-radius:8px;border-left:4px solid #fea619;margin-bottom:24px;">
-                  <p style="margin:0;color:#92400e;font-size:13px;font-weight:700;">⏰ Link berlaku selama 24 jam</p>
-                  <p style="margin:6px 0 0 0;color:#92400e;font-size:12px;">Jika tidak berhasil, salin dan tempel URL ini di browser:</p>
-                  <p style="margin:4px 0 0 0;font-size:11px;color:#6b7280;word-break:break-all;">""" + link + """
-                  </p>
-                </div>
-                <p style="color:#9ca3af;font-size:12px;margin:0;">
-                  Jika Anda tidak mendaftar di Jejak Ilmu, abaikan email ini.
-                </p>
-              </div>
-              <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
-                © 2024 Jejak Ilmu. Academic Excellence Redefined.
-              </p>
-            </div>
-            """;
+    private String buildOtpEmail(String nama, String otp) {
+        // Pisahkan tiap digit agar tampil sebagai kotak terpisah di email
+        StringBuilder digitBoxes = new StringBuilder();
+        for (char c : otp.toCharArray()) {
+            digitBoxes.append(
+                "<span style=\"display:inline-block;width:48px;height:56px;line-height:56px;" +
+                "text-align:center;font-size:28px;font-weight:900;color:#061748;" +
+                "background:#dce1ff;border-radius:10px;margin:0 4px;\">" + c + "</span>"
+            );
+        }
+        return "<div style=\"font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f8f9fa;padding:28px;\">"
+            + "<div style=\"background:#061748;padding:22px 28px;border-radius:14px;margin-bottom:20px;\">"
+            + "  <h1 style=\"color:#ffffff;margin:0;font-size:20px;font-weight:900;\">Jejak Ilmu</h1>"
+            + "  <p style=\"color:#b6c4fe;margin:4px 0 0 0;font-size:12px;\">Platform Mentoring Akademik</p>"
+            + "</div>"
+            + "<div style=\"background:#ffffff;padding:32px;border-radius:14px;border:1px solid #e5e7eb;\">"
+            + "  <h2 style=\"color:#061748;margin:0 0 6px 0;font-size:20px;font-weight:900;\">Kode Verifikasi Anda</h2>"
+            + "  <p style=\"color:#6b7280;margin:0 0 24px 0;font-size:14px;\">Halo <strong>" + nama + "</strong>, masukkan kode berikut di halaman verifikasi:</p>"
+            + "  <div style=\"text-align:center;margin:24px 0;\">" + digitBoxes + "</div>"
+            + "  <div style=\"background:#fef3c7;padding:12px 16px;border-radius:8px;border-left:4px solid #fea619;margin-top:24px;\">"
+            + "    <p style=\"margin:0;color:#92400e;font-size:13px;font-weight:700;\">⏰ Kode berlaku 15 menit</p>"
+            + "    <p style=\"margin:4px 0 0 0;color:#92400e;font-size:12px;\">Jangan bagikan kode ini kepada siapapun.</p>"
+            + "  </div>"
+            + "  <p style=\"color:#9ca3af;font-size:12px;margin-top:20px;\">Jika Anda tidak mendaftar di Jejak Ilmu, abaikan email ini.</p>"
+            + "</div>"
+            + "<p style=\"text-align:center;color:#9ca3af;font-size:11px;margin-top:20px;\">© 2025 Jejak Ilmu. Platform Mentoring Akademik Indonesia.</p>"
+            + "</div>";
     }
 
     private String buildMentorRegistrationEmail(String nama, String email,

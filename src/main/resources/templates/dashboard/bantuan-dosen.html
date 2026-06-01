@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
@@ -57,9 +57,9 @@ tailwind.config = {
 <aside class="fixed left-0 top-0 h-screen w-[280px] flex flex-col py-8 px-6 gap-y-4 shadow-2xl z-50" style="background: linear-gradient(to bottom, #00081e, #001142);">
   <div class="mb-8">
     <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
-        <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
-      </div>
+      <a th:href="@{/dashboard}">
+        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;flex-shrink:0;display:block;"/>
+      </a>
       <div>
         <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
         <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Elite Mentorship</p>

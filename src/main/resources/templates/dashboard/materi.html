@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
@@ -88,9 +88,9 @@ tailwind.config = {
 <!-- ==================== SIDEBAR (Materi active) ==================== -->
 <nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
   <div class="mb-12 flex items-center gap-3">
-    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
-      <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
-    </div>
+    <a th:href="@{/dashboard}">
+      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;flex-shrink:0;display:block;"/>
+    </a>
     <div>
       <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
       <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
@@ -160,10 +160,12 @@ tailwind.config = {
       <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
         <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-          <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span></div><div><p class="text-[13px] font-bold">Sesi Divalidasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Sesi mentoring Anda berhasil divalidasi supervisor.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">star</span></div><div><p class="text-[13px] font-bold">Rating Baru Diterima</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mentee memberi rating 5 bintang sesi terakhir.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">5 jam yang lalu</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">person_add</span></div><div><p class="text-[13px] font-bold">Permintaan Mentoring Baru</p><p class="text-[12px] text-on-surface-variant mt-0.5">1 permintaan baru menunggu konfirmasi Anda.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">1 hari yang lalu</p></div></div>
+          <!-- INBOX DINAMIS -->
+          <div th:if="${inboxPercakapan == null or #lists.isEmpty(inboxPercakapan)}" class="px-5 py-8 text-center text-on-surface-variant text-[13px]">Belum ada percakapan</div>
+          <div th:each="conv : ${inboxPercakapan}" class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors" th:onclick="|window.location.href='@{/dashboard/pesan}'|">
+            <div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0" th:text="${#strings.substring(conv['partner'].namaLengkap,0,2).toUpperCase()}">??</div>
+            <div class="min-w-0"><p class="text-[13px] font-bold truncate" th:text="${conv['partner'].namaLengkap}">-</p><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${'Topik: ' + conv['topik']}">-</p></div>
+          </div>
         </div>
         <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
       </div>
@@ -173,9 +175,12 @@ tailwind.config = {
       <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
         <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-          <div class="px-5 py-4 flex gap-3 bg-primary/5 cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">AT</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Andi Pratama</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">10:30</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Kak, boleh saya tanya soal materi integral?</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#1a3a8c] flex items-center justify-center text-white font-black text-xs flex-shrink-0">RS</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Rina Sari</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Terima kasih kak sudah bantu saya memahami materi!</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#4e5c8f] flex items-center justify-center text-white font-black text-xs flex-shrink-0">BW</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Budi Wijaya</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Kemarin</p></div><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2">Kak, apakah sesi minggu depan bisa dipindah ke Selasa?</p></div></div>
+          <!-- INBOX DINAMIS -->
+          <div th:if="${inboxPercakapan == null or #lists.isEmpty(inboxPercakapan)}" class="px-5 py-8 text-center text-on-surface-variant text-[13px]">Belum ada percakapan</div>
+          <div th:each="conv : ${inboxPercakapan}" class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors" th:onclick="|window.location.href='@{/dashboard/pesan}'|">
+            <div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0" th:text="${#strings.substring(conv['partner'].namaLengkap,0,2).toUpperCase()}">??</div>
+            <div class="min-w-0"><p class="text-[13px] font-bold truncate" th:text="${conv['partner'].namaLengkap}">-</p><p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${'Topik: ' + conv['topik']}">-</p></div>
+          </div>
         </div>
         <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
       </div>
@@ -198,10 +203,21 @@ tailwind.config = {
       <h2 class="font-headline-md text-headline-md font-black text-primary">Materi Saya</h2>
       <p class="text-on-surface-variant mt-1">Kelola dan bagikan materi pembelajaran kepada mentee Anda.</p>
     </div>
-    <button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
+    <button onclick="document.getElementById('modalUnggahMateri').classList.remove('hidden')"
+            class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
       <span class="material-symbols-outlined">upload_file</span>
       Unggah Materi Baru
     </button>
+  </div>
+
+  <!-- Alert Sukses/Error dari redirect -->
+  <div th:if="${sukses}" class="mb-4 flex items-center gap-3 rounded-xl border border-success-green bg-success-green/10 px-4 py-3">
+    <span class="material-symbols-outlined text-success-green text-[20px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+    <p class="text-success-green font-bold text-sm" th:text="${sukses}"></p>
+  </div>
+  <div th:if="${error}" class="mb-4 flex items-center gap-3 rounded-xl border border-error bg-error-container px-4 py-3">
+    <span class="material-symbols-outlined text-on-error-container text-[20px]">error</span>
+    <p class="text-on-error-container font-bold text-sm" th:text="${error}"></p>
   </div>
 
   <!-- Filter & View Toggle Bar -->
@@ -392,5 +408,69 @@ document.addEventListener('click', function() {
   document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
 });
 </script>
+
+<!-- ==================== MODAL UNGGAH MATERI ==================== -->
+<div id="modalUnggahMateri" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.5);">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-6 border-b border-outline-variant">
+      <h3 class="font-headline-md text-headline-md text-primary">Unggah Materi Baru</h3>
+      <button onclick="document.getElementById('modalUnggahMateri').classList.add('hidden')"
+              class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form th:action="@{/profil/materi/unggah}" method="post" enctype="multipart/form-data" class="p-6 space-y-5">
+      <div>
+        <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Judul Materi *</label>
+        <input name="judul" required type="text" placeholder="misal: Modul OOP Java Semester 3"
+               class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm"/>
+      </div>
+      <div>
+        <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Mata Kuliah / Pelajaran</label>
+        <input name="mataPelajaran" type="text" placeholder="misal: Pemrograman Berorientasi Objek"
+               class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low focus:border-primary outline-none text-sm"/>
+      </div>
+      <div>
+        <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Jenis Materi *</label>
+        <select name="jenisMateri" required
+                class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low focus:border-primary outline-none text-sm appearance-none">
+          <option value="DOKUMEN">Dokumen / PDF</option>
+          <option value="PRESENTASI">Presentasi / Slide</option>
+          <option value="CATATAN">Catatan / Notes</option>
+          <option value="TAUTAN">Tautan / Link</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Deskripsi</label>
+        <textarea name="deskripsi" rows="3" placeholder="Jelaskan isi materi secara singkat..."
+                  class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low focus:border-primary outline-none text-sm resize-none"></textarea>
+      </div>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Unggah File</label>
+          <input name="fileMateri" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md"
+                 class="w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white hover:file:bg-primary/90"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Atau Tautan URL</label>
+          <input name="tautanMateri" type="url" placeholder="https://drive.google.com/..."
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low focus:border-primary outline-none text-sm"/>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="document.getElementById('modalUnggahMateri').classList.add('hidden')"
+                class="flex-1 px-4 py-3 border border-outline-variant rounded-xl font-bold text-sm text-on-surface-variant hover:bg-surface-container transition-all">
+          Batal
+        </button>
+        <button type="submit"
+                class="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">upload_file</span>
+          Unggah Sekarang
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 </body>
 </html>

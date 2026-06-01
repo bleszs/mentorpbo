@@ -11,18 +11,16 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * Service MentoringService - Lapisan logika bisnis inti untuk sistem mentoring.
+ * MentoringService — Lapisan logika bisnis inti untuk sistem mentoring.
  *
- * Menangani seluruh alur bisnis utama:
- * - Pencarian mentor berdasarkan mata pelajaran/kuliah, topik, dan rating
- * - Penjadwalan dan manajemen sesi mentoring (Online, Offline, Video)
- * - Sistem penilaian (rating dan review) setelah sesi
- * - Pengelolaan materi belajar
- * - Sistem poin progres
+ * Mengelola seluruh lifecycle sesi bimbingan:
+ *   MENUNGGU_KONFIRMASI → DIJADWALKAN → BERLANGSUNG → SELESAI → (validasi supervisor)
  *
- * Service ini mendemonstrasikan penggunaan POLIMORFISME dimana
- * SesiMentoring diperlakukan secara generik melalui interface Schedulable,
- * namun perilaku spesifik tetap dijalankan oleh subclass masing-masing.
+ * Demonstrasi konsep OOP:
+ * - POLIMORFISME: buatDanJadwalkanSesi() menerima SesiMentoring abstrak,
+ *   perilaku spesifik dieksekusi oleh subclass (SesiOnline/Offline/Video).
+ * - INTERFACE: Schedulable dipakai via sesi.jadwalkanSesi(),
+ *              Ratable dipakai via beriRating() pada subclass Pengguna.
  */
 @Service
 @Transactional
@@ -59,11 +57,6 @@ public class MentoringService {
 
     /**
      * Mencari mentor siswa berdasarkan mata pelajaran keahlian.
-     * Mengembalikan daftar siswa yang aktif sebagai mentor dan memiliki
-     * keahlian di mata pelajaran yang dicari.
-     *
-     * @param mataPelajaran kata kunci mata pelajaran
-     * @return daftar Siswa mentor yang cocok
      */
     public List<Siswa> cariMentorSiswa(String mataPelajaran) {
         if (mataPelajaran == null || mataPelajaran.isBlank()) {
@@ -74,224 +67,356 @@ public class MentoringService {
 
     /**
      * Mencari mentor mahasiswa berdasarkan mata kuliah atau topik keahlian.
-     *
-     * @param kataKunci kata kunci pencarian (mata kuliah atau topik)
-     * @return daftar Mahasiswa mentor yang cocok
+     * Menggabungkan dua hasil pencarian dan menghilangkan duplikat — demonstrasi
+     * penggabungan koleksi yang efisien menggunakan Set.
      */
     public List<Mahasiswa> cariMentorMahasiswa(String kataKunci) {
         if (kataKunci == null || kataKunci.isBlank()) {
             return mahasiswaRepository.findByIsMentorTrue();
         }
-        // Gabungkan hasil pencarian dari mata kuliah dan topik
-        List<Mahasiswa> hasilMataKuliah = mahasiswaRepository
-            .cariMentorBerdasarkanMataKuliah(kataKunci);
-        List<Mahasiswa> hasilTopik = mahasiswaRepository
-            .cariMentorBerdasarkanTopik(kataKunci);
+        List<Mahasiswa> dariMataKuliah = mahasiswaRepository.cariMentorBerdasarkanMataKuliah(kataKunci);
+        List<Mahasiswa> dariTopik      = mahasiswaRepository.cariMentorBerdasarkanTopik(kataKunci);
 
-        // Gabungkan dan hilangkan duplikat menggunakan Set
-        Set<Long> idSudahAda = new HashSet<>();
-        List<Mahasiswa> hasilGabungan = new ArrayList<>();
-
-        for (Mahasiswa m : hasilMataKuliah) {
-            if (idSudahAda.add(m.getId())) {
-                hasilGabungan.add(m);
-            }
-        }
-        for (Mahasiswa m : hasilTopik) {
-            if (idSudahAda.add(m.getId())) {
-                hasilGabungan.add(m);
-            }
-        }
-        return hasilGabungan;
+        Set<Long> sudahAda = new HashSet<>();
+        List<Mahasiswa> gabungan = new ArrayList<>();
+        for (Mahasiswa m : dariMataKuliah) { if (sudahAda.add(m.getId())) gabungan.add(m); }
+        for (Mahasiswa m : dariTopik)      { if (sudahAda.add(m.getId())) gabungan.add(m); }
+        return gabungan;
     }
 
-    /**
-     * Mendapatkan ranking mentor siswa berdasarkan rating tertinggi.
-     */
-    public List<Siswa> getRankingMentorSiswa() {
-        return siswaRepository.getRankingMentorSiswa();
-    }
-
-    /**
-     * Mendapatkan ranking mentor mahasiswa berdasarkan rating tertinggi.
-     */
-    public List<Mahasiswa> getRankingMentorMahasiswa() {
-        return mahasiswaRepository.getRankingMentorMahasiswa();
-    }
+    public List<Siswa>     getRankingMentorSiswa()     { return siswaRepository.getRankingMentorSiswa(); }
+    public List<Mahasiswa> getRankingMentorMahasiswa() { return mahasiswaRepository.getRankingMentorMahasiswa(); }
 
     // ============================================================
-    // PENJADWALAN SESI MENTORING
+    // LIFECYCLE SESI — STATE TRANSITION
     // ============================================================
 
     /**
-     * Membuat dan menjadwalkan sesi mentoring baru.
-     * Method ini mendemonstrasikan POLIMORFISME: parameter bertipe SesiMentoring (abstract)
-     * tetapi yang diterima adalah instance konkret (SesiOnline/SesiOffline/SesiVideo).
+     * [STEP 1 — MENTEE] Membuat permintaan sesi baru.
+     * Status awal: MENUNGGU_KONFIRMASI — mentor harus mengkonfirmasi sebelum jadwal dikunci.
      *
-     * @param sesi objek sesi mentoring (SesiOnline, SesiOffline, atau SesiVideo)
-     * @param waktuMulai waktu mulai yang dijadwalkan
+     * Secara otomatis menetapkan supervisor berdasarkan institusi mentor.
+     *
+     * @param sesi      instance konkret (SesiOnline/Offline/Video) — POLIMORFISME
+     * @param waktuMulai waktu yang diinginkan mentee
      * @param durasiMenit durasi dalam menit
-     * @return sesi yang sudah disimpan dan dijadwalkan
+     * @return sesi yang tersimpan dengan status MENUNGGU_KONFIRMASI
      */
-    public SesiMentoring buatDanJadwalkanSesi(SesiMentoring sesi,
-                                               LocalDateTime waktuMulai,
-                                               int durasiMenit) {
-        // Polimorfisme: memanggil jadwalkanSesi() yang diimplementasikan di SesiMentoring
-        boolean berhasilDijadwalkan = sesi.jadwalkanSesi(waktuMulai, durasiMenit);
-        if (!berhasilDijadwalkan) {
-            throw new IllegalArgumentException(
-                "Gagal menjadwalkan sesi. Pastikan waktu mulai valid (di masa depan).");
+    public SesiMentoring buatPermintaanSesi(SesiMentoring sesi,
+                                            LocalDateTime waktuMulai,
+                                            int durasiMenit) {
+        // Validasi waktu: harus di masa depan
+        if (waktuMulai == null || waktuMulai.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Waktu sesi harus di masa depan.");
+        }
+        if (durasiMenit < 15) {
+            throw new IllegalArgumentException("Durasi minimum sesi adalah 15 menit.");
         }
 
-        SesiMentoring sesiTersimpan = sesiRepository.save(sesi);
+        // Panggil interface Schedulable — implementasi ada di SesiMentoring
+        sesi.jadwalkanSesi(waktuMulai, durasiMenit);
 
-        // Kirim notifikasi ke mentor
-        Notifikasi notifMentor = new Notifikasi(
-            "Sesi Mentoring Baru",
-            "Anda memiliki sesi mentoring baru: " + sesi.getTopikPembahasan(),
+        // Override ke MENUNGGU_KONFIRMASI karena ini permintaan dari mentee
+        sesi.setStatusSesi(StatusSesi.MENUNGGU_KONFIRMASI);
+
+        // Auto-assign supervisor berdasarkan institusi mentor
+        Pengguna supervisorOtomatis = cariSupervisorUntukSesi(sesi);
+        if (supervisorOtomatis != null) {
+            sesi.setSupervisor(supervisorOtomatis);
+        }
+
+        SesiMentoring tersimpan = sesiRepository.save(sesi);
+
+        // Notifikasi ke mentor tentang permintaan baru
+        kirimNotifikasi(
+            "Permintaan Sesi Baru",
+            sesi.getMentee().getNamaLengkap() + " meminta sesi: \"" + sesi.getTopikPembahasan() + "\".",
             "JADWAL",
             sesi.getMentor()
         );
-        notifikasiRepository.save(notifMentor);
 
-        return sesiTersimpan;
+        return tersimpan;
     }
 
     /**
-     * Mentor mengkonfirmasi permintaan sesi dari mentee (MENUNGGU_KONFIRMASI → DIJADWALKAN).
+     * [STEP 1 — MENTOR] Membuat dan langsung menjadwalkan sesi baru (undangan dari mentor).
+     * Status: langsung DIJADWALKAN karena mentor yang memulai.
+     *
+     * Demonstrasi POLIMORFISME: parameter bertipe abstrak SesiMentoring,
+     * perilaku jadwalkanSesi() dieksekusi oleh subclass masing-masing.
+     */
+    public SesiMentoring buatDanJadwalkanSesi(SesiMentoring sesi,
+                                              LocalDateTime waktuMulai,
+                                              int durasiMenit) {
+        if (waktuMulai == null || waktuMulai.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Waktu sesi harus di masa depan.");
+        }
+
+        // Panggil method dari interface Schedulable — polimorfis
+        boolean berhasil = sesi.jadwalkanSesi(waktuMulai, durasiMenit);
+        if (!berhasil) {
+            throw new IllegalArgumentException(
+                "Gagal menjadwalkan sesi. Pastikan waktu mulai valid dan di masa depan.");
+        }
+
+        // Auto-assign supervisor
+        Pengguna supervisor = cariSupervisorUntukSesi(sesi);
+        if (supervisor != null) sesi.setSupervisor(supervisor);
+
+        SesiMentoring tersimpan = sesiRepository.save(sesi);
+
+        // Notifikasi ke mentee
+        kirimNotifikasi(
+            "Undangan Sesi Baru",
+            sesi.getMentor().getNamaLengkap() + " mengundang Anda untuk sesi: \""
+                + sesi.getTopikPembahasan() + "\".",
+            "JADWAL",
+            sesi.getMentee()
+        );
+
+        return tersimpan;
+    }
+
+    /**
+     * [STEP 2 — MENTOR] Mengkonfirmasi permintaan sesi dari mentee.
+     * Transisi: MENUNGGU_KONFIRMASI → DIJADWALKAN
+     *
+     * Validasi bisnis: hanya mentor dari sesi ini yang boleh mengkonfirmasi.
      */
     public SesiMentoring konfirmasiSesi(Long sesiId, Long mentorId) {
-        SesiMentoring sesi = sesiRepository.findById(sesiId)
-            .orElseThrow(() -> new NoSuchElementException("Sesi tidak ditemukan: " + sesiId));
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
 
-        if (sesi.getMentor() == null || !sesi.getMentor().getId().equals(mentorId)) {
-            throw new IllegalStateException("Hanya mentor dari sesi ini yang bisa mengkonfirmasi.");
+        if (!sesi.getMentor().getId().equals(mentorId)) {
+            throw new IllegalStateException("Hanya mentor sesi ini yang bisa mengkonfirmasi.");
         }
         if (sesi.getStatusSesi() != StatusSesi.MENUNGGU_KONFIRMASI) {
-            throw new IllegalStateException("Sesi ini tidak dalam status menunggu konfirmasi.");
+            throw new IllegalStateException(
+                "Sesi ini tidak dalam status menunggu konfirmasi. Status saat ini: "
+                    + sesi.getStatusSesi().getLabel());
         }
 
         sesi.setStatusSesi(StatusSesi.DIJADWALKAN);
 
-        // Notifikasi ke mentee
-        Notifikasi notif = new Notifikasi(
-            "Sesi Dikonfirmasi",
-            "Mentor " + sesi.getMentor().getNamaLengkap() + " telah mengkonfirmasi sesi '"
-                + sesi.getTopikPembahasan() + "'.",
+        kirimNotifikasi(
+            "Sesi Dikonfirmasi ✓",
+            sesi.getMentor().getNamaLengkap() + " telah mengkonfirmasi sesi \""
+                + sesi.getTopikPembahasan() + "\". Jadwal dikunci!",
             "JADWAL",
             sesi.getMentee()
         );
-        notifikasiRepository.save(notif);
 
         return sesiRepository.save(sesi);
     }
 
     /**
-     * Mengubah jadwal sesi mentoring yang sudah ada.
+     * [STEP 3 — MENTOR] Memulai sesi yang sudah dijadwalkan.
+     * Transisi: DIJADWALKAN → BERLANGSUNG
+     *
+     * Validasi bisnis: sesi harus berstatus DIJADWALKAN sebelum bisa dimulai.
      */
-    public SesiMentoring ubahJadwalSesi(Long sesiId, LocalDateTime waktuBaru) {
-        SesiMentoring sesi = sesiRepository.findById(sesiId)
-            .orElseThrow(() -> new NoSuchElementException(
-                "Sesi mentoring tidak ditemukan dengan ID: " + sesiId));
+    public SesiMentoring mulaiSesi(Long sesiId, Long mentorId) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
 
-        boolean berhasil = sesi.ubahJadwal(waktuBaru);
-        if (!berhasil) {
-            throw new IllegalStateException("Sesi tidak dapat dijadwalkan ulang.");
+        if (!sesi.getMentor().getId().equals(mentorId)) {
+            throw new IllegalStateException("Hanya mentor sesi ini yang bisa memulai.");
         }
+        if (sesi.getStatusSesi() != StatusSesi.DIJADWALKAN) {
+            throw new IllegalStateException(
+                "Hanya sesi berstatus DIJADWALKAN yang bisa dimulai. Status saat ini: "
+                    + sesi.getStatusSesi().getLabel());
+        }
+
+        sesi.setStatusSesi(StatusSesi.BERLANGSUNG);
+
+        // Polimorfisme: lakukanSesi() mengembalikan instruksi spesifik per tipe
+        String instruksi = sesi.lakukanSesi();
+
+        kirimNotifikasi(
+            "Sesi Dimulai 🚀",
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" sedang berlangsung. " + instruksi,
+            "SESI",
+            sesi.getMentee()
+        );
+
+        return sesiRepository.save(sesi);
+    }
+
+    /**
+     * [STEP 4 — MENTOR] Menyelesaikan sesi yang sedang berlangsung.
+     * Transisi: BERLANGSUNG → SELESAI
+     *
+     * Validasi bisnis ketat: sesi WAJIB berstatus BERLANGSUNG.
+     * Setelah selesai: poin dialokasikan dan supervisor dinotifikasi
+     * untuk memproses laporan akademik.
+     *
+     * Poin berdasarkan durasi:
+     *   < 30 mnt  → 5 poin mentor, 3 poin mentee
+     *   30–60 mnt → 10 poin mentor, 7 poin mentee
+     *   > 60 mnt  → 15 poin mentor, 10 poin mentee
+     */
+    public SesiMentoring selesaikanSesi(Long sesiId) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
+
+        // === VALIDASI BISNIS KETAT ===
+        if (sesi.getStatusSesi() != StatusSesi.BERLANGSUNG) {
+            throw new IllegalStateException(
+                "Sesi tidak bisa diselesaikan karena tidak sedang berlangsung. " +
+                "Status saat ini: " + sesi.getStatusSesi().getLabel() +
+                ". Pastikan sesi sudah dimulai terlebih dahulu.");
+        }
+
+        // Hitung poin berdasarkan durasi
+        int poinMentor, poinMentee;
+        if (sesi.getDurasiMenit() < 30) {
+            poinMentor = 5;  poinMentee = 3;
+        } else if (sesi.getDurasiMenit() <= 60) {
+            poinMentor = 10; poinMentee = 7;
+        } else {
+            poinMentor = 15; poinMentee = 10;
+        }
+
+        // Panggil method entity — mengubah status ke SELESAI dan menyimpan poin
+        sesi.selesaikanSesi(poinMentor, poinMentee);
+
+        // Tambahkan poin ke profil pengguna (polimorfis via instanceof)
+        tambahPoinKePengguna(sesi.getMentor(), poinMentor);
+        tambahPoinKePengguna(sesi.getMentee(), poinMentee);
+        incrementSesiDiselesaikan(sesi.getMentor());
+
+        // === TRIGGER LAPORAN AKADEMIK ===
+        // Setelah sesi selesai, statusValidasi = BELUM_DITINJAU (default).
+        // Supervisor mendapat notifikasi untuk memproses laporan.
+        if (sesi.getSupervisor() != null) {
+            kirimNotifikasi(
+                "Laporan Akademik Baru",
+                "Sesi \"" + sesi.getTopikPembahasan() + "\" antara " +
+                    sesi.getMentor().getNamaLengkap() + " dan " +
+                    sesi.getMentee().getNamaLengkap() +
+                    " telah selesai dan menunggu validasi Anda.",
+                "VALIDASI",
+                sesi.getSupervisor()
+            );
+        }
+
+        // Notifikasi mentee: minta review
+        kirimNotifikasi(
+            "Sesi Selesai — Berikan Rating",
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" telah selesai. " +
+                "Anda mendapat +" + poinMentee + " poin! Jangan lupa berikan rating untuk mentor.",
+            "SESI",
+            sesi.getMentee()
+        );
+
+        // Notifikasi mentor
+        kirimNotifikasi(
+            "Sesi Selesai ++" + poinMentor + " Poin",
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" telah selesai. Terima kasih!",
+            "SESI",
+            sesi.getMentor()
+        );
 
         return sesiRepository.save(sesi);
     }
 
     /**
      * Membatalkan sesi mentoring.
+     * Bisa dilakukan selama sesi masih dalam status aktif (bukan SELESAI/DIBATALKAN).
      */
     public SesiMentoring batalkanSesi(Long sesiId, String alasan) {
-        SesiMentoring sesi = sesiRepository.findById(sesiId)
-            .orElseThrow(() -> new NoSuchElementException(
-                "Sesi mentoring tidak ditemukan dengan ID: " + sesiId));
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
 
-        sesi.batalkanJadwal(alasan);
-        return sesiRepository.save(sesi);
-    }
-
-    /**
-     * Menyelesaikan sesi mentoring dan mengalokasikan poin progres.
-     * Poin ditentukan berdasarkan durasi sesi:
-     * - < 30 menit: 5 poin mentor, 3 poin mentee
-     * - 30-60 menit: 10 poin mentor, 7 poin mentee
-     * - > 60 menit: 15 poin mentor, 10 poin mentee
-     */
-    public SesiMentoring selesaikanSesi(Long sesiId) {
-        SesiMentoring sesi = sesiRepository.findById(sesiId)
-            .orElseThrow(() -> new NoSuchElementException(
-                "Sesi mentoring tidak ditemukan dengan ID: " + sesiId));
-
-        // Hitung poin berdasarkan durasi
-        int poinMentor, poinMentee;
-        if (sesi.getDurasiMenit() < 30) {
-            poinMentor = 5;
-            poinMentee = 3;
-        } else if (sesi.getDurasiMenit() <= 60) {
-            poinMentor = 10;
-            poinMentee = 7;
-        } else {
-            poinMentor = 15;
-            poinMentee = 10;
+        if (!sesi.getStatusSesi().isAktif()) {
+            throw new IllegalStateException(
+                "Sesi tidak bisa dibatalkan karena sudah berakhir. Status: "
+                    + sesi.getStatusSesi().getLabel());
         }
 
-        sesi.selesaikanSesi(poinMentor, poinMentee);
+        // Delegasi ke interface Schedulable
+        sesi.batalkanJadwal(alasan);
 
-        // Tambahkan poin ke profil mentor dan mentee
-        tambahPoinKePengguna(sesi.getMentor(), poinMentor);
-        tambahPoinKePengguna(sesi.getMentee(), poinMentee);
+        kirimNotifikasi(
+            "Sesi Dibatalkan",
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan,
+            "JADWAL",
+            sesi.getMentee()
+        );
+        kirimNotifikasi(
+            "Sesi Dibatalkan",
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan,
+            "JADWAL",
+            sesi.getMentor()
+        );
 
-        // Update jumlah sesi diselesaikan untuk mentor
-        incrementSesiDiselesaikan(sesi.getMentor());
+        return sesiRepository.save(sesi);
+    }
+
+    /**
+     * Mengubah jadwal sesi yang sudah ada.
+     * Delegasi ke interface Schedulable — ubahJadwal() mengecek apakah sesi bisa dijadwal ulang.
+     */
+    public SesiMentoring ubahJadwalSesi(Long sesiId, LocalDateTime waktuBaru) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
+
+        boolean berhasil = sesi.ubahJadwal(waktuBaru);
+        if (!berhasil) {
+            throw new IllegalStateException(
+                "Jadwal tidak dapat diubah. Sesi mungkin sudah berlangsung atau selesai.");
+        }
 
         return sesiRepository.save(sesi);
     }
 
     // ============================================================
-    // SISTEM PENILAIAN (RATING & REVIEW)
+    // SISTEM PENILAIAN (Interface Ratable)
     // ============================================================
 
     /**
-     * Memberikan review dan rating untuk sesi mentoring yang sudah selesai.
-     * Secara otomatis memperbarui total rating di profil mentor.
+     * Memberikan review dan rating untuk sesi yang sudah selesai.
+     *
+     * Demonstrasi POLIMORFISME: beriRating() dipanggil pada Pengguna abstrak,
+     * implementasi konkret ada di Siswa dan Mahasiswa (keduanya mengimplementasi Ratable).
      */
     public ReviewRating beriReviewDanRating(Long sesiId, Long pemberiId,
-                                             int nilaiRating, String ulasan) {
-        SesiMentoring sesi = sesiRepository.findById(sesiId)
-            .orElseThrow(() -> new NoSuchElementException("Sesi tidak ditemukan."));
+                                            int nilaiRating, String ulasan) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
 
         if (sesi.getStatusSesi() != StatusSesi.SELESAI) {
-            throw new IllegalStateException("Rating hanya bisa diberikan untuk sesi yang selesai.");
+            throw new IllegalStateException(
+                "Rating hanya bisa diberikan untuk sesi yang sudah selesai.");
+        }
+        if (nilaiRating < 1 || nilaiRating > 5) {
+            throw new IllegalArgumentException("Nilai rating harus antara 1 dan 5.");
         }
 
-        Pengguna pemberi = penggunaRepository.findById(pemberiId)
+        Pengguna pemberi  = penggunaRepository.findById(pemberiId)
             .orElseThrow(() -> new NoSuchElementException("Pemberi review tidak ditemukan."));
-
         Pengguna penerima = sesi.getMentor();
 
-        // Buat review baru
         ReviewRating review = new ReviewRating(nilaiRating, ulasan, sesi, pemberi, penerima);
-        ReviewRating reviewTersimpan = reviewRepository.save(review);
+        ReviewRating tersimpan = reviewRepository.save(review);
 
-        // Update rating di profil mentor (menerapkan interface Ratable secara polimorfis)
+        // Update rating di profil mentor — polimorfisme via instanceof + interface Ratable
         if (penerima instanceof Siswa siswa) {
             siswa.beriRating(nilaiRating, ulasan);
             siswaRepository.save(siswa);
         } else if (penerima instanceof Mahasiswa mahasiswa) {
             mahasiswa.beriRating(nilaiRating, ulasan);
+            // Cek apakah mahasiswa memenuhi syarat Asdos setelah rating diperbarui
+            if (mahasiswa.memenuhiSyaratAsdos()) {
+                mahasiswa.setKandidatAsdos(true);
+                kirimNotifikasi(
+                    "Selamat! Anda Memenuhi Syarat Asdos",
+                    "Prestasi Anda memenuhi kriteria Asisten Dosen. Tunggu rekomendasi dari Dosen.",
+                    "ASDOS",
+                    mahasiswa
+                );
+            }
             mahasiswaRepository.save(mahasiswa);
         }
 
-        return reviewTersimpan;
+        return tersimpan;
     }
 
-    /**
-     * Mendapatkan semua review yang diterima oleh pengguna tertentu.
-     */
     public List<ReviewRating> getReviewUntukPengguna(Long penggunaId) {
         return reviewRepository.findByPenerimaReviewId(penggunaId);
     }
@@ -300,101 +425,82 @@ public class MentoringService {
     // MATERI BELAJAR
     // ============================================================
 
-    /**
-     * Mengunggah materi belajar baru.
-     */
-    public MateriBelajar unggahMateri(MateriBelajar materi) {
-        return materiRepository.save(materi);
-    }
-
-    /**
-     * Mencari materi berdasarkan judul.
-     */
-    public List<MateriBelajar> cariMateri(String kataKunci) {
-        return materiRepository.findByJudulContainingIgnoreCase(kataKunci);
-    }
-
-    /**
-     * Mendapatkan materi terpopuler berdasarkan jumlah unduhan.
-     */
-    public List<MateriBelajar> getMateriPopuler() {
-        return materiRepository.findAllByOrderByJumlahUnduhanDesc();
-    }
-
-    /**
-     * Mendapatkan materi yang diunggah oleh pengguna tertentu.
-     */
-    public List<MateriBelajar> getMateriByPengguna(Long penggunaId) {
-        return materiRepository.findByPengunggahId(penggunaId);
-    }
+    public MateriBelajar unggahMateri(MateriBelajar materi)      { return materiRepository.save(materi); }
+    public List<MateriBelajar> cariMateri(String kataKunci)       { return materiRepository.findByJudulContainingIgnoreCase(kataKunci); }
+    public List<MateriBelajar> getMateriPopuler()                 { return materiRepository.findAllByOrderByJumlahUnduhanDesc(); }
+    public List<MateriBelajar> getMateriByPengguna(Long id)       { return materiRepository.findByPengunggahId(id); }
 
     // ============================================================
-    // SESI QUERIES
+    // QUERY SESI
+    // ============================================================
+
+    public Optional<SesiMentoring> getSesiById(Long id)                 { return sesiRepository.findById(id); }
+    public List<SesiMentoring> getSemuaSesiPengguna(Long id)            { return sesiRepository.findSemuaSesiPengguna(id); }
+    public List<SesiMentoring> getSesiMendatangMentor(Long id)          { return sesiRepository.getSesiMendatangMentor(id, LocalDateTime.now()); }
+    public List<SesiMentoring> getSesiMendatangMentee(Long id)          { return sesiRepository.getSesiMendatangMentee(id, LocalDateTime.now()); }
+    public long hitungSesiSelesaiMentor(Long mentorId)                  { return sesiRepository.countByMentorIdAndStatusSesi(mentorId, StatusSesi.SELESAI); }
+
+    // ============================================================
+    // HELPER PRIVATE
     // ============================================================
 
     /**
-     * Mendapatkan semua sesi untuk pengguna tertentu.
+     * Mencari supervisor yang paling sesuai untuk sesi berdasarkan institusi mentor.
+     * - Mentor Siswa    → Guru pertama dari sekolah yang sama
+     * - Mentor Mahasiswa → Dosen pertama dari program studi yang sama
+     *
+     * Menggunakan PenggunaRepository.findByRole() agar tidak perlu inject GuruRepository
+     * / DosenRepository secara terpisah — cukup dengan satu repository yang sudah ada.
      */
-    public List<SesiMentoring> getSemuaSesiPengguna(Long penggunaId) {
-        return sesiRepository.findSemuaSesiPengguna(penggunaId);
+    private Pengguna cariSupervisorUntukSesi(SesiMentoring sesi) {
+        Pengguna mentor = sesi.getMentor();
+        if (mentor instanceof Siswa siswa) {
+            return penggunaRepository.findByRole(RolePengguna.GURU).stream()
+                .filter(p -> p instanceof Guru g
+                          && siswa.getNamaSekolah() != null
+                          && siswa.getNamaSekolah().equals(g.getNamaSekolah()))
+                .findFirst().orElse(null);
+        } else if (mentor instanceof Mahasiswa mhs) {
+            return penggunaRepository.findByRole(RolePengguna.DOSEN).stream()
+                .filter(p -> p instanceof Dosen d
+                          && mhs.getProgramStudi() != null
+                          && mhs.getProgramStudi().equals(d.getProgramStudi()))
+                .findFirst().orElse(null);
+        }
+        return null;
     }
-
-    /**
-     * Mendapatkan sesi mendatang untuk mentor.
-     */
-    public List<SesiMentoring> getSesiMendatangMentor(Long mentorId) {
-        return sesiRepository.getSesiMendatangMentor(mentorId, LocalDateTime.now());
-    }
-
-    /**
-     * Mendapatkan sesi mendatang untuk mentee.
-     */
-    public List<SesiMentoring> getSesiMendatangMentee(Long menteeId) {
-        return sesiRepository.getSesiMendatangMentee(menteeId, LocalDateTime.now());
-    }
-
-    /**
-     * Mendapatkan sesi berdasarkan ID.
-     */
-    public Optional<SesiMentoring> getSesiById(Long sesiId) {
-        return sesiRepository.findById(sesiId);
-    }
-
-    /**
-     * Menghitung total sesi selesai untuk pengguna sebagai mentor.
-     */
-    public long hitungSesiSelesaiMentor(Long mentorId) {
-        return sesiRepository.countByMentorIdAndStatusSesi(mentorId, StatusSesi.SELESAI);
-    }
-
-    // ============================================================
-    // HELPER METHODS (Private)
-    // ============================================================
 
     /**
      * Menambahkan poin progres ke pengguna berdasarkan tipe konkretnya.
-     * Mendemonstrasikan pengecekan tipe dan downcast yang aman.
+     * Demonstrasi penggunaan pattern-matching instanceof (Java 16+).
      */
     private void tambahPoinKePengguna(Pengguna pengguna, int poin) {
         if (pengguna instanceof Siswa siswa) {
             siswa.tambahPoinProgres(poin);
             siswaRepository.save(siswa);
-        } else if (pengguna instanceof Mahasiswa mahasiswa) {
-            mahasiswa.tambahPoinProgres(poin);
-            mahasiswaRepository.save(mahasiswa);
+        } else if (pengguna instanceof Mahasiswa mhs) {
+            mhs.tambahPoinProgres(poin);
+            mahasiswaRepository.save(mhs);
         }
     }
 
-    /**
-     * Menambahkan jumlah sesi diselesaikan untuk mentor.
-     */
     private void incrementSesiDiselesaikan(Pengguna mentor) {
         if (mentor instanceof Siswa siswa) {
             siswa.setSesiDiselesaikan(siswa.getSesiDiselesaikan() + 1);
             siswaRepository.save(siswa);
-        } else if (mentor instanceof Mahasiswa mahasiswa) {
-            mahasiswa.setSesiDiselesaikan(mahasiswa.getSesiDiselesaikan() + 1);
-            mahasiswaRepository.save(mahasiswa);
+        } else if (mentor instanceof Mahasiswa mhs) {
+            mhs.setSesiDiselesaikan(mhs.getSesiDiselesaikan() + 1);
+            mahasiswaRepository.save(mhs);
         }
+    }
+
+    private void kirimNotifikasi(String judul, String pesan, String kategori, Pengguna penerima) {
+        if (penerima == null) return;
+        notifikasiRepository.save(new Notifikasi(judul, pesan, kategori, penerima));
+    }
+
+    private SesiMentoring getSesiAtauLempar(Long sesiId) {
+        return sesiRepository.findById(sesiId)
+            .orElseThrow(() -> new NoSuchElementException("Sesi mentoring tidak ditemukan: " + sesiId));
     }
 }
