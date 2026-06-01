@@ -58,6 +58,16 @@ public abstract class Pengguna {
     @Column(nullable = false)
     private boolean aktif = true;
 
+    // Kolom default TRUE agar user lama (sebelum fitur ini) tetap bisa login
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean emailVerified = true;
+
+    @Column(length = 100)
+    private String tokenVerifikasi;
+
+    @Column
+    private LocalDateTime tokenVerifikasiExpiry;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime tanggalDaftar;
 
@@ -198,6 +208,30 @@ public abstract class Pengguna {
 
     public void setTerakhirLogin(LocalDateTime terakhirLogin) {
         this.terakhirLogin = terakhirLogin;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getTokenVerifikasi() {
+        return tokenVerifikasi;
+    }
+
+    public void setTokenVerifikasi(String tokenVerifikasi) {
+        this.tokenVerifikasi = tokenVerifikasi;
+    }
+
+    public LocalDateTime getTokenVerifikasiExpiry() {
+        return tokenVerifikasiExpiry;
+    }
+
+    public void setTokenVerifikasiExpiry(LocalDateTime tokenVerifikasiExpiry) {
+        this.tokenVerifikasiExpiry = tokenVerifikasiExpiry;
     }
 
     // === Override dari Object ===

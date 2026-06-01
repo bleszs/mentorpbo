@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Jejak Ilmu | Akselerasi Akademik Elit</title>
+<title>Beranda | Jejak Ilmu - Platform Mentoring Akademik</title>
+<link rel="icon" href="/favicon.ico"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
 tailwind.config = {
@@ -13,66 +15,41 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        "outline-variant": "#c6c6d0",
-        "surface-variant": "#e1e3e4",
-        "background": "#f8f9fa",
-        "primary-fixed": "#dce1ff",
-        "on-primary": "#ffffff",
-        "surface-dim": "#d9dadb",
-        "on-background": "#191c1d",
-        "inverse-on-surface": "#f0f1f2",
-        "surface-container-highest": "#e1e3e4",
-        "on-error-container": "#93000a",
-        "on-primary-fixed": "#061748",
-        "surface-container": "#edeeef",
-        "surface": "#f8f9fa",
-        "inverse-surface": "#2e3132",
-        "error-container": "#ffdad6",
-        "on-surface": "#191c1d",
-        "error-crimson": "#ba1a1a",
-        "glass-border": "rgba(255,255,255,0.4)",
-        "surface-bright": "#f8f9fa",
-        "success-green": "#10b981",
-        "on-secondary-container": "#754900",
-        "on-primary-fixed-variant": "#364475",
-        "warning-gold": "#fea619",
-        "secondary-container": "#fdb965",
-        "active-glow": "rgba(181,196,255,0.4)",
-        "outline": "#767680",
-        "surface-container-high": "#e7e8e9",
-        "primary-fixed-dim": "#b6c4fe",
-        "inverse-primary": "#b6c4fe",
-        "surface-container-low": "#f3f4f5",
-        "primary-container": "#061748",
-        "primary": "#000000",
-        "on-primary-container": "#7382b7",
-        "error": "#ba1a1a",
-        "on-surface-variant": "#45464f",
-        "on-surface-container-lowest": "#ffffff",
+        "outline-variant": "#c6c6d0","surface-variant": "#e1e3e4","background": "#f8f9fa",
+        "primary-fixed": "#dce1ff","on-primary": "#ffffff","surface-dim": "#d9dadb",
+        "on-background": "#191c1d","inverse-on-surface": "#f0f1f2",
+        "surface-container-highest": "#e1e3e4","on-error-container": "#93000a",
+        "on-primary-fixed": "#061748","surface-container": "#edeeef","surface": "#f8f9fa",
+        "inverse-surface": "#2e3132","error-container": "#ffdad6","on-surface": "#191c1d",
+        "error-crimson": "#ba1a1a","glass-border": "rgba(255,255,255,0.4)",
+        "surface-bright": "#f8f9fa","success-green": "#10b981",
+        "on-secondary-container": "#754900","on-primary-fixed-variant": "#364475",
+        "warning-gold": "#fea619","secondary-container": "#fdb965",
+        "active-glow": "rgba(181,196,255,0.4)","outline": "#767680",
+        "surface-container-high": "#e7e8e9","primary-fixed-dim": "#b6c4fe",
+        "inverse-primary": "#b6c4fe","surface-container-low": "#f3f4f5",
+        "primary-container": "#061748","primary": "#000000",
+        "on-primary-container": "#7382b7","error": "#ba1a1a",
+        "on-surface-variant": "#45464f","on-surface-container-lowest": "#ffffff",
         "surface-container-lowest": "#ffffff"
       },
-      borderRadius: {
-        "DEFAULT": "0.25rem", "lg": "0.5rem",
-        "xl": "0.75rem", "2xl": "1rem", "full": "9999px"
-      },
+      borderRadius: { "DEFAULT": "0.25rem","lg": "0.5rem","xl": "0.75rem","2xl": "1rem","full": "9999px" },
       spacing: {
-        "margin-mobile": "16px", "container-max": "1280px",
-        "topbar-height": "72px", "sidebar-width": "280px",
-        "margin-desktop": "32px", "gutter": "24px", "base": "8px"
+        "margin-mobile": "16px","container-max": "1280px","topbar-height": "72px",
+        "sidebar-width": "280px","margin-desktop": "32px","gutter": "24px","base": "8px"
       },
       fontFamily: {
-        "caption-xs": ["Inter"], "label-sm": ["Inter"],
-        "display-lg-mobile": ["Inter"], "display-lg": ["Inter"],
-        "body-md": ["Inter"], "headline-md": ["Inter"], "body-lg": ["Inter"]
+        "caption-xs": ["Inter"],"label-sm": ["Inter"],"display-lg-mobile": ["Inter"],
+        "display-lg": ["Inter"],"body-md": ["Inter"],"headline-md": ["Inter"],"body-lg": ["Inter"]
       },
       fontSize: {
-        "caption-xs": ["10px", {"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}],
-        "label-sm": ["12px", {"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
-        "display-lg-mobile": ["32px", {"lineHeight":"1.2","fontWeight":"900"}],
-        "display-lg": ["48px", {"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
-        "body-md": ["14px", {"lineHeight":"1.5","fontWeight":"400"}],
-        "headline-md": ["24px", {"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
-        "body-lg": ["18px", {"lineHeight":"1.6","fontWeight":"500"}]
+        "caption-xs": ["10px",{"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}],
+        "label-sm": ["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+        "display-lg-mobile": ["32px",{"lineHeight":"1.2","fontWeight":"900"}],
+        "display-lg": ["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
+        "body-md": ["14px",{"lineHeight":"1.5","fontWeight":"400"}],
+        "headline-md": ["24px",{"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+        "body-lg": ["18px",{"lineHeight":"1.6","fontWeight":"500"}]
       }
     }
   }
@@ -85,15 +62,25 @@ tailwind.config = {
   .premium-card-shadow:hover { box-shadow: 0 12px 40px rgba(0,17,66,0.1); transform: translateY(-4px); }
   .glass-header { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.4); }
   .mesh-gradient { background-color: #061748; background-image: radial-gradient(at 0% 0%, rgba(181,196,255,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16,185,129,0.1) 0px, transparent 50%); }
+  .hero-section { background-image: url('/images/bg-kampus.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; }
+  .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(12,26,48,0.85); z-index: 1; }
+  .card-materi-berkualitas { background-image: linear-gradient(135deg, rgba(12,26,48,0.75) 0%, rgba(12,26,48,0.6) 100%), url('/images/Materi%20berkualitas.jpg'); background-size: cover; background-position: center; }
+  .card-pantau-progres { background-image: linear-gradient(135deg, rgba(12,26,48,0.75) 0%, rgba(12,26,48,0.6) 100%), url('/images/pantau%20progres.jpg'); background-size: cover; background-position: center; }
+  .card-jadwal-fleksibel { background-image: linear-gradient(135deg, rgba(12,26,48,0.75) 0%, rgba(12,26,48,0.6) 100%), url('/images/jadwal%20fleksibel.jpg'); background-size: cover; background-position: center; }
+  .card-sistem-reward { background-image: linear-gradient(135deg, rgba(12,26,48,0.75) 0%, rgba(12,26,48,0.6) 100%), url('/images/sistem%20point%20award.jpg'); background-size: cover; background-position: center; }
+  .mentor-header { background-image: linear-gradient(135deg, rgba(12,26,48,0.7) 0%, rgba(12,26,48,0.5) 100%), url('/images/mentor.jpg'); background-size: cover; background-position: center; }
+  .mentee-header { background-image: linear-gradient(135deg, rgba(13,61,38,0.7) 0%, rgba(13,61,38,0.5) 100%), url('/images/mente.jpg'); background-size: cover; background-position: center; }
 </style>
 </head>
 <body class="text-on-surface">
 
-<!-- ==================== TOPBAR ==================== -->
+<!-- ==================== HEADER ==================== -->
 <header class="fixed top-0 w-full h-[72px] glass-header z-50 transition-all duration-300" id="topbar">
   <div class="flex justify-between items-center px-margin-desktop h-full w-full max-w-container-max mx-auto">
     <div class="flex items-center gap-10">
-      <a th:href="@{/}" class="font-headline-md text-headline-md font-black text-primary">Jejak Ilmu</a>
+      <a th:href="@{/}">
+        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:52px;width:auto;"/>
+      </a>
       <nav class="hidden md:flex items-center gap-8">
         <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md">Beranda</a>
         <a href="#fitur" class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 font-body-md text-body-md">Program</a>
@@ -102,67 +89,47 @@ tailwind.config = {
       </nav>
     </div>
     <div class="flex items-center gap-4">
-      <a th:href="@{/login}" class="px-6 py-2 rounded-xl font-label-sm text-label-sm font-black text-primary hover:bg-surface-container transition-all">
-        Masuk
-      </a>
-      <a th:href="@{/register}" class="px-6 py-2 rounded-xl bg-primary-container text-on-primary font-label-sm text-label-sm font-black hover:opacity-90 transition-all active:scale-95 shadow-sm">
-        Daftar Sekarang
-      </a>
+      <a th:href="@{/login}" class="px-6 py-2 rounded-xl font-label-sm text-label-sm font-black text-primary hover:bg-surface-container transition-all">Masuk</a>
+      <a th:href="@{/register}" class="px-6 py-2 rounded-xl bg-primary-container text-on-primary font-label-sm text-label-sm font-black hover:opacity-90 transition-all active:scale-95 shadow-sm">Daftar Sekarang</a>
     </div>
   </div>
 </header>
 
 <!-- ==================== HERO ==================== -->
-<section class="relative min-h-[870px] flex items-center overflow-hidden mesh-gradient">
-  <!-- Gradient mesh background (no external images) -->
-  <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-    <div class="absolute top-0 left-0 w-[700px] h-[700px] bg-primary-fixed-dim/10 rounded-full blur-[120px]"></div>
-    <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-success-green/10 rounded-full blur-[100px]"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] bg-white/3 rounded-full blur-[80px]"></div>
-  </div>
-
+<section class="hero-section relative min-h-[870px] flex items-center overflow-hidden">
+  <div class="hero-overlay pointer-events-none"></div>
   <div class="container mx-auto px-margin-desktop relative z-10 max-w-container-max py-20">
     <div class="max-w-4xl">
-      <span class="inline-block py-1 px-3 mb-6 rounded-full bg-white/10 border border-white/20 text-white font-label-sm text-label-sm tracking-widest uppercase">
-        Elite Mentorship Platform
-      </span>
+      <span class="inline-block py-1 px-3 mb-6 rounded-full bg-white/10 border border-white/20 text-white font-label-sm text-label-sm tracking-widest uppercase shadow-sm">Elite Mentorship Platform</span>
       <h1 class="font-display-lg text-display-lg text-white mb-6 leading-[1.1]">
         Jejak Ilmu: Akselerasi Akademik melalui <span class="text-secondary-container">Peer-Mentoring Elit</span>
       </h1>
-      <p class="font-body-lg text-body-lg text-white/80 mb-10 max-w-2xl">
-        Platform eksklusif bagi mahasiswa berprestasi untuk berbagi pengetahuan. Belajar langsung dari teman sejawat yang telah menguasai bidangnya, atau jadilah mentor untuk mengasah kepemimpinan akademik Anda.
-      </p>
+      <p class="font-body-lg text-body-lg text-white/80 mb-10 max-w-2xl">Platform eksklusif bagi mahasiswa berprestasi untuk berbagi pengetahuan. Belajar langsung dari teman sejawat yang telah menguasai bidangnya, atau jadilah mentor untuk mengasah kepemimpinan akademik Anda.</p>
       <div class="flex flex-col sm:flex-row gap-4">
         <a th:href="@{/register}" class="px-10 py-5 rounded-2xl bg-secondary-container text-on-secondary-container font-body-md text-[16px] font-black uppercase tracking-wider hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3">
-          Daftar Sekarang
-          <span class="material-symbols-outlined">arrow_forward</span>
+          Daftar Sekarang <span class="material-symbols-outlined">arrow_forward</span>
         </a>
-        <a th:href="@{/login}" class="px-10 py-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-body-md text-[16px] font-black uppercase tracking-wider hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center">
-          Masuk ke Platform
-        </a>
+        <a th:href="@{/login}" class="px-10 py-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-body-md text-[16px] font-black uppercase tracking-wider hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center shadow-md">Masuk ke Platform</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== FITUR BENTO GRID ==================== -->
-<section class="py-24 bg-surface-bright" id="fitur">
+<!-- ==================== FITUR ==================== -->
+<section class="py-24 mesh-gradient" id="fitur">
   <div class="container mx-auto px-margin-desktop max-w-container-max">
     <div class="text-center mb-16">
-      <span class="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-black text-caption-xs mb-4 uppercase tracking-widest">Keunggulan Platform</span>
-      <h2 class="font-headline-md text-headline-md text-primary mb-4">Mengapa Memilih Jejak Ilmu?</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">Ekosistem terstruktur yang dirancang untuk memaksimalkan potensi akademik melalui kolaborasi dan dukungan komunitas.</p>
+      <span class="inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-white font-black text-caption-xs mb-4 uppercase tracking-widest">Keunggulan Platform</span>
+      <h2 class="font-headline-md text-headline-md text-white mb-4">Mengapa Memilih Jejak Ilmu?</h2>
+      <p class="font-body-md text-body-md text-white/70 max-w-xl mx-auto">Ekosistem terstruktur yang dirancang untuk memaksimalkan potensi akademik melalui kolaborasi dan dukungan komunitas.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-
-      <!-- Feature 1 (large) -->
       <div class="md:col-span-2 bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-primary">
-        <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+        <div class="w-11 h-11 rounded-xl bg-white/10 text-white flex items-center justify-center mb-6">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">groups</span>
         </div>
-        <h3 class="font-headline-md text-xl mb-3">Bimbingan Peer-to-Peer</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Belajar dari sesama mahasiswa yang mengerti tantangan kurikulum Anda secara mendalam. Komunikasi yang lebih cair dan relevan.</p>
-        <!-- Placeholder visual (no external image) -->
+        <h3 class="font-headline-md text-xl mb-3 text-white">Bimbingan Peer-to-Peer</h3>
+        <p class="font-body-md text-body-md text-white/70 mb-6">Belajar dari sesama mahasiswa yang mengerti tantangan kurikulum Anda secara mendalam. Komunikasi yang lebih cair dan relevan.</p>
         <div class="w-full h-48 rounded-xl bg-gradient-to-br from-primary/10 to-primary-fixed/30 flex items-center justify-center">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-black">ME</div>
@@ -174,26 +141,20 @@ tailwind.config = {
           </div>
         </div>
       </div>
-
-      <!-- Feature 2 -->
-      <div class="bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-success-green">
-        <div class="w-11 h-11 rounded-xl bg-success-green/10 text-success-green flex items-center justify-center mb-6">
+      <div class="bg-white/10 backdrop-blur-md border border-white/20 p-7 rounded-2xl premium-card-shadow border-l-4 border-warning-gold card-materi-berkualitas">
+        <div class="w-11 h-11 rounded-xl bg-white/10 text-warning-gold flex items-center justify-center mb-6">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_stories</span>
         </div>
-        <h3 class="font-headline-md text-xl mb-3">Materi Berkualitas</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">Akses ribuan materi, catatan kuliah, dan bank soal yang telah dikurasi oleh mentor terbaik di bidangnya.</p>
+        <h3 class="font-headline-md text-xl mb-3 text-white">Materi Berkualitas</h3>
+        <p class="font-body-md text-body-md text-white/70">Akses ribuan materi, catatan kuliah, dan bank soal yang telah dikurasi oleh mentor terbaik di bidangnya.</p>
       </div>
-
-      <!-- Feature 3 -->
-      <div class="bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-warning-gold">
-        <div class="w-11 h-11 rounded-xl bg-warning-gold/10 text-warning-gold flex items-center justify-center mb-6">
+      <div class="bg-white/10 backdrop-blur-md border border-white/20 p-7 rounded-2xl premium-card-shadow border-l-4 border-success-green card-pantau-progres">
+        <div class="w-11 h-11 rounded-xl bg-white/10 text-success-green flex items-center justify-center mb-6">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">monitoring</span>
         </div>
-        <h3 class="font-headline-md text-xl mb-3">Pantau Progres</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">Dashboard analitik untuk melihat perkembangan belajar Anda secara real-time dan pencapaian target mingguan.</p>
+        <h3 class="font-headline-md text-xl mb-3 text-white">Pantau Progres</h3>
+        <p class="font-body-md text-body-md text-white/70">Dashboard analitik untuk melihat perkembangan belajar Anda secara real-time dan pencapaian target mingguan.</p>
       </div>
-
-      <!-- Feature 4 (wide) -->
       <div class="md:col-span-2 bg-primary-container p-7 rounded-2xl premium-card-shadow text-white flex flex-col md:flex-row items-center gap-8">
         <div class="flex-1">
           <div class="w-11 h-11 rounded-xl bg-white/10 text-white flex items-center justify-center mb-6">
@@ -206,31 +167,26 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[64px] opacity-30" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
         </div>
       </div>
-
-      <!-- Feature 5 -->
-      <div class="bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-error-crimson">
-        <div class="w-11 h-11 rounded-xl bg-error-crimson/10 text-error-crimson flex items-center justify-center mb-6">
+      <div class="bg-white/10 backdrop-blur-md border border-white/20 p-7 rounded-2xl premium-card-shadow border-l-4 border-error-crimson card-jadwal-fleksibel">
+        <div class="w-11 h-11 rounded-xl bg-white/10 text-error-crimson flex items-center justify-center mb-6">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">schedule</span>
         </div>
-        <h3 class="font-headline-md text-xl mb-3">Jadwal Fleksibel</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">Atur sesi bimbingan sesuai jadwal kuliah Anda. Notifikasi otomatis memastikan tidak ada sesi yang terlewat.</p>
+        <h3 class="font-headline-md text-xl mb-3 text-white">Jadwal Fleksibel</h3>
+        <p class="font-body-md text-body-md text-white/70">Atur sesi bimbingan sesuai jadwal kuliah Anda. Notifikasi otomatis memastikan tidak ada sesi yang terlewat.</p>
       </div>
-
-      <!-- Feature 6 -->
-      <div class="bg-white p-7 rounded-2xl premium-card-shadow border-l-4 border-primary-fixed-dim">
-        <div class="w-11 h-11 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-6">
+      <div class="bg-white/10 backdrop-blur-md border border-white/20 p-7 rounded-2xl premium-card-shadow border-l-4 border-warning-gold card-sistem-reward">
+        <div class="w-11 h-11 rounded-xl bg-white/10 text-warning-gold flex items-center justify-center mb-6">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
         </div>
-        <h3 class="font-headline-md text-xl mb-3">Sistem Poin &amp; Reward</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">Setiap sesi menghasilkan poin prestasi. Kumpulkan dan tukar dengan reward eksklusif dari mitra kami.</p>
+        <h3 class="font-headline-md text-xl mb-3 text-white">Sistem Poin &amp; Reward</h3>
+        <p class="font-body-md text-body-md text-white/70">Setiap sesi menghasilkan poin prestasi. Kumpulkan dan tukar dengan reward eksklusif dari mitra kami.</p>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ==================== ROLE SELECTION ==================== -->
-<section class="py-24 bg-surface-container" id="role">
+<!-- ==================== ROLE ==================== -->
+<section class="py-24 mesh-gradient" id="role">
   <div class="container mx-auto px-margin-desktop max-w-container-max">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-black text-caption-xs mb-4 uppercase tracking-widest">Pilih Jalur</span>
@@ -238,11 +194,8 @@ tailwind.config = {
       <p class="font-body-md text-body-md text-on-surface-variant">Apakah Anda ingin berbagi ilmu atau mengakselerasi pemahaman Anda?</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-
-      <!-- Mentor Card -->
       <div class="group relative overflow-hidden rounded-2xl bg-white premium-card-shadow">
-        <!-- Color banner (no external image) -->
-        <div class="h-64 overflow-hidden bg-gradient-to-br from-primary-container to-[#1a3a8c] flex items-center justify-center relative">
+        <div class="h-64 overflow-hidden mentor-header flex items-center justify-center relative">
           <div class="absolute inset-0 opacity-10" style="background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.3) 0%, transparent 60%);"></div>
           <div class="relative z-10 text-center">
             <div class="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-4">
@@ -262,28 +215,15 @@ tailwind.config = {
             </div>
           </div>
           <ul class="space-y-3 mb-8">
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Membangun portofolio kepemimpinan
-            </li>
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Insentif finansial per sesi bimbingan
-            </li>
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Akses ke komunitas elit mentor nasional
-            </li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Membangun portofolio kepemimpinan</li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Insentif finansial per sesi bimbingan</li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Akses ke komunitas elit mentor nasional</li>
           </ul>
-          <a th:href="@{/register/mentor}" class="block w-full py-4 rounded-xl bg-primary text-center text-white font-label-sm text-label-sm font-black uppercase tracking-widest hover:bg-on-primary-container transition-colors">
-            Mulai Mengajar
-          </a>
+          <a th:href="@{/register/mentor}" class="block w-full py-4 rounded-xl bg-primary text-center text-white font-label-sm text-label-sm font-black uppercase tracking-widest hover:bg-on-primary-container transition-colors">Mulai Mengajar</a>
         </div>
       </div>
-
-      <!-- Mentee Card -->
       <div class="group relative overflow-hidden rounded-2xl bg-white premium-card-shadow">
-        <div class="h-64 overflow-hidden bg-gradient-to-br from-[#1a5c3a] to-[#0d3d26] flex items-center justify-center relative">
+        <div class="h-64 overflow-hidden mentee-header flex items-center justify-center relative">
           <div class="absolute inset-0 opacity-10" style="background: radial-gradient(circle at 70% 50%, rgba(255,255,255,0.3) 0%, transparent 60%);"></div>
           <div class="relative z-10 text-center">
             <div class="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-4">
@@ -303,30 +243,18 @@ tailwind.config = {
             </div>
           </div>
           <ul class="space-y-3 mb-8">
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Belajar materi sulit secara personal
-            </li>
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Tips &amp; trik ujian dari mahasiswa berprestasi
-            </li>
-            <li class="flex items-center gap-3 text-on-surface-variant font-body-md">
-              <span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>
-              Grup diskusi intensif dan eksklusif
-            </li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Belajar materi sulit secara personal</li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Tips &amp; trik ujian dari mahasiswa berprestasi</li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-body-md"><span class="material-symbols-outlined text-success-green text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span>Grup diskusi intensif dan eksklusif</li>
           </ul>
-          <a th:href="@{/register/mentee}" class="block w-full py-4 rounded-xl bg-white border-2 border-primary text-center text-primary font-label-sm text-label-sm font-black uppercase tracking-widest hover:bg-primary/5 transition-colors">
-            Cari Mentor Sekarang
-          </a>
+          <a th:href="@{/register/mentee}" class="block w-full py-4 rounded-xl bg-white border-2 border-primary text-center text-primary font-label-sm text-label-sm font-black uppercase tracking-widest hover:bg-primary/5 transition-colors">Cari Mentor Sekarang</a>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ==================== CTA FINAL ==================== -->
+<!-- ==================== CTA ==================== -->
 <section class="py-24 mesh-gradient text-white overflow-hidden relative">
   <div class="absolute -top-24 -right-24 w-96 h-96 bg-secondary-container/20 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-container/40 rounded-full blur-3xl pointer-events-none"></div>
@@ -338,11 +266,8 @@ tailwind.config = {
       </div>
       <div class="w-full md:w-auto flex flex-col gap-4">
         <div class="flex flex-col sm:flex-row gap-3">
-          <input class="px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:ring-2 focus:ring-secondary-container focus:border-transparent outline-none w-full sm:w-80"
-                 placeholder="Alamat email kampus" type="email"/>
-          <a th:href="@{/register}" class="px-8 py-4 rounded-2xl bg-secondary-container text-on-secondary-container font-black uppercase tracking-widest hover:scale-105 transition-all text-center font-label-sm">
-            Daftar
-          </a>
+          <input class="px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:ring-2 focus:ring-secondary-container focus:border-transparent outline-none w-full sm:w-80" placeholder="Alamat email kampus" type="email"/>
+          <a th:href="@{/register}" class="px-8 py-4 rounded-2xl bg-secondary-container text-on-secondary-container font-black uppercase tracking-widest hover:scale-105 transition-all text-center font-label-sm">Daftar</a>
         </div>
         <p class="font-caption-xs text-caption-xs opacity-50">Daftar menggunakan email .ac.id untuk mendapatkan akses prioritas.</p>
       </div>
@@ -353,8 +278,8 @@ tailwind.config = {
 <!-- ==================== FOOTER ==================== -->
 <footer class="w-full py-8 bg-surface-container border-t border-outline-variant">
   <div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-8">
-    <div class="flex flex-col items-center md:items-start">
-      <span class="font-headline-md text-headline-md text-primary mb-1">Jejak Ilmu</span>
+    <div class="flex flex-col items-center md:items-start gap-1">
+      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:44px;width:auto;"/>
       <p class="font-caption-xs text-caption-xs text-on-surface-variant">© 2025 Jejak Ilmu. Institutional Excellence Platform.</p>
     </div>
     <div class="flex gap-8">
@@ -385,7 +310,6 @@ tailwind.config = {
       header.style.boxShadow = 'none';
     }
   });
-
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.premium-card-shadow').forEach((card, i) => {
       card.style.opacity = '0';
@@ -398,6 +322,5 @@ tailwind.config = {
     });
   });
 </script>
-
 </body>
 </html>

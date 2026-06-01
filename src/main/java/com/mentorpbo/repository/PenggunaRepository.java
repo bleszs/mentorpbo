@@ -76,6 +76,8 @@ public interface PenggunaRepository extends JpaRepository<Pengguna, Long> {
      */
     boolean existsByEmail(String email);
 
+    Optional<Pengguna> findByTokenVerifikasi(String tokenVerifikasi);
+
     /**
      * Menghitung jumlah pengguna berdasarkan role.
      *

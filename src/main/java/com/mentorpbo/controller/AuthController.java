@@ -6,6 +6,7 @@ import com.mentorpbo.model.Pengguna;
 import com.mentorpbo.model.Siswa;
 import com.mentorpbo.service.EmailService;
 import com.mentorpbo.service.PenggunaService;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,15 @@ public class AuthController {
     private final PenggunaService penggunaService;
     private final EmailService emailService;
 
+    @Value("${app.google.oauth2.enabled:false}")
+    private boolean googleOAuth2Enabled;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
+    private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret:PLACEHOLDER}")
+    private String googleClientSecret;
+
     @Autowired
     public AuthController(PenggunaService penggunaService, EmailService emailService) {
         this.penggunaService = penggunaService;
@@ -29,11 +39,38 @@ public class AuthController {
     }
 
     /**
+     * Google Client ID yang valid selalu berakhir dengan .apps.googleusercontent.com.
+     * Ini memastikan hanya credentials asli dari Google Cloud Console yang diterima.
+     */
+    private boolean isGoogleOAuth2Ready() {
+        return googleOAuth2Enabled
+            && googleClientId != null
+            && googleClientId.endsWith(".apps.googleusercontent.com")
+            && googleClientSecret != null
+            && !googleClientSecret.startsWith("GANTI")
+            && !googleClientSecret.equals("PLACEHOLDER");
+    }
+
+    /**
      * Menampilkan halaman login.
      */
     @GetMapping("/login")
-    public String halamanLogin() {
+    public String halamanLogin(Model model) {
+        model.addAttribute("googleOAuth2Ready", isGoogleOAuth2Ready());
         return "auth/login";
+    }
+
+    /**
+     * Redirect ke /login jika Google OAuth2 belum dikonfigurasi.
+     * Catatan: jika sudah dikonfigurasi dengan benar, Spring Security intersep URL ini
+     * sebelum mencapai controller ini.
+     */
+    @GetMapping("/oauth2/authorization/google")
+    public String handleGoogleOAuth2(RedirectAttributes ra) {
+        ra.addFlashAttribute("error",
+            "Login Google belum dikonfigurasi. Buka Google Cloud Console, buat OAuth 2.0 Client ID, " +
+            "lalu isi credentials di application.properties dan set app.google.oauth2.enabled=true.");
+        return "redirect:/login";
     }
 
     /**
@@ -47,7 +84,7 @@ public class AuthController {
     /**
      * Memproses form login.
      * Jika berhasil, menyimpan data pengguna ke session dan redirect ke dashboard.
-     * Jika gagal, kembali ke halaman login dengan pesan error.
+     * Jika email belum diverifikasi, tampilkan pesan khusus.
      */
     @PostMapping("/login")
     public String prosesLogin(@RequestParam String email,
@@ -58,17 +95,43 @@ public class AuthController {
 
         if (pengguna.isPresent()) {
             Pengguna user = pengguna.get();
+
+            if (!user.isEmailVerified()) {
+                redirectAttributes.addFlashAttribute("error",
+                    "Email belum diverifikasi. Cek inbox " + user.getEmail() + " dan klik link verifikasi (berlaku 24 jam).");
+                return "redirect:/login";
+            }
+
             session.setAttribute("penggunaLogin", user);
             session.setAttribute("penggunaId", user.getId());
             session.setAttribute("penggunaRole", user.getRole().name());
             session.setAttribute("penggunaNama", user.getNamaLengkap());
 
-            // Redirect ke dashboard sesuai role (polimorfisme via getDashboardView())
             return "redirect:/dashboard";
         }
 
-        // Redirect dengan URL parameter ?error untuk ditangkap oleh Thymeleaf
         return "redirect:/login?error";
+    }
+
+    /**
+     * Verifikasi email melalui link yang dikirim ke email pengguna.
+     */
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam(required = false) String token,
+                              RedirectAttributes redirectAttributes) {
+        if (token == null || token.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Link verifikasi tidak valid.");
+            return "redirect:/login";
+        }
+        boolean berhasil = penggunaService.verifikasiEmail(token);
+        if (berhasil) {
+            redirectAttributes.addFlashAttribute("sukses",
+                "Email berhasil diverifikasi! Silakan login sekarang.");
+        } else {
+            redirectAttributes.addFlashAttribute("error",
+                "Link verifikasi tidak valid atau sudah kedaluwarsa (24 jam). Daftar ulang untuk mendapat link baru.");
+        }
+        return "redirect:/login";
     }
 
     /**
@@ -197,6 +260,7 @@ public class AuthController {
         dto.setMotivasi(motivasi);
 
         try {
+            Pengguna savedUser;
             if (dto.isSiswa()) {
                 Siswa siswa = new Siswa(
                     dto.getNamaLengkap(),
@@ -208,7 +272,7 @@ public class AuthController {
                 );
                 siswa.setMentor(true);
                 siswa.setMataPelajaranKeahlian(dto.getKeahlian());
-                penggunaService.daftarSiswa(siswa);
+                savedUser = penggunaService.daftarSiswa(siswa);
             } else {
                 int semesterInt = 1;
                 try { semesterInt = Integer.parseInt(dto.getSemester()); } catch (Exception ignored) {}
@@ -229,24 +293,23 @@ public class AuthController {
                         if (!ipkStr.isEmpty()) mhs.setIpk(Double.parseDouble(ipkStr));
                     } catch (Exception ignored) {}
                 }
-                penggunaService.daftarMahasiswa(mhs);
+                savedUser = penggunaService.daftarMahasiswa(mhs);
             }
 
             session.removeAttribute("mentorRegDto");
 
-            // Kirim email notifikasi ke admin + konfirmasi ke mentor (async, tidak blocking)
-            try {
-                emailService.kirimNotifikasiPendaftaranMentor(
+            // Generate token verifikasi dan kirim email
+            String token = penggunaService.generateTokenVerifikasi(savedUser);
+            emailService.kirimEmailVerifikasi(dto.getNamaLengkap(), dto.getEmail(), token);
+            try { emailService.kirimNotifikasiPendaftaranMentor(
                     dto.getNamaLengkap(), dto.getEmail(),
                     dto.getInstitusi() != null ? dto.getInstitusi() : "-",
-                    dto.getKeahlian() != null ? dto.getKeahlian() : "-"
-                );
-                emailService.kirimKonfirmasiKeMentor(dto.getNamaLengkap(), dto.getEmail());
-            } catch (Exception ignored) { /* email gagal tidak batalkan registrasi */ }
+                    dto.getKeahlian() != null ? dto.getKeahlian() : "-"); }
+            catch (Exception ignored) {}
 
             redirectAttributes.addFlashAttribute("sukses",
-                "Selamat! Akun mentor berhasil dibuat. Cek email Anda untuk konfirmasi.");
-            return "redirect:/register/mentor/step3";
+                "Akun mentor berhasil dibuat! Cek email " + dto.getEmail() + " untuk verifikasi (berlaku 24 jam).");
+            return "redirect:/login";
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -263,6 +326,7 @@ public class AuthController {
     @GetMapping("/register/mentee")
     public String halamanRegisterMentee(Model model) {
         model.addAttribute("form", new com.mentorpbo.dto.MenteeRegistrationDTO());
+        model.addAttribute("googleOAuth2Ready", isGoogleOAuth2Ready());
         return "auth/register-mentee";
     }
 
@@ -290,6 +354,7 @@ public class AuthController {
 
         try {
             boolean isSiswa = tingkatPendidikan != null && tingkatPendidikan.startsWith("SMA");
+            Pengguna user;
             if (isSiswa) {
                 Siswa siswa = new Siswa(
                     namaLengkap, email, kataSandi,
@@ -297,7 +362,7 @@ public class AuthController {
                     nimNisn != null ? nimNisn : ""
                 );
                 siswa.setMataPelajaranKeahlian(minatBelajar);
-                penggunaService.daftarSiswa(siswa);
+                user = penggunaService.daftarSiswa(siswa);
             } else {
                 Mahasiswa mhs = new Mahasiswa(
                     namaLengkap, email, kataSandi,
@@ -305,11 +370,16 @@ public class AuthController {
                     "", "", institusi, 1
                 );
                 mhs.setMataKuliahKeahlian(minatBelajar);
-                penggunaService.daftarMahasiswa(mhs);
+                user = penggunaService.daftarMahasiswa(mhs);
             }
+
+            // Generate token dan kirim email verifikasi
+            String token = penggunaService.generateTokenVerifikasi(user);
+            emailService.kirimEmailVerifikasi(namaLengkap, email, token);
+
             redirectAttributes.addFlashAttribute("sukses",
-                "Akun mentee berhasil dibuat! Silakan login dengan email dan kata sandi Anda.");
-            return "redirect:/login?registered";
+                "Akun berhasil dibuat! Cek email " + email + " untuk verifikasi (berlaku 24 jam).");
+            return "redirect:/login";
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -326,6 +396,7 @@ public class AuthController {
     @GetMapping("/register-pengawas")
     public String halamanRegisterPengawas(Model model) {
         model.addAttribute("pengawasDto", new com.mentorpbo.dto.PengawasRegistrationDTO());
+        model.addAttribute("googleOAuth2Ready", isGoogleOAuth2Ready());
         return "auth/register-pengawas";
     }
 
@@ -360,6 +431,7 @@ public class AuthController {
             String tipe = pengawasDto.getTipeInstitusi();
             boolean isGuru = "SEKOLAH".equalsIgnoreCase(tipe);
 
+            Pengguna savedUser;
             if (isGuru) {
                 com.mentorpbo.model.Guru guru = new com.mentorpbo.model.Guru(
                     pengawasDto.getNamaLengkap(),
@@ -372,7 +444,7 @@ public class AuthController {
                 if (pengawasDto.getJabatan() != null) guru.setBidangKeahlian(pengawasDto.getJabatan());
                 if (pengawasDto.getGelarAkademik() != null)
                     guru.setBio("Gelar: " + pengawasDto.getGelarAkademik());
-                penggunaService.daftarGuru(guru);
+                savedUser = penggunaService.daftarGuru(guru);
             } else {
                 com.mentorpbo.model.Dosen dosen = new com.mentorpbo.model.Dosen(
                     pengawasDto.getNamaLengkap(),
@@ -380,19 +452,24 @@ public class AuthController {
                     pengawasDto.getKataSandi(),
                     pengawasDto.getNidnNip() != null ? pengawasDto.getNidnNip() : "",
                     pengawasDto.getDepartemen() != null ? pengawasDto.getDepartemen() : "",
-                    "", // fakultas
+                    "",
                     pengawasDto.getNamaInstitusi() != null ? pengawasDto.getNamaInstitusi() : ""
                 );
                 if (pengawasDto.getJabatan() != null) dosen.setJabatanFungsional(pengawasDto.getJabatan());
                 if (pengawasDto.getMinatRiset() != null) dosen.setBidangRiset(pengawasDto.getMinatRiset());
                 if (pengawasDto.getGelarAkademik() != null)
                     dosen.setBio("Gelar: " + pengawasDto.getGelarAkademik());
-                penggunaService.daftarDosen(dosen);
+                savedUser = penggunaService.daftarDosen(dosen);
             }
 
+            // Generate token verifikasi dan kirim email
+            String token = penggunaService.generateTokenVerifikasi(savedUser);
+            emailService.kirimEmailVerifikasi(pengawasDto.getNamaLengkap(), pengawasDto.getEmail(), token);
+
             redirectAttributes.addFlashAttribute("sukses",
-                "Akun " + (isGuru ? "Guru" : "Dosen") + " berhasil dibuat! Silakan login.");
-            return "redirect:/login-pengawas?registered";
+                "Akun " + (isGuru ? "Guru" : "Dosen") + " berhasil dibuat! Cek email " +
+                pengawasDto.getEmail() + " untuk verifikasi (berlaku 24 jam).");
+            return "redirect:/login";
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

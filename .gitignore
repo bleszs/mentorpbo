@@ -38,6 +38,11 @@ app.log
 skills-lock.json
 data/
 
+### Credentials lokal (jangan di-push ke GitHub) ###
+# Buat file ini untuk menyimpan credentials asli di lokal
+application-local.properties
+application-secret.properties
+
 ### Claude Code internal ###
 .agents/
 .claude/

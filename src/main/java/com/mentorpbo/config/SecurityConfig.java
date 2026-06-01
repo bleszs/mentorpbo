@@ -2,20 +2,22 @@ package com.mentorpbo.config;
 
 import com.mentorpbo.service.CustomOAuth2UserService;
 import com.mentorpbo.service.OAuth2SuccessHandler;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * SecurityConfig - Mengkonfigurasi Spring Security untuk:
- * 1. Mengizinkan semua request (autentikasi manual via HttpSession)
- * 2. Mengaktifkan Google OAuth2 login
- * 3. Menonaktifkan CSRF (tidak diperlukan karena form Thymeleaf + manual auth)
- * 4. Mengizinkan H2 console (frame-options)
- */
+import java.io.IOException;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -26,40 +28,60 @@ public class SecurityConfig {
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
 
+    @Value("${app.google.oauth2.enabled:false}")
+    private boolean googleOAuth2Enabled;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
+    private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret:PLACEHOLDER}")
+    private String googleClientSecret;
+
+    /**
+     * Google Client ID yang valid selalu berakhir dengan .apps.googleusercontent.com
+     * dan client secret tidak boleh placeholder.
+     */
+    private boolean isOAuth2Ready() {
+        return googleOAuth2Enabled
+            && googleClientId != null
+            && googleClientId.endsWith(".apps.googleusercontent.com")
+            && googleClientSecret != null
+            && !googleClientSecret.startsWith("GANTI")
+            && !googleClientSecret.equals("PLACEHOLDER");
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Matikan CSRF — kita gunakan autentikasi manual via session
             .csrf(csrf -> csrf.disable())
-
-            // Izinkan iframe untuk H2 console
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin())
-            )
-
-            // Izinkan semua request — logika auth ditangani controller
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            )
-
-            // Matikan form login bawaan Spring Security
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .formLogin(form -> form.disable())
-
-            // Matikan HTTP Basic
             .httpBasic(basic -> basic.disable())
+            .logout(logout -> logout.disable());
 
-            // Matikan logout Spring Security (kita punya /logout sendiri)
-            .logout(logout -> logout.disable())
-
-            // Konfigurasi OAuth2 Login (Google)
-            .oauth2Login(oauth2 -> oauth2
+        if (isOAuth2Ready()) {
+            http.oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService)
-                )
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
                 .failureUrl("/login?error=oauth")
             );
+        } else {
+            // Blokir /oauth2/authorization/** agar tidak diteruskan ke Google dengan credentials kosong/salah
+            http.addFilterBefore(new OncePerRequestFilter() {
+                @Override
+                protected void doFilterInternal(HttpServletRequest request,
+                                                HttpServletResponse response,
+                                                FilterChain chain) throws ServletException, IOException {
+                    if (request.getRequestURI().startsWith("/oauth2/authorization/")) {
+                        response.sendRedirect(request.getContextPath() + "/login?error=oauth-not-configured");
+                        return;
+                    }
+                    chain.doFilter(request, response);
+                }
+            }, SecurityContextHolderFilter.class);
+        }
 
         return http.build();
     }

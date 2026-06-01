@@ -48,7 +48,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 "", "", "", "", 1
             );
             newUser.setBio("Akun dibuat via Google Login.");
+            // Google sudah verifikasi email — tidak perlu verifikasi manual
+            newUser.setEmailVerified(true);
             mahasiswaRepository.save(newUser);
+        } else {
+            // User sudah ada — pastikan emailVerified=true jika login via Google
+            penggunaRepository.findByEmail(email).ifPresent(p -> {
+                if (!p.isEmailVerified()) {
+                    p.setEmailVerified(true);
+                    penggunaRepository.save(p);
+                }
+            });
         }
 
         return oAuth2User;

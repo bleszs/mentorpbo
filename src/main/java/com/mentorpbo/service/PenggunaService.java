@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service PenggunaService - Lapisan logika bisnis untuk manajemen pengguna.
@@ -119,6 +120,40 @@ public class PenggunaService {
             throw new IllegalArgumentException("Email sudah terdaftar: " + dosen.getEmail());
         }
         return dosenRepository.save(dosen);
+    }
+
+    // === Verifikasi Email ===
+
+    /**
+     * Generate token verifikasi email, simpan ke DB, dan return tokennya.
+     * Token berlaku selama 24 jam.
+     */
+    public String generateTokenVerifikasi(Pengguna pengguna) {
+        String token = UUID.randomUUID().toString();
+        pengguna.setEmailVerified(false);
+        pengguna.setTokenVerifikasi(token);
+        pengguna.setTokenVerifikasiExpiry(LocalDateTime.now().plusHours(24));
+        penggunaRepository.save(pengguna);
+        return token;
+    }
+
+    /**
+     * Validasi token verifikasi email.
+     * Jika valid dan belum expired → set emailVerified=true, hapus token.
+     * Return false jika token tidak ditemukan atau sudah kedaluwarsa.
+     */
+    public boolean verifikasiEmail(String token) {
+        Optional<Pengguna> opt = penggunaRepository.findByTokenVerifikasi(token);
+        if (opt.isEmpty()) return false;
+        Pengguna p = opt.get();
+        if (p.getTokenVerifikasiExpiry() == null || p.getTokenVerifikasiExpiry().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        p.setEmailVerified(true);
+        p.setTokenVerifikasi(null);
+        p.setTokenVerifikasiExpiry(null);
+        penggunaRepository.save(p);
+        return true;
     }
 
     // === Pencarian ===

@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Pendaftaran Mentor – Motivasi | Jejak Ilmu</title>
+<title>Daftar Mentor | Jejak Ilmu - Platform Mentoring Akademik</title>
+<link rel="icon" href="/favicon.ico"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
 tailwind.config = {
@@ -54,11 +56,8 @@ tailwind.config = {
     <div class="relative z-10">
       <!-- Logo -->
       <div class="mb-12">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
-            <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
-          </div>
-          <h1 class="font-headline-md text-headline-md font-black text-white">Jejak Ilmu</h1>
+        <div class="mb-4">
+          <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;"/>
         </div>
         <div class="h-1 w-12 bg-secondary-fixed"></div>
       </div>
@@ -124,10 +123,7 @@ tailwind.config = {
       <!-- Mobile header -->
       <div class="md:hidden mb-8 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center">
-            <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">school</span>
-          </div>
-          <span class="font-headline-md font-black text-primary-container">Jejak Ilmu</span>
+          <img src="/images/logo.png" alt="Jejak Ilmu" style="height:56px;width:auto;"/>
         </div>
         <a th:href="@{/login}" class="text-sm text-on-surface-variant hover:text-primary">Batal</a>
       </div>
