@@ -36,7 +36,10 @@ build/
 app.log
 *.log
 skills-lock.json
-data/
+# H2 database files di root project (ephemeral, jangan di-commit)
+/data/
+# Pastikan static data JSON tetap ter-track
+!src/main/resources/static/data/
 
 ### User uploads (file yang diupload pengguna, jangan di-push) ###
 uploads/
