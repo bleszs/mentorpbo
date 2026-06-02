@@ -2,10 +2,6 @@ package com.mentorpbo.config;
 
 import com.mentorpbo.service.CustomOAuth2UserService;
 import com.mentorpbo.service.OAuth2SuccessHandler;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -32,29 +24,21 @@ public class SecurityConfig {
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    @Value("${app.google.oauth2.enabled:false}")
-    private boolean googleOAuth2Enabled;
-
     @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
     private String googleClientId;
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret:PLACEHOLDER}")
     private String googleClientSecret;
 
-    /**
-     * Google Client ID yang valid selalu berakhir dengan .apps.googleusercontent.com
-     * dan client secret tidak boleh placeholder.
-     */
-    private boolean isOAuth2Ready() {
-        boolean enabled   = googleOAuth2Enabled;
-        boolean idOk      = googleClientId != null && googleClientId.endsWith(".apps.googleusercontent.com");
-        boolean secretOk  = googleClientSecret != null
-                            && !googleClientSecret.startsWith("GANTI")
-                            && !googleClientSecret.equals("PLACEHOLDER");
-        boolean ready = enabled && idOk && secretOk;
-        log.info("[OAuth2] enabled={} idOk={} secretOk={} -> ready={}",
-                 enabled, idOk, secretOk, ready);
-        return ready;
+    private boolean hasRealCredentials() {
+        String id     = googleClientId  != null ? googleClientId.trim()     : "";
+        String secret = googleClientSecret != null ? googleClientSecret.trim() : "";
+        boolean ok = id.endsWith(".apps.googleusercontent.com")
+                  && !secret.equals("PLACEHOLDER")
+                  && !secret.isBlank();
+        log.info("[OAuth2] clientId ends OK={} secretOk={} -> configured={}",
+                 id.endsWith(".apps.googleusercontent.com"), !secret.equals("PLACEHOLDER") && !secret.isBlank(), ok);
+        return ok;
     }
 
     @Bean
@@ -67,7 +51,8 @@ public class SecurityConfig {
             .httpBasic(basic -> basic.disable())
             .logout(logout -> logout.disable());
 
-        if (isOAuth2Ready()) {
+        if (hasRealCredentials()) {
+            log.info("[OAuth2] Configuring Google OAuth2 login");
             http.oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
@@ -75,19 +60,7 @@ public class SecurityConfig {
                 .failureUrl("/login?error=oauth")
             );
         } else {
-            // Blokir /oauth2/authorization/** agar tidak diteruskan ke Google dengan credentials kosong/salah
-            http.addFilterBefore(new OncePerRequestFilter() {
-                @Override
-                protected void doFilterInternal(HttpServletRequest request,
-                                                HttpServletResponse response,
-                                                FilterChain chain) throws ServletException, IOException {
-                    if (request.getRequestURI().startsWith("/oauth2/authorization/")) {
-                        response.sendRedirect(request.getContextPath() + "/login?error=oauth-not-configured");
-                        return;
-                    }
-                    chain.doFilter(request, response);
-                }
-            }, SecurityContextHolderFilter.class);
+            log.warn("[OAuth2] Google credentials not set — OAuth2 login disabled");
         }
 
         return http.build();
