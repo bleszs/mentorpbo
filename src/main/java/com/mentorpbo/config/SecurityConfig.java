@@ -5,6 +5,7 @@ import com.mentorpbo.service.OAuth2SuccessHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,31 +29,34 @@ public class SecurityConfig {
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    /**
-     * Baca credentials LANGSUNG dari System.getenv() — melewati Spring property
-     * resolution yang sebelumnya mengembalikan string kosong di Railway.
-     */
+    // Dibaca dari JVM system property -D (diset oleh Dockerfile ENTRYPOINT dari shell env var)
+    @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret:PLACEHOLDER}")
+    private String clientSecret;
+
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
-        String clientId     = System.getenv("GOOGLE_CLIENT_ID");
-        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+        String id  = clientId  != null ? clientId.trim()  : "PLACEHOLDER";
+        String sec = clientSecret != null ? clientSecret.trim() : "PLACEHOLDER";
 
-        log.info("[OAuth2] GOOGLE_CLIENT_ID  = {}",
-                 clientId != null ? clientId.substring(0, Math.min(20, clientId.length())) + "..." : "NULL");
-        log.info("[OAuth2] GOOGLE_CLIENT_SECRET = {}",
-                 clientSecret != null ? "set (" + clientSecret.length() + " chars)" : "NULL");
+        log.info("[OAuth2] client-id  : {}",
+                 id.endsWith(".apps.googleusercontent.com")
+                     ? id.substring(0, 20) + "...(valid)" : id);
+        log.info("[OAuth2] client-sec : {}",
+                 (!sec.equals("PLACEHOLDER") && !sec.isBlank()) ? "set" : "PLACEHOLDER/empty");
 
-        if (clientId == null || clientId.isBlank()
-                || !clientId.trim().endsWith(".apps.googleusercontent.com")
-                || clientSecret == null || clientSecret.isBlank()) {
-            log.warn("[OAuth2] Credentials missing/invalid — OAuth2 disabled");
+        if (!id.endsWith(".apps.googleusercontent.com") || sec.equals("PLACEHOLDER") || sec.isBlank()) {
+            log.warn("[OAuth2] Credentials not available — OAuth2 disabled");
             return registrationId -> null;
         }
 
-        ClientRegistration google = ClientRegistration
-                .withRegistrationId("google")
-                .clientId(clientId.trim())
-                .clientSecret(clientSecret.trim())
+        log.info("[OAuth2] Google OAuth2 configured OK");
+        return new InMemoryClientRegistrationRepository(
+            ClientRegistration.withRegistrationId("google")
+                .clientId(id)
+                .clientSecret(sec)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .scope("email", "profile")
@@ -62,10 +66,8 @@ public class SecurityConfig {
                 .userNameAttributeName(IdTokenClaimNames.SUB)
                 .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
                 .clientName("Google")
-                .build();
-
-        log.info("[OAuth2] Google OAuth2 configured successfully");
-        return new InMemoryClientRegistrationRepository(google);
+                .build()
+        );
     }
 
     @Bean

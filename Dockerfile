@@ -64,4 +64,8 @@ ENTRYPOINT ["sh", "-c", \
    -XX:MaxMetaspaceSize=128m \
    -Djava.security.egd=file:/dev/./urandom \
    -Dserver.port=${PORT:-8080} \
+   -Dspring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID:-PLACEHOLDER} \
+   -Dspring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET:-PLACEHOLDER} \
+   -Dspring.mail.username=${SPRING_MAIL_USERNAME:-} \
+   -Dspring.mail.password=${SPRING_MAIL_PASSWORD:-} \
    -jar app.jar"]
