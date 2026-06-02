@@ -10,11 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -44,30 +39,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        if (!isOAuthValid()) {
-            log.warn("[OAuth2] Credentials missing — repository empty");
-            return new InMemoryClientRegistrationRepository();  // empty, tidak crash
-        }
-        log.info("[OAuth2] Google OAuth2 configured OK");
-        return new InMemoryClientRegistrationRepository(
-            ClientRegistration.withRegistrationId("google")
-                .clientId(clientId.trim())
-                .clientSecret(clientSecret.trim())
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                .scope("email", "profile")
-                .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
-                .tokenUri("https://oauth2.googleapis.com/token")
-                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-                .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
-                .clientName("Google")
-                .build()
-        );
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
@@ -78,12 +49,15 @@ public class SecurityConfig {
             .logout(logout -> logout.disable());
 
         if (isOAuthValid()) {
+            log.info("[OAuth2] Enabling Google OAuth2 login");
             http.oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
                 .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
                 .failureUrl("/login?error=oauth")
             );
+        } else {
+            log.warn("[OAuth2] Credentials not valid — OAuth2 login disabled");
         }
 
         return http.build();
