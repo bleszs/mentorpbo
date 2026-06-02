@@ -511,7 +511,7 @@ public class DashboardController {
         Pengguna pengguna = optPengguna.get();
 
         // Siswa redirect ke pesan-chat jika ada percakapan
-        if (pengguna instanceof Siswa siswa) {
+        if (pengguna instanceof Siswa) {
             List<SesiMentoring> sesiSiswa = mentoringService.getSemuaSesiPengguna(penggunaId);
             Optional<Long> firstPartner = sesiSiswa.stream()
                 .map(s -> s.getMentor() != null && !s.getMentor().getId().equals(penggunaId)
