@@ -6,7 +6,6 @@ import com.mentorpbo.service.MentoringService;
 import com.mentorpbo.service.PenggunaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -242,7 +241,8 @@ public class ProfileController {
             MateriBelajar sumberDaya = new MateriBelajar();
             sumberDaya.setJudul(judul.trim());
             sumberDaya.setDeskripsi(deskripsi);
-            sumberDaya.setJenisMateri(kategori != null ? kategori : "SUMBER_DAYA");
+            sumberDaya.setJenisMateri(kategori != null ? kategori : "DOKUMEN");
+            sumberDaya.setTipeKonten("SUMBER_DAYA");
             sumberDaya.setPengunggah(pengguna);
 
             if (fileSumberDaya != null && !fileSumberDaya.isEmpty()) {
@@ -265,6 +265,76 @@ public class ProfileController {
             flash.addFlashAttribute("error", "Gagal menambahkan sumber daya: " + e.getMessage());
         }
         return "redirect:/dashboard/sumber-daya";
+    }
+
+    // ============================================================
+    // HAPUS & EDIT MATERI / SUMBER DAYA
+    // ============================================================
+
+    @PostMapping("/materi/{id}/hapus")
+    public String hapusMateri(@PathVariable Long id, HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            mentoringService.getMateriById(id).ifPresentOrElse(materi -> {
+                if (!materi.getPengunggah().getId().equals(penggunaId)) {
+                    flash.addFlashAttribute("error", "Materi bukan milik Anda.");
+                } else {
+                    mentoringService.hapusMateri(id);
+                    flash.addFlashAttribute("sukses", "Materi berhasil dihapus.");
+                }
+            }, () -> flash.addFlashAttribute("error", "Materi tidak ditemukan."));
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Gagal menghapus: " + e.getMessage());
+        }
+        return "redirect:/dashboard/materi";
+    }
+
+    @PostMapping("/materi/{id}/hapus-sd")
+    public String hapusSumberDaya(@PathVariable Long id, HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            mentoringService.getMateriById(id).ifPresentOrElse(sd -> {
+                if (!sd.getPengunggah().getId().equals(penggunaId)) {
+                    flash.addFlashAttribute("error", "Sumber daya bukan milik Anda.");
+                } else {
+                    mentoringService.hapusMateri(id);
+                    flash.addFlashAttribute("sukses", "Sumber daya berhasil dihapus.");
+                }
+            }, () -> flash.addFlashAttribute("error", "Sumber daya tidak ditemukan."));
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Gagal menghapus: " + e.getMessage());
+        }
+        return "redirect:/dashboard/sumber-daya";
+    }
+
+    @PostMapping("/materi/{id}/edit")
+    public String editMateri(@PathVariable Long id,
+                              @RequestParam String judul,
+                              @RequestParam(required = false) String deskripsi,
+                              HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            mentoringService.getMateriById(id).ifPresentOrElse(materi -> {
+                if (!materi.getPengunggah().getId().equals(penggunaId)) {
+                    flash.addFlashAttribute("error", "Materi bukan milik Anda.");
+                } else {
+                    materi.setJudul(judul.trim());
+                    materi.setDeskripsi(deskripsi);
+                    mentoringService.unggahMateri(materi);
+                    String tipe = "SUMBER_DAYA".equals(materi.getTipeKonten()) ? "sumber-daya" : "materi";
+                    flash.addFlashAttribute("sukses", "Berhasil diperbarui.");
+                }
+            }, () -> flash.addFlashAttribute("error", "Materi tidak ditemukan."));
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Gagal mengedit: " + e.getMessage());
+        }
+        return "redirect:/dashboard/materi";
     }
 
     // ============================================================

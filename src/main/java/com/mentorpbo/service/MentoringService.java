@@ -265,15 +265,18 @@ public class MentoringService {
                 ". Pastikan sesi sudah dimulai terlebih dahulu.");
         }
 
-        // Hitung poin berdasarkan durasi
-        int poinMentor, poinMentee;
-        if (sesi.getDurasiMenit() < 30) {
-            poinMentor = 5;  poinMentee = 3;
-        } else if (sesi.getDurasiMenit() <= 60) {
-            poinMentor = 10; poinMentee = 7;
-        } else {
-            poinMentor = 15; poinMentee = 10;
-        }
+        // Poin mentor (awal berdasarkan durasi — rating akan menambah/kurangi poin setelahnya)
+        int poinMentor;
+        if (sesi.getDurasiMenit() < 30) poinMentor = 5;
+        else if (sesi.getDurasiMenit() <= 60) poinMentor = 10;
+        else poinMentor = 15;
+
+        // Poin mentee: selesai sesi +10, tepat waktu +2 (jika waktu mulai sudah lewat ≤ 5 menit)
+        int poinMentee = 10;
+        boolean tepakWaktu = sesi.getWaktuMulai() != null &&
+            !LocalDateTime.now().isBefore(sesi.getWaktuMulai()) &&
+            LocalDateTime.now().isBefore(sesi.getWaktuMulai().plusMinutes(sesi.getDurasiMenit() + 5));
+        if (tepakWaktu) poinMentee += 2;
 
         // Panggil method entity — mengubah status ke SELESAI dan menyimpan poin
         sesi.selesaikanSesi(poinMentor, poinMentee);
@@ -299,10 +302,11 @@ public class MentoringService {
         }
 
         // Notifikasi mentee: minta review
+        String bonusInfo = tepakWaktu ? " (+2 poin tepat waktu)" : "";
         kirimNotifikasi(
             "Sesi Selesai — Berikan Rating",
             "Sesi \"" + sesi.getTopikPembahasan() + "\" telah selesai. " +
-                "Anda mendapat +" + poinMentee + " poin! Jangan lupa berikan rating untuk mentor.",
+                "Anda mendapat +" + poinMentee + " poin" + bonusInfo + "! Jangan lupa berikan rating untuk mentor (+3 poin).",
             "SESI",
             sesi.getMentee()
         );
@@ -334,9 +338,25 @@ public class MentoringService {
         // Delegasi ke interface Schedulable
         sesi.batalkanJadwal(alasan);
 
+        // Batal mendadak (< 24 jam sebelum sesi) = -25 poin untuk yang membatalkan
+        boolean mendadak = sesi.getWaktuMulai() != null &&
+            sesi.getWaktuMulai().isBefore(LocalDateTime.now().plusHours(24));
+        if (mendadak) {
+            // Kurangi poin mentee jika pembatalan mendadak
+            Pengguna mentee = sesi.getMentee();
+            if (mentee instanceof Siswa s) {
+                s.setTotalPoinProgres(Math.max(0, s.getTotalPoinProgres() - 25));
+                siswaRepository.save(s);
+            } else if (mentee instanceof Mahasiswa m) {
+                m.setTotalPoinProgres(Math.max(0, m.getTotalPoinProgres() - 25));
+                mahasiswaRepository.save(m);
+            }
+        }
+
         kirimNotifikasi(
             "Sesi Dibatalkan",
-            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan,
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan +
+                (mendadak ? " (-25 poin karena pembatalan mendadak)" : ""),
             "JADWAL",
             sesi.getMentee()
         );
@@ -378,6 +398,12 @@ public class MentoringService {
      */
     public ReviewRating beriReviewDanRating(Long sesiId, Long pemberiId,
                                             int nilaiRating, String ulasan) {
+        return beriReviewDanRatingLengkap(sesiId, pemberiId, nilaiRating, ulasan, null);
+    }
+
+    public ReviewRating beriReviewDanRatingLengkap(Long sesiId, Long pemberiId,
+                                                    int nilaiRating, String ulasan,
+                                                    String saranKritik) {
         SesiMentoring sesi = getSesiAtauLempar(sesiId);
 
         if (sesi.getStatusSesi() != StatusSesi.SELESAI) {
@@ -393,26 +419,50 @@ public class MentoringService {
         Pengguna penerima = sesi.getMentor();
 
         ReviewRating review = new ReviewRating(nilaiRating, ulasan, sesi, pemberi, penerima);
+        if (saranKritik != null && !saranKritik.isBlank()) {
+            review.setSaranKritik(saranKritik);
+        }
         ReviewRating tersimpan = reviewRepository.save(review);
 
-        // Update rating di profil mentor — polimorfisme via instanceof + interface Ratable
+        // Hitung poin mentor berdasarkan rating: b5 +15, b4 +10, b3 +5, b2 -5, b1 -10
+        int poinDariRating = switch (nilaiRating) {
+            case 5 -> 15;
+            case 4 -> 10;
+            case 3 -> 5;
+            case 2 -> -5;
+            case 1 -> -10;
+            default -> 0;
+        };
+
+        // Update rating dan poin di profil mentor
         if (penerima instanceof Siswa siswa) {
             siswa.beriRating(nilaiRating, ulasan);
+            if (poinDariRating > 0) siswa.tambahPoinProgres(poinDariRating);
+            else if (poinDariRating < 0) siswa.setTotalPoinProgres(Math.max(0, siswa.getTotalPoinProgres() + poinDariRating));
             siswaRepository.save(siswa);
         } else if (penerima instanceof Mahasiswa mahasiswa) {
             mahasiswa.beriRating(nilaiRating, ulasan);
-            // Cek apakah mahasiswa memenuhi syarat Asdos setelah rating diperbarui
+            if (poinDariRating > 0) mahasiswa.tambahPoinProgres(poinDariRating);
+            else if (poinDariRating < 0) mahasiswa.setTotalPoinProgres(Math.max(0, mahasiswa.getTotalPoinProgres() + poinDariRating));
             if (mahasiswa.memenuhiSyaratAsdos()) {
                 mahasiswa.setKandidatAsdos(true);
                 kirimNotifikasi(
                     "Selamat! Anda Memenuhi Syarat Asdos",
                     "Prestasi Anda memenuhi kriteria Asisten Dosen. Tunggu rekomendasi dari Dosen.",
-                    "ASDOS",
-                    mahasiswa
+                    "ASDOS", mahasiswa
                 );
             }
             mahasiswaRepository.save(mahasiswa);
         }
+
+        // Mentee mendapat +3 poin untuk memberikan feedback/rating
+        tambahPoinKePengguna(pemberi, 3);
+
+        // Notifikasi mentor tentang rating baru
+        String pesanRating = "Mentee memberi rating " + nilaiRating + " bintang (" +
+            (poinDariRating >= 0 ? "+" : "") + poinDariRating + " poin) untuk sesi \"" +
+            sesi.getTopikPembahasan() + "\".";
+        kirimNotifikasi("Rating Baru Diterima", pesanRating, "RATING", penerima);
 
         return tersimpan;
     }
@@ -429,6 +479,10 @@ public class MentoringService {
     public List<MateriBelajar> cariMateri(String kataKunci)       { return materiRepository.findByJudulContainingIgnoreCase(kataKunci); }
     public List<MateriBelajar> getMateriPopuler()                 { return materiRepository.findAllByOrderByJumlahUnduhanDesc(); }
     public List<MateriBelajar> getMateriByPengguna(Long id)       { return materiRepository.findByPengunggahId(id); }
+    public List<MateriBelajar> getMateriSajaByPengguna(Long id)   { return materiRepository.findByPengunggahIdAndTipeKonten(id, "MATERI"); }
+    public List<MateriBelajar> getSumberDayaByPengguna(Long id)   { return materiRepository.findByPengunggahIdAndTipeKonten(id, "SUMBER_DAYA"); }
+    public Optional<MateriBelajar> getMateriById(Long id)         { return materiRepository.findById(id); }
+    public void hapusMateri(Long id)                              { materiRepository.deleteById(id); }
 
     // ============================================================
     // QUERY SESI

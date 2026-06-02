@@ -38,10 +38,16 @@ app.log
 skills-lock.json
 data/
 
+### User uploads (file yang diupload pengguna, jangan di-push) ###
+uploads/
+
 ### Credentials lokal (jangan di-push ke GitHub) ###
 # Buat file ini untuk menyimpan credentials asli di lokal
 application-local.properties
 application-secret.properties
+.env
+.env.local
+.env.*
 
 ### Claude Code internal ###
 .agents/

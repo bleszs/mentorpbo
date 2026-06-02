@@ -36,6 +36,10 @@ public class ReviewRating {
     @Column(length = 500)
     private String aspekPerbaikan;
 
+    /** Saran dan kritik / alasan dari mentee setelah memberi rating */
+    @Column(length = 1000)
+    private String saranKritik;
+
     /** Apakah mentee merekomendasikan mentor ini ke orang lain */
     @Column(nullable = false)
     private boolean merekomendasikan = false;
@@ -125,6 +129,14 @@ public class ReviewRating {
 
     public void setAspekPerbaikan(String aspekPerbaikan) {
         this.aspekPerbaikan = aspekPerbaikan;
+    }
+
+    public String getSaranKritik() {
+        return saranKritik;
+    }
+
+    public void setSaranKritik(String saranKritik) {
+        this.saranKritik = saranKritik;
     }
 
     public boolean isMerekomendasikan() {

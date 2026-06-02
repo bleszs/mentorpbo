@@ -46,6 +46,14 @@ public class MateriBelajar {
     @Column(length = 100)
     private String mataPelajaran;
 
+    /** Tipe konten: MATERI atau SUMBER_DAYA — digunakan untuk memisahkan tampilan di dashboard */
+    @Column(nullable = false, length = 20)
+    private String tipeKonten = "MATERI";
+
+    /** URL sampul/thumbnail konten */
+    @Column(length = 500)
+    private String sampulUrl;
+
     /** Jumlah unduhan materi */
     @Column(nullable = false)
     private int jumlahUnduhan = 0;
@@ -157,6 +165,22 @@ public class MateriBelajar {
 
     public void setMataPelajaran(String mataPelajaran) {
         this.mataPelajaran = mataPelajaran;
+    }
+
+    public String getTipeKonten() {
+        return tipeKonten;
+    }
+
+    public void setTipeKonten(String tipeKonten) {
+        this.tipeKonten = tipeKonten;
+    }
+
+    public String getSampulUrl() {
+        return sampulUrl;
+    }
+
+    public void setSampulUrl(String sampulUrl) {
+        this.sampulUrl = sampulUrl;
     }
 
     public int getJumlahUnduhan() {

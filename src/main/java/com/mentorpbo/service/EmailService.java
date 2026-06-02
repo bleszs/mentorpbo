@@ -166,7 +166,7 @@ public class EmailService {
                 </a>
               </div>
               <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
-                © 2024 Jejak Ilmu. Academic Excellence through Elite Mentorship.
+                © 2025 Jejak Ilmu. Platform Mentoring Akademik Indonesia.
               </p>
             </div>
             """;
@@ -201,7 +201,7 @@ public class EmailService {
                 </a>
               </div>
               <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
-                © 2024 Jejak Ilmu. Academic Excellence through Elite Mentorship.
+                © 2025 Jejak Ilmu. Platform Mentoring Akademik Indonesia.
               </p>
             </div>
             """;

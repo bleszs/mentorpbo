@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Dashboard - ' + ${dosen.namaLengkap}">Jejak Ilmu - Dashboard Dosen</title>
+<title>Beranda | Jejak Ilmu - Platform Mentoring Akademik</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -65,7 +65,7 @@ tailwind.config = {
       </a>
       <div>
         <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-        <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Elite Mentorship</p>
+        <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
       </div>
     </div>
     <div class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 border border-secondary-container/30">
@@ -141,8 +141,7 @@ tailwind.config = {
         <p class="font-caption-xs text-caption-xs text-on-surface-variant"
            th:text="${dosen.jabatanFungsional ?: 'Koordinator Akademik'}">Jabatan</p>
       </div>
-      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed flex items-center justify-center text-white font-black text-sm"
-           th:text="${#strings.substring(dosen.namaLengkap, 0, 2).toUpperCase()}">DO</div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0"><img th:if="${dosen.fotoProfil != null}" th:src="${dosen.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${dosen.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(dosen.namaLengkap, 0, 2).toUpperCase()}">DO</div></div>
     </div>
   </div>
 </header>

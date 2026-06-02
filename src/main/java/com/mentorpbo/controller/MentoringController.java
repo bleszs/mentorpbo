@@ -300,6 +300,7 @@ public class MentoringController {
                       || (p instanceof Mahasiswa m && !m.isMentor()))
             .collect(Collectors.toList());
         model.addAttribute("daftarMentee", daftarMentee);
+        model.addAttribute("isSiswaMentor", pengguna instanceof Siswa);
 
         List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentor(penggunaId);
         model.addAttribute("sesiMendatang", sesiMendatang);
@@ -316,9 +317,9 @@ public class MentoringController {
         return "mentoring/jadwalkan-sesi";
     }
 
-    /** Submit undangan sesi online dari mentor — langsung DIJADWALKAN. */
+    /** Submit undangan sesi online dari mentor — bisa ke banyak mentee sekaligus. */
     @PostMapping("/jadwalkan-sesi")
-    public String buatSesiOnline(@RequestParam Long   menteeId,
+    public String buatSesiOnline(@RequestParam List<Long> menteeId,
                                  @RequestParam String topikPembahasan,
                                  @RequestParam String tanggal,
                                  @RequestParam String jamMulai,
@@ -330,18 +331,32 @@ public class MentoringController {
         Long penggunaId = requireLogin(session);
         if (penggunaId == null) return "redirect:/login";
 
+        int berhasil = 0;
+        List<String> gagal = new ArrayList<>();
         try {
             Pengguna mentor = getPenggunaAtauLempar(penggunaId, "Mentor tidak ditemukan.");
-            Pengguna mentee = getPenggunaAtauLempar(menteeId, "Mentee tidak ditemukan.");
+            LocalDateTime waktuMulai = parseWaktu(tanggal, jamMulai);
 
-            SesiOnline sesi = new SesiOnline(topikPembahasan, durasiMenit,
-                mentor, mentee, tautanMeeting, platformDaring);
-            if (!catatan.isBlank()) sesi.setDeskripsi(catatan);
+            for (Long mid : menteeId) {
+                try {
+                    Pengguna mentee = getPenggunaAtauLempar(mid, "Mentee tidak ditemukan.");
+                    SesiOnline sesi = new SesiOnline(topikPembahasan, durasiMenit,
+                        mentor, mentee, tautanMeeting, platformDaring);
+                    if (!catatan.isBlank()) sesi.setDeskripsi(catatan);
+                    mentoringService.buatDanJadwalkanSesi(sesi, waktuMulai, durasiMenit);
+                    berhasil++;
+                } catch (Exception e) {
+                    gagal.add(e.getMessage());
+                }
+            }
 
-            mentoringService.buatDanJadwalkanSesi(sesi, parseWaktu(tanggal, jamMulai), durasiMenit);
-
-            flash.addFlashAttribute("sukses",
-                "Undangan sesi \"" + topikPembahasan + "\" berhasil dikirim!");
+            if (berhasil > 0) {
+                flash.addFlashAttribute("sukses",
+                    "Undangan sesi \"" + topikPembahasan + "\" berhasil dikirim ke " + berhasil + " mentee!");
+            }
+            if (!gagal.isEmpty()) {
+                flash.addFlashAttribute("error", "Beberapa gagal: " + String.join(", ", gagal));
+            }
         } catch (Exception e) {
             flash.addFlashAttribute("error", "Gagal membuat sesi: " + e.getMessage());
         }
@@ -419,16 +434,19 @@ public class MentoringController {
 
     /** Mentee memberikan rating setelah sesi SELESAI. */
     @PostMapping("/review")
-    public String beriReview(@RequestParam Long   sesiId,
-                             @RequestParam int    nilaiRating,
-                             @RequestParam String ulasan,
+    public String beriReview(@RequestParam Long sesiId,
+                             @RequestParam int  nilaiRating,
+                             @RequestParam(required = false, defaultValue = "") String ulasan,
+                             @RequestParam(required = false, defaultValue = "") String saranKritik,
                              HttpSession session, RedirectAttributes flash) {
         Long penggunaId = requireLogin(session);
         if (penggunaId == null) return "redirect:/login";
 
         try {
-            mentoringService.beriReviewDanRating(sesiId, penggunaId, nilaiRating, ulasan);
-            flash.addFlashAttribute("sukses", "Review berhasil dikirim! Terima kasih.");
+            mentoringService.beriReviewDanRatingLengkap(sesiId, penggunaId, nilaiRating,
+                ulasan.isBlank() ? null : ulasan,
+                saranKritik.isBlank() ? null : saranKritik);
+            flash.addFlashAttribute("sukses", "Rating berhasil dikirim! Anda mendapat +3 poin. Terima kasih.");
         } catch (Exception e) {
             flash.addFlashAttribute("error", e.getMessage());
         }

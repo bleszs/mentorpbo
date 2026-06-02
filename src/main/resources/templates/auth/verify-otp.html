@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Verifikasi Kode OTP | Jejak Ilmu</title>
+<title>Verifikasi OTP | Jejak Ilmu - Platform Mentoring Akademik</title>
 <link rel="icon" href="/favicon.ico"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
@@ -126,7 +126,7 @@ tailwind.config = {
       <p class="font-bold text-primary-container mb-6 text-[15px]" th:text="${email}">email@example.com</p>
 
       <!-- ============ BANNER OTP DEV MODE ============ -->
-      <!-- Tampil jika email SMTP gagal dikirim — user bisa salin kode dari sini -->
+      <!-- Tampil jika email SMTP gagal dikirim â€” user bisa salin kode dari sini -->
       <div th:if="${devOtp != null and !devOtp.isEmpty()}"
            class="mb-6 rounded-2xl border-2 border-warning-gold bg-[#fffbeb] px-5 py-4">
         <div class="flex items-center gap-2 mb-3">
@@ -222,7 +222,7 @@ tailwind.config = {
       <p class="mt-8 text-center font-body-md text-body-md text-on-surface-variant">
         Salah akun?
         <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register}">Daftar ulang</a>
-        &nbsp;·&nbsp;
+        &nbsp;Â·&nbsp;
         <a class="text-on-primary-container font-bold hover:underline" th:href="@{/login}">Kembali login</a>
       </p>
 

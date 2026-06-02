@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Mentorship - ' + ${mahasiswa?.namaLengkap ?: pengguna.namaLengkap}">Jejak Ilmu - Manajemen Mentorship</title>
+<title>Daftar Sesi | Jejak Ilmu - Platform Mentoring Akademik</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -92,7 +92,7 @@ tailwind.config = {
     </div>
     <div>
       <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
     </div>
   </div>
 
@@ -167,8 +167,10 @@ tailwind.config = {
         <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
            th:text="${mahasiswa?.programStudi ?: 'Mentee'}">Mentee</p>
       </div>
-      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
-           th:text="${#strings.substring(mahasiswa?.namaLengkap ?: pengguna.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
+        <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+        <div th:unless="${pengguna.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mahasiswa?.namaLengkap ?: pengguna.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+      </div>
     </div>
   </div>
 </header>
@@ -240,7 +242,7 @@ tailwind.config = {
               </div>
               <span class="flex-shrink-0 px-3 py-1 rounded-lg text-caption-xs font-bold uppercase tracking-widest"
                     th:classappend="${i.index == 0} ? 'bg-secondary-fixed text-on-secondary-fixed' : 'bg-tertiary-fixed text-on-tertiary-fixed'"
-                    th:text="${sesi.waktuMulai != null ? #temporals.format(sesi.waktuMulai, 'dd MMM · HH:mm') : '-'}">-</span>
+                    th:text="${sesi.waktuMulai != null ? #temporals.format(sesi.waktuMulai, 'dd MMM Â· HH:mm') : '-'}">-</span>
             </div>
             <div class="flex flex-wrap gap-4 mt-4">
               <div class="flex items-center gap-2 text-on-surface-variant">
@@ -262,15 +264,14 @@ tailwind.config = {
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Actions: Gabung Sesi + Lihat Detail digabung -->
           <div class="flex flex-col justify-center gap-2 flex-shrink-0">
-            <button th:if="${sesi.jenisSesi?.name() == 'ONLINE' or sesi.jenisSesi?.name() == 'VIDEO'}"
-                    class="bg-primary text-white px-6 py-3 rounded-xl font-bold text-label-sm hover:bg-primary/90 transition-all shadow-lg">
-              GABUNG SESI
-            </button>
             <a th:href="@{/mentoring/sesi/{id}(id=${sesi.id})}"
-               class="text-primary bg-surface-container-low px-6 py-3 rounded-xl font-bold text-label-sm hover:bg-surface-container-high transition-all text-center">
-              DETAIL
+               class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-bold text-label-sm hover:bg-primary/90 transition-all shadow-lg">
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">
+                <span th:text="${sesi.jenisSesi?.name() == 'ONLINE' ? 'videocam' : (sesi.jenisSesi?.name() == 'VIDEO' ? 'play_circle' : 'location_on')}">videocam</span>
+              </span>
+              <span th:text="${sesi.statusSesi.name() == 'BERLANGSUNG' ? 'GABUNG SESI' : 'LIHAT DETAIL'}">LIHAT DETAIL</span>
             </a>
           </div>
         </div>
@@ -425,3 +426,4 @@ tailwind.config = {
 
 </body>
 </html>
+

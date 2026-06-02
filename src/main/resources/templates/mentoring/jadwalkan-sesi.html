@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Buka Sesi Baru - Jejak Ilmu</title>
+<title>Jadwalkan Sesi | Jejak Ilmu - Platform Mentoring Akademik</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -90,7 +90,7 @@ tailwind.config = {
     </div>
     <div>
       <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
     </div>
   </div>
 
@@ -217,8 +217,7 @@ tailwind.config = {
         <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
         <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
       </div>
-      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
-           th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0"><img th:if="${mentor.fotoProfil != null}" th:src="${mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${mentor.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div></div>
     </div>
   </div>
 </header>
@@ -279,24 +278,36 @@ tailwind.config = {
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Pilih Mentee -->
-            <div class="space-y-2">
-              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block" for="menteeId">
-                Pilih Mentee
+            <!-- Pilih Mentee (multi-select) -->
+            <div class="space-y-2 md:col-span-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">
+                Pilih Mentee <span class="text-[10px] normal-case tracking-normal font-normal">(bisa pilih lebih dari satu)</span>
               </label>
-              <div class="relative">
-                <select class="w-full px-5 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-fixed appearance-none outline-none font-body-md text-body-md pr-12"
-                        id="menteeId" name="menteeId" required>
-                  <option value="" disabled selected>Pilih dari daftar aktif...</option>
-                  <option th:each="m : ${daftarMentee}"
-                          th:value="${m.id}"
-                          th:attr="data-nama=${m.namaLengkap},data-prodi=${m.programStudi ?: 'Mahasiswa'},data-inisial=${#strings.substring(m.namaLengkap, 0, 2).toUpperCase()}"
-                          th:selected="${selectedMenteeId != null and m.id == selectedMenteeId}"
-                          th:text="${m.namaLengkap + ' - ' + (m.programStudi ?: 'Mahasiswa')}">Mentee</option>
-                </select>
-                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+              <div class="border border-outline-variant rounded-xl bg-surface-container-lowest overflow-hidden">
+                <div class="px-4 py-2 border-b border-outline-variant/30 bg-surface-container-low flex items-center gap-2">
+                  <span class="material-symbols-outlined text-on-surface-variant text-[16px]">search</span>
+                  <input type="text" id="searchMentee" placeholder="Cari nama mentee..."
+                         class="flex-1 bg-transparent border-none outline-none text-[13px]"
+                         oninput="filterMentee(this.value)"/>
+                </div>
+                <div class="max-h-48 overflow-y-auto px-2 py-2" id="menteeList">
+                  <p th:if="${#lists.isEmpty(daftarMentee)}" class="text-[12px] text-on-surface-variant px-3 py-4 text-center italic">Belum ada mentee terdaftar.</p>
+                  <label th:each="m : ${daftarMentee}"
+                         class="mentee-option flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors"
+                         th:attr="data-nama=${m.namaLengkap}">
+                    <input type="checkbox" name="menteeId" th:value="${m.id}"
+                           th:checked="${selectedMenteeId != null and m.id == selectedMenteeId}"
+                           class="w-4 h-4 rounded border-outline-variant text-primary-container focus:ring-primary-fixed"/>
+                    <div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary-container font-black text-[11px] flex-shrink-0"
+                         th:text="${#strings.substring(m.namaLengkap,0,2).toUpperCase()}">??</div>
+                    <div class="min-w-0">
+                      <p class="text-[13px] font-bold text-on-surface truncate" th:text="${m.namaLengkap}">-</p>
+                      <p class="text-[11px] text-on-surface-variant" th:text="${isSiswaMentor ? (m.kelas ?: 'Siswa') : (m.programStudi ?: 'Mahasiswa')}">-</p>
+                    </div>
+                  </label>
+                </div>
               </div>
-              <p th:if="${#lists.isEmpty(daftarMentee)}" class="text-[11px] text-on-surface-variant italic">Belum ada mentee terdaftar.</p>
+              <p class="text-[11px] text-on-surface-variant">Centang mentee yang ingin diundang. Sesi terpisah akan dibuat untuk setiap mentee.</p>
             </div>
 
             <!-- Tipe Pertemuan -->
@@ -456,30 +467,26 @@ tailwind.config = {
 </main>
 
 <script>
-  document.getElementById('menteeId').addEventListener('change', function(e) {
-    const option = e.target.selectedOptions[0];
-    const preview = document.getElementById('menteePreview');
-    if (option && option.dataset.nama) {
-      document.getElementById('previewInitials').textContent = option.dataset.inisial || '??';
-      document.getElementById('previewName').textContent = option.dataset.nama;
-      document.getElementById('previewMajor').textContent = (option.dataset.prodi || '').toUpperCase();
-      document.getElementById('previewProgram').textContent = option.dataset.prodi || '';
-      preview.classList.remove('hidden');
-    } else {
-      preview.classList.add('hidden');
-    }
-  });
+  // Filter mentee by name
+  function filterMentee(q) {
+    document.querySelectorAll('.mentee-option').forEach(el => {
+      const nama = el.getAttribute('data-nama') || '';
+      el.style.display = nama.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+    });
+  }
 
   // Set min date ke hari ini
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('tanggal').setAttribute('min', today);
 
-  // Pre-select jika sudah ada nilai terpilih
-  const sel = document.getElementById('menteeId');
-  if (sel.value) sel.dispatchEvent(new Event('change'));
-
-  // Submit animation
+  // Submit: validasi minimal 1 mentee dipilih
   document.getElementById('sessionForm').addEventListener('submit', function(e) {
+    const checked = document.querySelectorAll('input[name="menteeId"]:checked');
+    if (checked.length === 0) {
+      e.preventDefault();
+      alert('Pilih minimal satu mentee untuk diundang!');
+      return;
+    }
     const btn = document.getElementById('submitBtn');
     btn.innerHTML = '<span class="animate-spin material-symbols-outlined">sync</span><span>MEMPROSES...</span>';
     btn.disabled = true;

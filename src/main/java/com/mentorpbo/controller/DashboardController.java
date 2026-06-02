@@ -323,8 +323,8 @@ public class DashboardController {
         model.addAttribute("pengguna", pengguna);
         siapkanDataUmum(penggunaId, pengguna, model);
 
-        // Materi sendiri yang diunggah
-        List<MateriBelajar> daftarMateri = mentoringService.getMateriByPengguna(penggunaId);
+        // Materi sendiri yang diunggah (hanya tipe MATERI, bukan SUMBER_DAYA)
+        List<MateriBelajar> daftarMateri = mentoringService.getMateriSajaByPengguna(penggunaId);
         model.addAttribute("daftarMateri", daftarMateri);
         model.addAttribute("totalMateri", daftarMateri.size());
         model.addAttribute("kategoriList", daftarMateri.stream()
@@ -344,7 +344,7 @@ public class DashboardController {
                     .distinct().toList();
                 model.addAttribute("mentorSaya", mentorList.isEmpty() ? null : mentorList.get(0));
                 List<MateriBelajar> materiMentor = mentorList.stream()
-                    .flatMap(m -> mentoringService.getMateriByPengguna(m.getId()).stream())
+                    .flatMap(m -> mentoringService.getMateriSajaByPengguna(m.getId()).stream())
                     .distinct().toList();
                 model.addAttribute("daftarMateri", materiMentor);
                 model.addAttribute("totalMateri", materiMentor.size());
@@ -379,8 +379,8 @@ public class DashboardController {
         model.addAttribute("pengguna", pengguna);
         siapkanDataUmum(penggunaId, pengguna, model);
 
-        // Sumber daya menggunakan MateriBelajar dengan jenisMateri SUMBER_DAYA
-        List<MateriBelajar> semuaMateri = mentoringService.getMateriByPengguna(penggunaId);
+        // Sumber daya: hanya konten bertipe SUMBER_DAYA
+        List<MateriBelajar> semuaMateri = mentoringService.getSumberDayaByPengguna(penggunaId);
         model.addAttribute("daftarSumberDaya", semuaMateri);
         model.addAttribute("daftarMateri", semuaMateri);
 

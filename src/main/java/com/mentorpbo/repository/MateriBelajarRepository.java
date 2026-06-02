@@ -36,4 +36,10 @@ public interface MateriBelajarRepository extends JpaRepository<MateriBelajar, Lo
      * Mendapatkan materi diurutkan berdasarkan jumlah unduhan terbanyak.
      */
     List<MateriBelajar> findAllByOrderByJumlahUnduhanDesc();
+
+    /** Materi milik pengguna tertentu berdasarkan tipeKonten */
+    List<MateriBelajar> findByPengunggahIdAndTipeKonten(Long pengunggahId, String tipeKonten);
+
+    /** Semua materi berdasarkan tipeKonten */
+    List<MateriBelajar> findByTipeKontenOrderByTanggalUnggahDesc(String tipeKonten);
 }

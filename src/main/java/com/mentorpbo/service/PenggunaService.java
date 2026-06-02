@@ -321,7 +321,7 @@ public class PenggunaService {
     }
 
     /**
-     * Update profil pengguna (nama, bio) — sinkronisasi ke entity Pengguna.
+     * Update profil pengguna (nama, bio, institusi) — sinkronisasi ke entity Pengguna.
      */
     public Pengguna updateProfil(Long penggunaId, String namaLengkap, String bio,
                                   String portofolioUrl) {
@@ -339,6 +339,26 @@ public class PenggunaService {
         preferencesRepository.save(pref);
 
         return penggunaRepository.save(p);
+    }
+
+    /**
+     * Update data akademik langsung ke entity Mahasiswa/Siswa.
+     */
+    @Transactional
+    public void updateDataAkademik(Long penggunaId, String programStudi, String universitas,
+                                    String namaSekolah, String keahlian, String topikKeahlian) {
+        Pengguna p = penggunaRepository.findById(penggunaId).orElse(null);
+        if (p instanceof com.mentorpbo.model.Mahasiswa mhs) {
+            if (programStudi != null && !programStudi.isBlank()) mhs.setProgramStudi(programStudi.trim());
+            if (universitas  != null && !universitas.isBlank())  mhs.setUniversitas(universitas.trim());
+            if (keahlian     != null) mhs.setMataKuliahKeahlian(keahlian.trim());
+            if (topikKeahlian!= null) mhs.setTopikKeahlian(topikKeahlian.trim());
+            penggunaRepository.save(mhs);
+        } else if (p instanceof com.mentorpbo.model.Siswa siswa) {
+            if (namaSekolah  != null && !namaSekolah.isBlank())  siswa.setNamaSekolah(namaSekolah.trim());
+            if (keahlian     != null) siswa.setMataPelajaranKeahlian(keahlian.trim());
+            penggunaRepository.save(siswa);
+        }
     }
 
     /**

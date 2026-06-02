@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Pesan - ' + ${mahasiswa.namaLengkap}">Jejak Ilmu - Pesan</title>
+<title>Pesan | Jejak Ilmu - Platform Mentoring Akademik</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -88,7 +88,7 @@ tailwind.config = {
     </a>
     <div>
       <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
     </div>
   </div>
 
@@ -100,7 +100,7 @@ tailwind.config = {
     </a>
     <a th:href="@{/mentoring/sesi}"
        class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="material-symbols-outlined">groups</span>
       <span class="font-label-sm text-label-sm">Mentorship</span>
     </a>
     <!-- ACTIVE: Pesan -->
@@ -111,12 +111,12 @@ tailwind.config = {
     </a>
     <a th:href="@{/dashboard/materi}"
        class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">menu_book</span>
+      <span class="material-symbols-outlined">school</span>
       <span class="font-label-sm text-label-sm">Materi</span>
     </a>
     <a th:href="@{/dashboard/sumber-daya}"
        class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">folder_shared</span>
+      <span class="material-symbols-outlined">library_books</span>
       <span class="font-label-sm text-label-sm">Sumber Daya</span>
     </a>
     <a th:href="@{/dashboard/pengaturan}"
@@ -167,8 +167,7 @@ tailwind.config = {
           <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
              th:text="${mahasiswa.programStudi ?: 'Mentee'}">Mentee</p>
         </div>
-        <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm"
-             th:text="${#strings.substring(mahasiswa.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+        <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0"><img th:if="${mahasiswa.fotoProfil != null}" th:src="${mahasiswa.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${mahasiswa.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mahasiswa.namaLengkap, 0, 2).toUpperCase()}">ME</div></div>
       </div>
     </div>
   </header>
@@ -206,26 +205,27 @@ tailwind.config = {
           </a>
         </div>
 
-        <!-- Dynamic conversation items (from backend) -->
-        <div th:each="conv,i : ${percakapan}"
-             th:class="${i.index == 0} ? 'conversation-item-active px-5 py-4 border-l-4 border-primary bg-primary/5 cursor-pointer flex gap-4' : 'px-5 py-4 border-l-4 border-transparent hover:bg-surface-container-low cursor-pointer flex gap-4 transition-all'"
-             th:attr="onclick=|selectConversation(this, '[[${conv.mentor.namaLengkap}]]', '[[${#strings.substring(conv.mentor.namaLengkap, 0, 2).toUpperCase()}]]')|">
+        <!-- Dynamic conversation items (link ke chat dinamis) -->
+        <a th:each="conv,i : ${percakapan}"
+             th:href="@{/pesan/chat/{id}(id=${conv.mentor.id})}"
+             th:class="${i.index == 0} ? 'conversation-item-active px-5 py-4 border-l-4 border-primary bg-primary/5 cursor-pointer flex gap-4 no-underline' : 'px-5 py-4 border-l-4 border-transparent hover:bg-surface-container-low cursor-pointer flex gap-4 transition-all no-underline'">
           <div class="relative flex-shrink-0">
-            <div class="w-12 h-12 rounded-2xl bg-[#001142] flex items-center justify-center text-white font-black"
-                 th:text="${#strings.substring(conv.mentor.namaLengkap, 0, 2).toUpperCase()}">??</div>
-            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-success-green border-2 border-white rounded-full"></div>
+            <div class="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0">
+              <img th:if="${conv.mentor.fotoProfil != null}" th:src="${conv.mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+              <div th:unless="${conv.mentor.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black"
+                   th:text="${#strings.substring(conv.mentor.namaLengkap, 0, 2).toUpperCase()}">??</div>
+            </div>
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex justify-between items-baseline mb-1">
-              <h3 th:class="${i.index == 0} ? 'font-bold text-primary text-[14px] truncate' : 'font-bold text-primary text-[14px] truncate'"
-                  th:text="${conv.mentor.namaLengkap}">Mentor</h3>
-              <span th:class="${i.index == 0} ? 'text-[11px] font-bold text-primary flex-shrink-0 ml-2' : 'text-[11px] font-medium text-on-surface-variant flex-shrink-0 ml-2'"
+              <h3 class="font-bold text-primary text-[14px] truncate" th:text="${conv.mentor.namaLengkap}">Mentor</h3>
+              <span class="text-[11px] font-medium text-on-surface-variant flex-shrink-0 ml-2"
                     th:text="${conv.sesiTerakhir != null and conv.sesiTerakhir.waktuMulai != null ? #temporals.format(conv.sesiTerakhir.waktuMulai, 'dd MMM') : '-'}">-</span>
             </div>
-            <p th:class="${i.index == 0} ? 'text-[13px] text-on-surface-variant font-bold truncate' : 'text-[13px] text-on-surface-variant truncate'"
+            <p class="text-[13px] text-on-surface-variant truncate"
                th:text="${conv.sesiTerakhir != null ? conv.sesiTerakhir.topikPembahasan : 'Klik untuk memulai percakapan'}">...</p>
           </div>
-        </div>
+        </a>
 
       </div>
     </section>
@@ -393,3 +393,4 @@ tailwind.config = {
 </script>
 </body>
 </html>
+

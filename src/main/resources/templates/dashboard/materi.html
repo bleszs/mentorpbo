@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Materi Saya - ' + ${mentor.namaLengkap}">Jejak Ilmu - Materi Saya</title>
+<title>Materi | Jejak Ilmu - Platform Mentoring Akademik</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -93,7 +93,7 @@ tailwind.config = {
     </a>
     <div>
       <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Elite Mentorship</p>
+      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
     </div>
   </div>
 
@@ -188,7 +188,7 @@ tailwind.config = {
     <div class="h-8 w-[1px] bg-outline-variant"></div>
     <div class="flex items-center gap-3 cursor-pointer">
       <div class="text-right"><p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p></div>
-      <div class="w-10 h-10 rounded-full bg-[#001142] border-2 border-primary-fixed-dim flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0"><img th:if="${mentor.fotoProfil != null}" th:src="${mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${mentor.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div></div>
     </div>
   </div>
 </header>
@@ -474,3 +474,4 @@ document.addEventListener('click', function() {
 </div>
 </body>
 </html>
+
