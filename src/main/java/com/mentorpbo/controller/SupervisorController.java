@@ -15,17 +15,6 @@ import java.util.List;
 
 /**
  * Controller SupervisorController - Menangani fitur khusus supervisor (Guru/Dosen).
- *
- * Endpoint:
- * - GET  /validasi-program         → Daftar sesi menunggu validasi
- * - POST /validasi-program/{id}    → Validasi sesi
- * - POST /tolak-sesi/{id}          → Tolak sesi
- * - GET  /monitoring-mentor        → Ranking/monitoring mentor
- * - GET  /data-mahasiswa           → Data mahasiswa & kandidat Asdos
- * - POST /rekomendasiAsdos         → Rekomendasikan mahasiswa sebagai Asdos
- * - GET  /laporan-akademik         → Laporan akademik
- * - GET  /pengaturan               → Pengaturan akun supervisor
- * - GET  /bantuan                  → Pusat bantuan supervisor
  */
 @Controller
 public class SupervisorController {
@@ -43,6 +32,13 @@ public class SupervisorController {
         this.penggunaService = penggunaService;
     }
 
+    /** Inject data notifikasi + preferences ke model (untuk semua halaman supervisor). */
+    private void siapkanDataUmumSupervisor(Long penggunaId, Model model) {
+        model.addAttribute("notifBelumDibaca", penggunaService.hitungNotifikasiBelumDibaca(penggunaId));
+        model.addAttribute("daftarNotifikasi", penggunaService.getDaftarNotifikasi(penggunaId));
+        model.addAttribute("preferences", penggunaService.getOrCreatePreferences(penggunaId));
+    }
+
     // === ENDPOINT ===
 
     /** GET /validasi-program — Daftar sesi menunggu validasi */
@@ -52,6 +48,7 @@ public class SupervisorController {
         if (penggunaId == null) return "redirect:/login";
 
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
         List<SesiMentoring> sesiMenunggu = supervisorService.getSesiMenungguValidasi(penggunaId);
         model.addAttribute("sesiMenungguValidasi", sesiMenunggu);
         model.addAttribute("totalSesiDivalidasi",
@@ -104,6 +101,7 @@ public class SupervisorController {
         if (penggunaId == null) return "redirect:/login";
 
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
 
         if ("SEKOLAH".equalsIgnoreCase(lingkungan)) {
             model.addAttribute("rankingMentor", mentoringService.getRankingMentorSiswa());
@@ -127,6 +125,7 @@ public class SupervisorController {
         if (penggunaId == null) return "redirect:/login";
 
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
 
         List<Mahasiswa> kandidat = supervisorService.cariKandidatAsdos(minIpk, 5, minSesi, minRating);
         model.addAttribute("kandidatAsdos", kandidat);
@@ -162,7 +161,12 @@ public class SupervisorController {
         Long penggunaId = (Long) session.getAttribute("penggunaId");
         if (penggunaId == null) return "redirect:/login";
 
-        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> {
+            model.addAttribute("pengguna", p);
+            if (p instanceof Dosen d) model.addAttribute("dosen", d);
+            else if (p instanceof Guru g) model.addAttribute("guru", g);
+        });
+        siapkanDataUmumSupervisor(penggunaId, model);
         return "supervisor/pengaturan";
     }
 
@@ -173,6 +177,7 @@ public class SupervisorController {
         if (penggunaId == null) return "redirect:/login";
 
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
         return "dashboard/bantuan-dosen";
     }
 
@@ -183,10 +188,19 @@ public class SupervisorController {
         if (penggunaId == null) return "redirect:/login";
 
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
 
         var statistik = supervisorService.getStatistikDashboard(penggunaId);
         model.addAttribute("statistik", statistik);
 
         return "supervisor/laporan-akademik";
+    }
+
+    /** POST /notifikasi/baca-semua — Tandai semua notifikasi sebagai dibaca */
+    @PostMapping("/notifikasi/baca-semua")
+    public String tandaiSemuaBaca(HttpSession session) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId != null) penggunaService.tandaiSemuaNotifikasiDibaca(penggunaId);
+        return "redirect:/dashboard";
     }
 }

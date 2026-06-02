@@ -46,8 +46,7 @@ public class ProfileController {
     // ============================================================
 
     /**
-     * POST /profil/simpan — update nama, bio, portofolio.
-     * Redirect kembali ke pengaturan dengan flash sukses/error.
+     * POST /profil/simpan — update nama, bio, portofolio, dan field supervisor.
      */
     @PostMapping("/simpan")
     public String simpanProfil(@RequestParam(required = false) String namaLengkap,
@@ -58,6 +57,15 @@ public class ProfileController {
                                 @RequestParam(required = false) String programStudi,
                                 @RequestParam(required = false) String universitas,
                                 @RequestParam(required = false) String namaSekolah,
+                                // Supervisor-specific fields
+                                @RequestParam(required = false) String jabatanFungsional,
+                                @RequestParam(required = false) String mataKuliahDiampu,
+                                @RequestParam(required = false) String mataPelajaranDiampu,
+                                @RequestParam(required = false) String bidangRiset,
+                                @RequestParam(required = false) String bidangKeahlian,
+                                @RequestParam(required = false) String nidn,
+                                @RequestParam(required = false) String nip,
+                                @RequestParam(required = false) String fakultas,
                                 HttpSession session,
                                 RedirectAttributes flash) {
         Long id = (Long) session.getAttribute("penggunaId");
@@ -69,12 +77,43 @@ public class ProfileController {
 
             // Update UserPreferences (keahlian, institusi, notif, dll)
             UserPreferences pref = penggunaService.getOrCreatePreferences(id);
-            if (keahlian     != null) pref.setKeahlian(keahlian);
-            if (topikKeahlian!= null) pref.setTopikKeahlian(topikKeahlian);
-            if (programStudi != null) pref.setProgramStudi(programStudi);
-            if (universitas  != null) pref.setUniversitas(universitas);
-            if (namaSekolah  != null) pref.setNamaSekolah(namaSekolah);
+            if (keahlian      != null) pref.setKeahlian(keahlian);
+            if (topikKeahlian != null) pref.setTopikKeahlian(topikKeahlian);
+            if (programStudi  != null) pref.setProgramStudi(programStudi);
+            if (universitas   != null) pref.setUniversitas(universitas);
+            if (namaSekolah   != null) pref.setNamaSekolah(namaSekolah);
             penggunaService.simpanPreferences(id, pref);
+
+            // Update field supervisor spesifik (Dosen / Guru)
+            penggunaRepository.findById(id).ifPresent(p -> {
+                if (p instanceof com.mentorpbo.model.Dosen dosen) {
+                    if (jabatanFungsional != null && !jabatanFungsional.isBlank())
+                        dosen.setJabatanFungsional(jabatanFungsional.trim());
+                    if (mataKuliahDiampu != null && !mataKuliahDiampu.isBlank())
+                        dosen.setMataKuliahDiampu(mataKuliahDiampu.trim());
+                    if (bidangRiset != null && !bidangRiset.isBlank())
+                        dosen.setBidangRiset(bidangRiset.trim());
+                    if (nidn != null && !nidn.isBlank())
+                        dosen.setNidn(nidn.trim());
+                    if (universitas != null && !universitas.isBlank())
+                        dosen.setUniversitas(universitas.trim());
+                    if (programStudi != null && !programStudi.isBlank())
+                        dosen.setProgramStudi(programStudi.trim());
+                    if (fakultas != null && !fakultas.isBlank())
+                        dosen.setFakultas(fakultas.trim());
+                    penggunaRepository.save(dosen);
+                } else if (p instanceof com.mentorpbo.model.Guru guru) {
+                    if (mataPelajaranDiampu != null && !mataPelajaranDiampu.isBlank())
+                        guru.setMataPelajaranDiampu(mataPelajaranDiampu.trim());
+                    if (bidangKeahlian != null && !bidangKeahlian.isBlank())
+                        guru.setBidangKeahlian(bidangKeahlian.trim());
+                    if (nip != null && !nip.isBlank())
+                        guru.setNip(nip.trim());
+                    if (namaSekolah != null && !namaSekolah.isBlank())
+                        guru.setNamaSekolah(namaSekolah.trim());
+                    penggunaRepository.save(guru);
+                }
+            });
 
             // Perbarui nama di session agar topbar langsung update
             session.setAttribute("penggunaNama", namaLengkap != null ? namaLengkap.trim() : session.getAttribute("penggunaNama"));

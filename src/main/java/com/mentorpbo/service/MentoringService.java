@@ -371,6 +371,37 @@ public class MentoringService {
     }
 
     /**
+     * Mentor menolak permintaan sesi: MENUNGGU_KONFIRMASI → DIBATALKAN.
+     * Mentee mendapat notifikasi penolakan dengan alasan.
+     */
+    public SesiMentoring tolakPermintaanSesi(Long sesiId, Long mentorId, String alasan) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
+
+        if (!sesi.getMentor().getId().equals(mentorId)) {
+            throw new IllegalStateException("Hanya mentor sesi ini yang dapat menolak permintaan.");
+        }
+        if (sesi.getStatusSesi() != StatusSesi.MENUNGGU_KONFIRMASI) {
+            throw new IllegalStateException(
+                "Hanya permintaan MENUNGGU_KONFIRMASI yang dapat ditolak. Status saat ini: "
+                    + sesi.getStatusSesi().getLabel());
+        }
+
+        sesi.setStatusSesi(StatusSesi.DIBATALKAN);
+        sesi.setDeskripsi("Ditolak mentor: " + (alasan != null ? alasan : "-"));
+
+        kirimNotifikasi(
+            "Permintaan Sesi Ditolak",
+            "Maaf, " + sesi.getMentor().getNamaLengkap() + " menolak permintaan sesi \""
+                + sesi.getTopikPembahasan() + "\". Alasan: " + (alasan != null ? alasan : "-")
+                + ". Coba cari mentor lain!",
+            "JADWAL",
+            sesi.getMentee()
+        );
+
+        return sesiRepository.save(sesi);
+    }
+
+    /**
      * Mengubah jadwal sesi yang sudah ada.
      * Delegasi ke interface Schedulable — ubahJadwal() mengecek apakah sesi bisa dijadwal ulang.
      */

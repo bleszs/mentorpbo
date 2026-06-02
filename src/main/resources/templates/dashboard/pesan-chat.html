@@ -3,366 +3,721 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Pesan - ' + ${partner.namaLengkap} + ' | Jejak Ilmu'">Pesan | Jejak Ilmu</title>
+<title th:text="'Pesan — ' + ${partner.namaLengkap} + ' | Jejak Ilmu'">Pesan | Jejak Ilmu</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-tailwind.config = {
-  darkMode:"class",
-  theme:{extend:{colors:{
-    "outline-variant":"#c6c6d0","primary-fixed-dim":"#b6c4fe","error":"#ba1a1a",
-    "surface-container-low":"#f3f4f5","success-green":"#10b981","warning-gold":"#fea619",
-    "surface-container-high":"#e7e8e9","surface-container":"#edeeef",
-    "on-primary-fixed":"#061748","on-background":"#191c1d","on-primary":"#ffffff",
-    "surface":"#f8f9fa","outline":"#767680","primary":"#000000","background":"#f8f9fa",
-    "on-surface-variant":"#45464f","primary-container":"#061748","primary-fixed":"#dce1ff",
-    "on-surface":"#191c1d","surface-container-lowest":"#ffffff"
-  },spacing:{"sidebar-width":"280px","topbar-height":"72px"},
-  fontFamily:{"label-sm":["Inter"],"body-md":["Inter"]},
-  fontSize:{"label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],"body-md":["14px",{"lineHeight":"1.5","fontWeight":"400"}]}
-  }}
-}
+tailwind.config={darkMode:"class",theme:{extend:{colors:{
+  "outline-variant":"#c6c6d0","primary-fixed-dim":"#b6c4fe","error":"#ba1a1a",
+  "surface-container-low":"#f3f4f5","success-green":"#10b981","warning-gold":"#fea619",
+  "surface-container-high":"#e7e8e9","surface-container":"#edeeef",
+  "on-primary-fixed":"#061748","on-background":"#191c1d","on-primary":"#ffffff",
+  "surface":"#f8f9fa","outline":"#767680","primary":"#000000","background":"#f8f9fa",
+  "on-surface-variant":"#45464f","primary-container":"#061748",
+  "on-primary-container":"#7382b7","primary-fixed":"#dce1ff",
+  "on-surface":"#191c1d","surface-container-lowest":"#ffffff",
+  "label-sm":["Inter"]
+},fontFamily:{"label-sm":["Inter"],"body-md":["Inter"]},
+fontSize:{"label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],"body-md":["14px",{"lineHeight":"1.5","fontWeight":"400"}]}
+}}}
 </script>
 <style>
-body { font-family: 'Inter', sans-serif; }
-.msg-me  { background:#061748; color:white; border-radius:18px 4px 18px 18px; }
-.msg-them{ background:#f3f4f5; color:#191c1d; border-radius:4px 18px 18px 18px; }
-.chat-scroll { overflow-y:auto; }
-.chat-scroll::-webkit-scrollbar { width:4px; }
-.chat-scroll::-webkit-scrollbar-thumb { background:#c6c6d0; border-radius:10px; }
-#emojiPanel { display:none; position:absolute; bottom:64px; left:0; z-index:50;
-  background:white; border:1px solid #c6c6d0; border-radius:12px;
-  padding:10px; width:280px; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+body { font-family:'Inter',sans-serif; }
+.material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+.msg-me   { background:#061748; color:white; border-radius:18px 4px 18px 18px; }
+.msg-them { background:#f3f4f5; color:#191c1d; border-radius:4px 18px 18px 18px; }
+.chat-bg  { background-color:#f8f9fa; background-image:radial-gradient(#e9eaec 1px, transparent 1px); background-size:20px 20px; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:10px; }
+#emojiPanel { display:none; position:absolute; bottom:68px; right:56px; z-index:50;
+  background:white; border:1px solid #e5e7eb; border-radius:16px;
+  padding:12px; width:300px; box-shadow:0 8px 32px rgba(0,0,0,.12); }
+
+/* ===== COLLAPSIBLE NAV SIDEBAR ===== */
+#mainSidebar {
+  width: 280px;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+body.sb-collapsed #mainSidebar { width: 64px; }
+
+#contentWrapper {
+  margin-left: 280px;
+  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+body.sb-collapsed #contentWrapper { margin-left: 64px; }
+
+.sb-label {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.2s, max-width 0.25s cubic-bezier(0.4,0,0.2,1);
+  max-width: 200px;
+}
+body.sb-collapsed .sb-label { opacity: 0; max-width: 0; }
+
+.sb-logo-text {
+  overflow: hidden;
+  transition: opacity 0.2s, max-width 0.25s cubic-bezier(0.4,0,0.2,1);
+  max-width: 180px;
+  white-space: nowrap;
+}
+body.sb-collapsed .sb-logo-text { opacity: 0; max-width: 0; }
+
+.sb-logo-img { transition: height 0.3s; }
+body.sb-collapsed .sb-logo-img { height: 36px !important; }
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+}
+body.sb-collapsed .sb-item {
+  justify-content: center;
+  gap: 0;
+  padding: 10px 8px;
+}
+body.sb-collapsed .sb-item[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #001142;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 1000;
+  border: 1px solid rgba(255,255,255,0.15);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+body.sb-collapsed .sb-item[data-tip]:hover::after { opacity: 1; }
+
+#panelToggleBtn {
+  left: 280px;
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+body.sb-collapsed #panelToggleBtn { left: 64px; }
 </style>
 </head>
 <body class="bg-surface text-on-surface overflow-hidden">
-<div class="flex h-screen overflow-hidden">
 
-<!-- SIDEBAR: daftar percakapan -->
-<nav class="w-[280px] h-screen flex-shrink-0 flex flex-col py-8 px-6 shadow-2xl z-50" style="background:#001142;">
-  <div class="mb-10 flex items-center gap-3">
-    <a th:href="@{/dashboard}">
-      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:64px;width:auto;flex-shrink:0;display:block;"/>
-    </a>
-    <div>
-      <h1 class="font-black text-white leading-none" style="font-size:18px;">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
-    </div>
-  </div>
-  <div class="flex-1 overflow-y-auto space-y-1 pr-1">
-    <p class="text-[10px] uppercase tracking-widest text-blue-200/40 font-black px-2 mb-3">Percakapan</p>
-    <div th:if="${#lists.isEmpty(daftarPartner)}" class="px-3 py-4 text-center">
-      <p class="text-[12px] text-blue-200/50">Belum ada percakapan</p>
-    </div>
-    <a th:each="item : ${daftarPartner}"
-       th:href="@{/pesan/chat/{id}(id=${item.partner.id})}"
-       th:class="${item.partner.id == partnerId} ? 'flex items-center gap-3 px-3 py-3 rounded-xl bg-white/15 border border-white/20' : 'flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/10 transition-colors'">
-      <div class="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-        <img th:if="${item.partner.fotoProfil != null}" th:src="${item.partner.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-        <div th:unless="${item.partner.fotoProfil != null}" class="w-full h-full bg-white/20 flex items-center justify-center text-white font-black text-sm"
-             th:text="${#strings.substring(item.partner.namaLengkap,0,2).toUpperCase()}">??</div>
+<!-- ==================== NAV SIDEBAR ==================== -->
+<nav id="mainSidebar" class="fixed left-0 top-0 h-screen flex flex-col z-50 shadow-2xl" style="background:#001142;">
+
+  <!-- Header: Logo + Toggle -->
+  <div class="flex items-center gap-3 px-4 pt-6 pb-4 flex-shrink-0">
+    <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
+      <img src="/images/logo.png" alt="Logo" class="sb-logo-img flex-shrink-0" style="height:48px;width:auto;"/>
+      <div class="sb-logo-text">
+        <h1 class="font-black text-white text-[15px] leading-none">Jejak Ilmu</h1>
+        <p class="text-blue-200/60 text-[9px] uppercase tracking-widest font-bold mt-0.5">Platform Mentoring Akademik</p>
       </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-[13px] font-bold text-white truncate" th:text="${item.partner.namaLengkap}">-</p>
-        <p class="text-[11px] text-blue-200/60" th:text="${item.partner.role}">-</p>
-      </div>
-      <span th:if="${item.belumDibaca > 0}"
-            class="w-5 h-5 bg-warning-gold text-white text-[10px] font-black rounded-full flex items-center justify-center flex-shrink-0"
-            th:text="${item.belumDibaca}">0</span>
+    </a>
+    <button onclick="toggleSidebar()"
+            class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0 ml-auto">
+      <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
+    </button>
+  </div>
+
+  <!-- Nav items -->
+  <div class="flex-1 px-3 space-y-0.5 overflow-hidden mt-2">
+    <a th:href="@{/dashboard}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">dashboard</span>
+      <span class="sb-label font-label-sm text-label-sm">Beranda</span>
+    </a>
+
+    <!-- Mentor mahasiswa -->
+    <a th:if="${mahasiswa != null and mahasiswa.mentor}"
+       th:href="@{/dashboard/mentorship}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Mentorship">
+      <span class="material-symbols-outlined flex-shrink-0">groups</span>
+      <span class="sb-label font-label-sm text-label-sm">Mentorship</span>
+    </a>
+
+    <!-- Mentor siswa -->
+    <a th:if="${siswa != null and siswa.mentor}"
+       th:href="@{/dashboard/mentorship}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Mentorship">
+      <span class="material-symbols-outlined flex-shrink-0">groups</span>
+      <span class="sb-label font-label-sm text-label-sm">Mentorship</span>
+    </a>
+
+    <!-- Mentee mahasiswa -->
+    <a th:if="${mahasiswa != null and !mahasiswa.mentor}"
+       th:href="@{/mentoring/sesi}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Sesi Saya">
+      <span class="material-symbols-outlined flex-shrink-0">calendar_month</span>
+      <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
+    </a>
+    <a th:if="${mahasiswa != null and !mahasiswa.mentor}"
+       th:href="@{/mentoring/cari-mentor}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Cari Mentor">
+      <span class="material-symbols-outlined flex-shrink-0">person_search</span>
+      <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
+    </a>
+
+    <!-- Mentee siswa -->
+    <a th:if="${siswa != null and !siswa.mentor}"
+       th:href="@{/mentoring/sesi}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Sesi Saya">
+      <span class="material-symbols-outlined flex-shrink-0">calendar_month</span>
+      <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
+    </a>
+    <a th:if="${siswa != null and !siswa.mentor}"
+       th:href="@{/mentoring/cari-mentor}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Cari Mentor">
+      <span class="material-symbols-outlined flex-shrink-0">person_search</span>
+      <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
+    </a>
+
+    <!-- ACTIVE: Pesan -->
+    <span class="sb-item text-white bg-white/10 border border-white/20 cursor-default" data-tip="Pesan">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">mail</span>
+      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
+    </span>
+
+    <a th:href="@{/dashboard/materi}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Materi">
+      <span class="material-symbols-outlined flex-shrink-0">school</span>
+      <span class="sb-label font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a th:href="@{/dashboard/sumber-daya}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Sumber Daya">
+      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
+      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Pengaturan">
+      <span class="material-symbols-outlined flex-shrink-0">settings</span>
+      <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
   </div>
-  <div class="pt-6 border-t border-white/10 space-y-1 mt-4">
-    <a th:href="@{/dashboard/pesan}" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/10 text-blue-100/70 hover:text-white transition-colors">
-      <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-      <span class="text-[12px] font-bold">Semua Pesan</span>
+
+  <!-- Bottom items -->
+  <div class="border-t border-white/10 px-3 py-4 space-y-0.5 flex-shrink-0">
+    <a th:href="@{/dashboard/bantuan}"
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
+       data-tip="Bantuan">
+      <span class="material-symbols-outlined flex-shrink-0">help</span>
+      <span class="sb-label font-label-sm text-label-sm">Bantuan</span>
     </a>
-    <a th:href="@{/logout}" class="flex items-center gap-3 px-3 py-3 text-red-400 hover:text-red-300 transition-colors">
-      <span class="material-symbols-outlined text-[20px]">logout</span>
-      <span class="text-[12px] font-bold">Keluar</span>
+    <a th:href="@{/logout}"
+       class="sb-item text-red-400 hover:text-red-300"
+       data-tip="Keluar">
+      <span class="material-symbols-outlined flex-shrink-0">logout</span>
+      <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
   </div>
 </nav>
 
-<!-- CHAT AREA -->
+<!-- ==================== CONTENT WRAPPER ==================== -->
+<div id="contentWrapper" class="flex h-screen overflow-hidden">
+
+<!-- ==================== LEFT: Percakapan (collapsible) ==================== -->
+<aside id="sidePanel"
+       class="w-[300px] flex-shrink-0 flex flex-col border-r border-outline-variant bg-white transition-all duration-300 overflow-hidden">
+
+  <!-- Panel Header -->
+  <div class="h-[64px] flex items-center justify-between px-5 border-b border-outline-variant">
+    <h2 class="font-black text-primary text-[18px]">Pesan</h2>
+    <div class="flex gap-1">
+      <button onclick="togglePanel()"
+              class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors" title="Sembunyikan">
+        <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="px-4 py-3 border-b border-outline-variant/40">
+    <div class="flex items-center gap-2 px-3 py-2 bg-surface-container rounded-xl">
+      <span class="material-symbols-outlined text-on-surface-variant text-[16px]">search</span>
+      <input type="text" placeholder="Cari percakapan..."
+             class="flex-1 bg-transparent border-none outline-none text-[13px]"
+             oninput="filterConv(this.value)"/>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="flex gap-2 px-4 py-2.5 border-b border-outline-variant/30">
+    <button onclick="setFilter('semua',this)"
+            class="filter-tab px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-wider">Semua</button>
+    <button onclick="setFilter('belum',this)"
+            class="filter-tab px-3 py-1 bg-surface-container text-on-surface-variant rounded-full text-[10px] font-black uppercase tracking-wider hover:bg-surface-container-high transition-colors">Belum Dibaca</button>
+  </div>
+
+  <!-- Conversation list -->
+  <div class="flex-1 overflow-y-auto divide-y divide-outline-variant/20" id="convList">
+    <div th:if="${#lists.isEmpty(daftarPartner)}"
+         class="flex flex-col items-center justify-center py-12 px-5 text-center">
+      <span class="material-symbols-outlined text-outline mb-2" style="font-size:36px;">chat_bubble_outline</span>
+      <p class="font-bold text-on-surface-variant text-[13px]">Belum ada percakapan</p>
+    </div>
+    <a th:each="item : ${daftarPartner}"
+       th:href="@{/pesan/chat/{id}(id=${item.partner.id})}"
+       class="conv-item flex gap-3 px-4 py-3.5 hover:bg-surface-container-low transition-all no-underline border-l-2 border-transparent"
+       th:classappend="${item.partner.id == partnerId} ? 'bg-primary/5 border-l-primary-container' : ''"
+       th:data-unread="${item.belumDibaca}">
+      <div class="relative flex-shrink-0">
+        <div class="w-11 h-11 rounded-2xl overflow-hidden">
+          <img th:if="${item.partner.fotoProfil != null}" th:src="${item.partner.fotoProfil}"
+               class="w-full h-full object-cover" alt="foto"/>
+          <div th:unless="${item.partner.fotoProfil != null}"
+               class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
+               th:text="${#strings.substring(item.partner.namaLengkap,0,2).toUpperCase()}">??</div>
+        </div>
+        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-success-green rounded-full border-2 border-white"></div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-baseline justify-between mb-0.5">
+          <h3 class="font-bold text-primary text-[13px] truncate" th:text="${item.partner.namaLengkap}">Partner</h3>
+          <span th:if="${item.belumDibaca > 0}"
+                class="ml-1 min-w-[18px] h-[18px] bg-primary text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 flex-shrink-0"
+                th:text="${item.belumDibaca}">1</span>
+        </div>
+        <p class="text-[11px] text-on-surface-variant truncate"
+           th:text="${item.partner.role.name() == 'MAHASISWA' or item.partner.role.name() == 'SISWA' ? 'Mentee' : 'Mentor'}">Mentee</p>
+      </div>
+    </a>
+  </div>
+</aside>
+
+<!-- Toggle button saat panel tersembunyi -->
+<div id="panelToggleBtn" class="hidden fixed top-1/2 -translate-y-1/2 z-50">
+  <button onclick="togglePanel()"
+          class="bg-white border border-outline-variant rounded-r-xl px-1.5 py-4 shadow-md hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+  </button>
+</div>
+
+<!-- ==================== RIGHT: Chat Area ==================== -->
 <main class="flex-1 flex flex-col h-screen overflow-hidden bg-surface-container-lowest">
 
-  <!-- Header -->
-  <header class="h-[72px] flex-shrink-0 bg-white border-b border-outline-variant px-6 flex items-center gap-4">
-    <div class="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
-      <img th:if="${partner.fotoProfil != null}" th:src="${partner.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-      <div th:unless="${partner.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
-           th:text="${#strings.substring(partner.namaLengkap,0,2).toUpperCase()}">??</div>
-    </div>
-    <div class="flex-1 min-w-0">
-      <h2 class="font-black text-primary text-[16px] truncate" th:text="${partner.namaLengkap}">Partner</h2>
-      <div class="flex items-center gap-1.5">
-        <span class="w-2 h-2 bg-success-green rounded-full"></span>
-        <p class="text-[12px] text-success-green font-bold uppercase tracking-wider">Online</p>
+  <!-- Chat Header -->
+  <header class="h-[64px] flex-shrink-0 bg-white border-b border-outline-variant px-5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button onclick="togglePanel()" id="openPanelBtn"
+              class="hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant mr-1">
+        <span class="material-symbols-outlined text-[20px]">menu</span>
+      </button>
+      <div class="w-10 h-10 rounded-2xl overflow-hidden flex-shrink-0">
+        <img th:if="${partner.fotoProfil != null}" th:src="${partner.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+        <div th:unless="${partner.fotoProfil != null}"
+             class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
+             th:text="${#strings.substring(partner.namaLengkap,0,2).toUpperCase()}">??</div>
+      </div>
+      <div>
+        <h2 class="font-black text-primary text-[15px] leading-tight" th:text="${partner.namaLengkap}">Partner</h2>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 bg-success-green rounded-full"></span>
+          <p class="text-[10px] text-success-green font-bold uppercase tracking-wider">Online</p>
+        </div>
       </div>
     </div>
-    <div class="flex items-center gap-2">
+
+    <!-- Topbar kanan -->
+    <div class="flex items-center gap-1.5">
+      <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+        <span class="material-symbols-outlined text-[20px]">videocam</span>
+      </button>
+      <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+        <span class="material-symbols-outlined text-[20px]">call</span>
+      </button>
+      <div class="w-[1px] h-5 bg-outline-variant mx-1"></div>
+      <!-- Notif -->
       <div class="relative">
-        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">notifications</span>
-        <span th:if="${notifBelumDibaca > 0}"
-              class="absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center"
-              th:text="${notifBelumDibaca}">0</span>
+        <button onclick="togglePopup('notifPopup',event)"
+                class="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors text-on-surface-variant">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span th:if="${notifBelumDibaca > 0}"
+                class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-error text-white text-[8px] font-black rounded-full flex items-center justify-center px-0.5"
+                th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+        </button>
+        <div id="notifPopup" class="popup-panel hidden absolute top-11 right-0 w-[300px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3.5 border-b border-surface-container-high">
+            <h3 class="font-bold text-[14px]">Notifikasi</h3>
+            <form th:action="@{/notifikasi/baca-semua}" method="post">
+              <button type="submit" class="text-primary text-[10px] font-black hover:underline uppercase">Tandai Dibaca</button>
+            </form>
+          </div>
+          <div class="max-h-[280px] overflow-y-auto divide-y divide-surface-container-high">
+            <div th:if="${#lists.isEmpty(inboxPercakapan)}" class="px-5 py-6 text-center text-[12px] text-on-surface-variant">Tidak ada notifikasi baru</div>
+            <a th:each="conv : ${inboxPercakapan}"
+               th:href="@{/pesan/chat/{id}(id=${conv['partner'].id})}"
+               class="px-4 py-3 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors no-underline">
+              <div class="w-8 h-8 rounded-lg bg-[#001142] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0"
+                   th:text="${#strings.substring(conv['partner'].namaLengkap,0,2).toUpperCase()}">??</div>
+              <div class="min-w-0">
+                <p class="text-[12px] font-bold truncate text-on-surface" th:text="${conv['partner'].namaLengkap}">-</p>
+                <p class="text-[11px] text-on-surface-variant truncate" th:text="${conv['topik']}">-</p>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
-      <a th:href="@{/dashboard}" class="w-9 h-9 rounded-xl hover:bg-surface-container flex items-center justify-center transition-colors">
-        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">home</span>
-      </a>
+      <div class="w-[1px] h-5 bg-outline-variant mx-1"></div>
+      <!-- User info -->
+      <div class="flex items-center gap-2.5">
+        <div class="text-right hidden sm:block">
+          <p class="font-black text-primary text-[12px]" th:text="${pengguna.namaLengkap}">User</p>
+          <p class="text-[9px] text-on-surface-variant font-bold uppercase tracking-tight"
+             th:text="${mahasiswa != null ? (mahasiswa.mentor ? 'Mentor' : 'Mentee') : (siswa != null ? (siswa.mentor ? 'Mentor Siswa' : 'Mentee') : 'Pengguna')}">Role</p>
+        </div>
+        <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0">
+          <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+          <div th:unless="${pengguna.fotoProfil != null}"
+               class="w-full h-full bg-[#061748] flex items-center justify-center text-white font-black text-[11px]"
+               th:text="${#strings.substring(pengguna.namaLengkap,0,2).toUpperCase()}">ME</div>
+        </div>
+      </div>
     </div>
   </header>
 
   <!-- Flash messages -->
-  <div th:if="${sukses}" class="mx-6 mt-3 px-4 py-2 bg-success-green/10 border border-success-green/30 rounded-xl text-success-green text-[13px] font-bold flex items-center gap-2">
-    <span class="material-symbols-outlined text-[16px]">check_circle</span><span th:text="${sukses}"></span>
+  <div th:if="${sukses}" class="mx-5 mt-2 px-4 py-2 bg-success-green/10 border border-success-green/30 rounded-xl text-success-green text-[12px] font-bold flex items-center gap-2">
+    <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+    <span th:text="${sukses}"></span>
   </div>
-  <div th:if="${error}" class="mx-6 mt-3 px-4 py-2 bg-error/10 border border-error/30 rounded-xl text-error text-[13px] font-bold" th:text="${error}"></div>
+  <div th:if="${error}" class="mx-5 mt-2 px-4 py-2 bg-error/10 border border-error/30 rounded-xl text-error text-[12px] font-bold" th:text="${error}"></div>
 
-  <!-- Messages list -->
-  <div class="flex-1 chat-scroll px-6 py-6 space-y-1" id="chatMessages">
+  <!-- Messages -->
+  <div class="flex-1 overflow-y-auto p-6 space-y-3 chat-bg" id="chatMessages">
 
-    <div th:if="${#lists.isEmpty(percakapan)}" class="flex flex-col items-center justify-center h-full text-center">
-      <span class="material-symbols-outlined text-outline mb-4" style="font-size:48px;">chat_bubble_outline</span>
-      <p class="font-bold text-on-surface-variant">Belum ada pesan</p>
-      <p class="text-[12px] text-outline mt-1">Kirim pesan pertama!</p>
+    <div th:if="${#lists.isEmpty(percakapan)}"
+         class="flex flex-col items-center justify-center h-full text-center py-16">
+      <div class="w-16 h-16 rounded-3xl bg-[#061748]/10 flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-primary-container" style="font-size:32px; font-variation-settings:'FILL' 1">chat</span>
+      </div>
+      <p class="font-bold text-on-surface-variant text-[15px]" th:text="'Mulai percakapan dengan ' + ${partner.namaLengkap}">Mulai chat</p>
+      <p class="text-[12px] text-outline mt-1">Kirim pesan pertamamu di bawah</p>
     </div>
 
     <div th:each="pesan : ${percakapan}"
          th:data-id="${pesan.id}"
-         th:class="${pesan.pengirim.id == pengguna.id} ? 'flex justify-end items-end gap-2 mb-3' : 'flex justify-start items-end gap-2 mb-3'">
+         th:class="${pesan.pengirim.id == pengguna.id} ? 'flex flex-row-reverse gap-2 items-end' : 'flex gap-2 items-end'">
 
       <!-- Avatar them -->
-      <div th:unless="${pesan.pengirim.id == pengguna.id}" class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 self-end">
+      <div th:unless="${pesan.pengirim.id == pengguna.id}"
+           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end">
         <img th:if="${partner.fotoProfil != null}" th:src="${partner.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-        <div th:unless="${partner.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-[10px]"
+        <div th:unless="${partner.fotoProfil != null}"
+             class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-[10px]"
              th:text="${#strings.substring(partner.namaLengkap,0,1).toUpperCase()}">?</div>
       </div>
 
-      <div class="max-w-[65%] space-y-1">
+      <div class="max-w-[62%]">
         <!-- Gambar -->
-        <div th:if="${pesan.tipeKonten == 'GAMBAR'}" th:class="${pesan.pengirim.id == pengguna.id} ? 'rounded-2xl overflow-hidden max-w-[260px]' : 'rounded-2xl overflow-hidden max-w-[260px]'">
-          <img th:src="${pesan.lampiran}" class="w-full object-cover cursor-pointer" onclick="window.open(this.src)" alt="gambar"/>
+        <div th:if="${pesan.tipeKonten == 'GAMBAR'}">
+          <div class="rounded-2xl overflow-hidden max-w-[240px] shadow-sm">
+            <img th:src="${pesan.lampiran}" class="w-full object-cover cursor-pointer rounded-2xl"
+                 onclick="window.open(this.src)" alt="gambar"/>
+          </div>
           <div th:if="${pesan.isi != null and !pesan.isi.isEmpty()}"
-               th:class="${pesan.pengirim.id == pengguna.id} ? 'msg-me px-4 py-2 text-[13px]' : 'msg-them px-4 py-2 text-[13px]'"
+               th:class="${pesan.pengirim.id == pengguna.id} ? 'msg-me px-4 py-2 text-[13px] mt-1' : 'msg-them px-4 py-2 text-[13px] mt-1'"
                th:text="${pesan.isi}"></div>
         </div>
-        <!-- File attachment -->
+        <!-- File -->
         <div th:if="${pesan.tipeKonten == 'FILE'}"
              th:class="${pesan.pengirim.id == pengguna.id} ? 'msg-me px-4 py-3' : 'msg-them px-4 py-3'">
-          <a th:href="${pesan.lampiran}" target="_blank" class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 1;">attach_file</span>
+          <a th:href="${pesan.lampiran}" target="_blank" class="flex items-center gap-2.5 no-underline">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">attach_file</span>
+            </div>
             <div>
-              <p class="text-[13px] font-bold" th:text="${pesan.namaFile ?: 'File'}">File</p>
-              <p class="text-[11px] opacity-70">Klik untuk buka</p>
+              <p class="text-[12px] font-bold" th:text="${pesan.namaFile ?: 'File'}">File</p>
+              <p class="text-[10px] opacity-70">Klik untuk buka</p>
             </div>
           </a>
-          <p th:if="${pesan.isi != null and !pesan.isi.isEmpty()}" class="text-[13px] mt-2 border-t border-white/20 pt-2" th:text="${pesan.isi}"></p>
+          <p th:if="${pesan.isi != null and !pesan.isi.isEmpty()}"
+             class="text-[12px] mt-1.5 pt-1.5 border-t border-white/20" th:text="${pesan.isi}"></p>
         </div>
-        <!-- Teks biasa -->
+        <!-- Teks -->
         <div th:if="${pesan.tipeKonten == 'TEKS' or pesan.tipeKonten == null}"
-             th:class="${pesan.pengirim.id == pengguna.id} ? 'msg-me px-4 py-3 text-[14px]' : 'msg-them px-4 py-3 text-[14px]'"
+             th:class="${pesan.pengirim.id == pengguna.id} ? 'msg-me px-4 py-2.5 text-[14px] leading-relaxed' : 'msg-them px-4 py-2.5 text-[14px] leading-relaxed'"
              th:text="${pesan.isi}">pesan</div>
-
-        <p th:class="${pesan.pengirim.id == pengguna.id} ? 'text-[10px] text-on-surface-variant text-right' : 'text-[10px] text-on-surface-variant'"
-           th:text="${#temporals.format(pesan.waktuKirim, 'HH:mm, dd MMM')}">-</p>
+        <!-- Timestamp -->
+        <div th:class="${pesan.pengirim.id == pengguna.id} ? 'flex items-center justify-end gap-1 mt-1' : 'mt-1'">
+          <span class="text-[10px] text-on-surface-variant font-medium"
+                th:text="${#temporals.format(pesan.waktuKirim, 'HH:mm, dd MMM')}">-</span>
+          <span th:if="${pesan.pengirim.id == pengguna.id}"
+                class="material-symbols-outlined text-[12px]"
+                th:classappend="${pesan.sudahDibaca} ? 'text-primary-container' : 'text-on-surface-variant'"
+                style="font-variation-settings:'FILL' 1">done_all</span>
+        </div>
       </div>
 
       <!-- Avatar me -->
-      <div th:if="${pesan.pengirim.id == pengguna.id}" class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 self-end">
+      <div th:if="${pesan.pengirim.id == pengguna.id}"
+           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end">
         <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-        <div th:unless="${pengguna.fotoProfil != null}" class="w-full h-full bg-[#061748] flex items-center justify-center text-white font-black text-[10px]"
+        <div th:unless="${pengguna.fotoProfil != null}"
+             class="w-full h-full bg-[#061748] flex items-center justify-center text-white font-black text-[10px]"
              th:text="${#strings.substring(pengguna.namaLengkap,0,1).toUpperCase()}">?</div>
       </div>
     </div>
+
+    <div class="h-2"></div>
   </div>
 
-  <!-- INPUT AREA -->
-  <div class="flex-shrink-0 border-t border-outline-variant bg-white px-4 py-3">
-
-    <!-- Preview file -->
-    <div id="filePreview" class="hidden mb-2 flex items-center gap-2 px-3 py-2 bg-surface-container-low rounded-xl">
-      <span class="material-symbols-outlined text-primary text-[18px]">attach_file</span>
-      <span id="filePreviewName" class="text-[13px] font-bold text-primary flex-1 truncate"></span>
-      <button type="button" onclick="clearFile()" class="text-error hover:text-error/80">
-        <span class="material-symbols-outlined text-[18px]">close</span>
-      </button>
-    </div>
+  <!-- ==================== INPUT ==================== -->
+  <div class="flex-shrink-0 border-t border-outline-variant bg-white px-4 py-3 space-y-2 relative">
 
     <!-- Emoji Panel -->
     <div id="emojiPanel">
-      <p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-2">Emoji</p>
       <div class="grid grid-cols-10 gap-1">
         <button type="button" th:each="e : ${'😊,😂,❤️,👍,🎉,🙏,🤔,😅,👀,💪,🔥,✅,📚,💡,🎯,⭐,🙌,😎,😭,🤝'.split(',')}"
-                class="text-lg hover:bg-surface-container rounded p-1 cursor-pointer"
-                th:onclick="'insertEmoji(\\'' + ${e} + '\\'')"
-                th:text="${e}">😊</button>
+                class="text-lg hover:bg-surface-container rounded p-1"
+                th:onclick="'insertEmoji(\\'' + ${e} + '\\'')" th:text="${e}">😊</button>
       </div>
     </div>
 
-    <!-- Teks form -->
-    <form th:action="@{/pesan/kirim}" method="post" id="formPesan" class="flex items-end gap-2">
-      <input type="hidden" name="penerimaId" th:value="${partner.id}"/>
-      <div class="flex-1 relative">
-        <textarea name="isi" id="inputPesan" rows="1"
-                  class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl focus:ring-2 focus:ring-primary-fixed outline-none text-[14px] resize-none overflow-hidden max-h-32"
-                  placeholder="Ketik pesan..."></textarea>
-      </div>
-      <!-- Emoji button -->
-      <button type="button" onclick="toggleEmoji()" title="Emoji"
-              class="w-10 h-10 rounded-xl hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors flex-shrink-0">
-        <span class="material-symbols-outlined text-[22px]">sentiment_satisfied</span>
+    <!-- File preview -->
+    <div id="filePreview" class="hidden items-center gap-2 px-3 py-2 bg-primary-fixed/30 border border-primary-fixed rounded-xl">
+      <span class="material-symbols-outlined text-primary-container text-[16px]" style="font-variation-settings:'FILL' 1">attach_file</span>
+      <span id="filePreviewName" class="text-[12px] font-bold text-primary-container flex-1 truncate">file</span>
+      <button type="button" onclick="clearFile()"
+              class="w-5 h-5 rounded-full bg-error/10 text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors">
+        <span class="material-symbols-outlined text-[12px]">close</span>
       </button>
-      <!-- Kirim teks -->
+    </div>
+
+    <!-- Form file caption -->
+    <form th:action="@{/pesan/kirim-file}" method="post" enctype="multipart/form-data" id="formFile"
+          class="hidden items-center gap-2">
+      <input type="hidden" name="penerimaId" th:value="${partner.id}"/>
+      <input type="file" id="fileInput" name="lampiran" class="hidden"
+             accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"/>
+      <input type="text" name="isi" id="filePesanCaption"
+             class="flex-1 px-4 py-2 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none text-[13px]"
+             th:placeholder="'Keterangan untuk ' + ${partner.namaLengkap} + ' (opsional)...'"/>
       <button type="submit"
-              class="w-10 h-10 bg-primary-container text-white rounded-xl flex items-center justify-center hover:bg-primary-container/90 transition-all active:scale-95 flex-shrink-0">
-        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">send</span>
+              class="h-9 px-4 bg-success-green text-white rounded-xl flex items-center gap-1.5 font-black text-[11px] uppercase tracking-wider hover:bg-success-green/90 transition-all active:scale-95">
+        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">send</span>Kirim
       </button>
     </form>
 
-    <!-- File form (tersembunyi, dipicu oleh tombol lampiran) -->
-    <form th:action="@{/pesan/kirim-file}" method="post" enctype="multipart/form-data" id="formFile" class="mt-2 flex items-center gap-2">
+    <!-- Baris utama -->
+    <form th:action="@{/pesan/kirim}" method="post" id="formPesan" class="flex items-end gap-2">
       <input type="hidden" name="penerimaId" th:value="${partner.id}"/>
-      <label for="fileInput" title="Lampirkan file/gambar"
-             class="w-10 h-10 rounded-xl hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 cursor-pointer">
-        <span class="material-symbols-outlined text-[22px]">attach_file</span>
-        <input type="file" id="fileInput" name="lampiran" class="hidden" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"/>
+      <label for="fileInput" title="Lampirkan"
+             class="w-9 h-9 rounded-xl hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 self-end cursor-pointer">
+        <span class="material-symbols-outlined text-[21px]">attach_file</span>
       </label>
-      <input type="text" name="isi" id="filePesanCaption"
-             class="flex-1 px-4 py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none text-[13px]"
-             placeholder="Tambah keterangan (opsional)..."/>
-      <button type="submit" id="btnKirimFile"
-              class="hidden w-10 h-10 bg-success-green text-white rounded-xl flex items-center justify-center hover:bg-success-green/90 transition-all active:scale-95 flex-shrink-0">
-        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">send</span>
+      <div class="flex-1 relative">
+        <textarea name="isi" id="inputPesan" rows="1"
+                  class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-2xl focus:ring-2 focus:ring-primary-fixed outline-none text-[14px] resize-none overflow-hidden max-h-32 leading-relaxed"
+                  th:placeholder="'Tulis pesan untuk ' + ${partner.namaLengkap} + '...'"></textarea>
+      </div>
+      <button type="button" onclick="toggleEmoji()"
+              class="w-9 h-9 rounded-xl hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 self-end">
+        <span class="material-symbols-outlined text-[21px]">sentiment_satisfied</span>
+      </button>
+      <button type="submit"
+              class="w-10 h-10 bg-[#061748] text-white rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex-shrink-0 self-end">
+        <span class="material-symbols-outlined text-[19px]" style="font-variation-settings:'FILL' 1">send</span>
       </button>
     </form>
   </div>
+
 </main>
-</div>
+</div><!-- /contentWrapper -->
 
 <script th:inline="javascript">
 const partnerId = /*[[${partner.id}]]*/ 0;
-const myId = /*[[${pengguna.id}]]*/ 0;
+const myId      = /*[[${pengguna.id}]]*/ 0;
 
-// Init lastId dari pesan terakhir
+// Init & scroll
 const chatMessages = document.getElementById('chatMessages');
 const allMsgs = chatMessages.querySelectorAll('[data-id]');
 let lastId = 0;
-allMsgs.forEach(el => {
-  const id = parseInt(el.getAttribute('data-id') || 0);
-  if (id > lastId) lastId = id;
-});
-
-// Scroll ke bawah
+allMsgs.forEach(el => { const id = parseInt(el.getAttribute('data-id')||0); if(id>lastId) lastId=id; });
 chatMessages.scrollTop = chatMessages.scrollHeight;
 
 // Auto-resize textarea
 const textarea = document.getElementById('inputPesan');
 textarea.addEventListener('input', function() {
-  this.style.height = 'auto';
-  this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+  this.style.height='auto';
+  this.style.height = Math.min(this.scrollHeight,128)+'px';
 });
-
-// Kirim via Enter (Shift+Enter = newline)
 textarea.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  if(e.key==='Enter' && !e.shiftKey) {
     e.preventDefault();
-    if (textarea.value.trim()) document.getElementById('formPesan').submit();
+    if(textarea.value.trim()) document.getElementById('formPesan').submit();
   }
 });
+
+// Toggle conversation side panel
+function togglePanel() {
+  const panel = document.getElementById('sidePanel');
+  const toggleBtn = document.getElementById('panelToggleBtn');
+  const openBtn = document.getElementById('openPanelBtn');
+  const isHidden = panel.style.width === '0px' || panel.classList.contains('hidden-panel');
+  if (isHidden) {
+    panel.style.width = '300px';
+    panel.style.opacity = '1';
+    toggleBtn.classList.add('hidden');
+    openBtn.classList.add('hidden');
+  } else {
+    panel.style.width = '0px';
+    panel.style.opacity = '0';
+    toggleBtn.classList.remove('hidden');
+    openBtn.classList.remove('hidden');
+  }
+}
 
 // Emoji
 function toggleEmoji() {
   const p = document.getElementById('emojiPanel');
-  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  p.style.display = p.style.display==='block' ? 'none' : 'block';
 }
-function insertEmoji(emoji) {
+function insertEmoji(e) {
   const inp = document.getElementById('inputPesan');
-  const start = inp.selectionStart;
-  inp.value = inp.value.substring(0, start) + emoji + inp.value.substring(inp.selectionEnd);
+  const s = inp.selectionStart;
+  inp.value = inp.value.substring(0,s)+e+inp.value.substring(inp.selectionEnd);
   inp.focus();
-  document.getElementById('emojiPanel').style.display = 'none';
+  document.getElementById('emojiPanel').style.display='none';
 }
-document.addEventListener('click', e => {
-  const panel = document.getElementById('emojiPanel');
-  if (!panel.contains(e.target) && !e.target.closest('[onclick="toggleEmoji()"]')) {
-    panel.style.display = 'none';
-  }
+document.addEventListener('click', ev => {
+  const p = document.getElementById('emojiPanel');
+  if(p.style.display==='block' && !p.contains(ev.target) && !ev.target.closest('[onclick="toggleEmoji()"]'))
+    p.style.display='none';
 });
 
 // File picker
 document.getElementById('fileInput').addEventListener('change', function() {
   const file = this.files[0];
-  if (!file) return clearFile();
-  document.getElementById('filePreview').classList.remove('hidden');
+  if(!file) return clearFile();
+  const prev = document.getElementById('filePreview');
+  prev.classList.remove('hidden'); prev.classList.add('flex');
   document.getElementById('filePreviewName').textContent = file.name;
-  document.getElementById('btnKirimFile').classList.remove('hidden');
-  document.getElementById('btnKirimFile').classList.add('flex');
+  const ff = document.getElementById('formFile');
+  ff.classList.remove('hidden'); ff.classList.add('flex');
+  document.getElementById('filePesanCaption').focus();
 });
 function clearFile() {
-  document.getElementById('fileInput').value = '';
-  document.getElementById('filePreview').classList.add('hidden');
-  document.getElementById('btnKirimFile').classList.add('hidden');
-  document.getElementById('btnKirimFile').classList.remove('flex');
+  document.getElementById('fileInput').value='';
+  const prev = document.getElementById('filePreview');
+  prev.classList.add('hidden'); prev.classList.remove('flex');
+  const ff = document.getElementById('formFile');
+  ff.classList.add('hidden'); ff.classList.remove('flex');
+  document.getElementById('filePesanCaption').value='';
 }
 
-// Buat elemen gelembung pesan
+// Notif popup
+function togglePopup(id, event) {
+  event.stopPropagation();
+  document.querySelectorAll('.popup-panel').forEach(p=>{ if(p.id!==id) p.classList.add('hidden'); });
+  document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click', ()=>document.querySelectorAll('.popup-panel').forEach(p=>p.classList.add('hidden')));
+
+// Filter conversations
+function filterConv(q) {
+  document.querySelectorAll('.conv-item').forEach(item=>{
+    const name = item.querySelector('h3')?.textContent.toLowerCase()||'';
+    item.style.display = name.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+function setFilter(type, btn) {
+  document.querySelectorAll('.filter-tab').forEach(b=>{
+    b.className='filter-tab px-3 py-1 bg-surface-container text-on-surface-variant rounded-full text-[10px] font-black uppercase tracking-wider hover:bg-surface-container-high transition-colors';
+  });
+  btn.className='filter-tab px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-wider';
+  document.querySelectorAll('.conv-item').forEach(item=>{
+    item.style.display = (type==='belum' && parseInt(item.dataset.unread||0)===0) ? 'none' : '';
+  });
+}
+
+// Build message bubble (for polling)
 function buildBubble(p) {
   const isMe = p.dariku;
   const wrap = document.createElement('div');
   wrap.setAttribute('data-id', p.id);
-  wrap.className = isMe ? 'flex justify-end items-end gap-2 mb-3' : 'flex justify-start items-end gap-2 mb-3';
+  wrap.className = isMe ? 'flex flex-row-reverse gap-2 items-end' : 'flex gap-2 items-end';
 
-  const initials = (p.nama || '?').substring(0,1).toUpperCase();
+  const initials = (p.nama||'?').substring(0,1).toUpperCase();
   const avatarHtml = p.foto
-    ? `<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 self-end"><img src="${p.foto}" class="w-full h-full object-cover"/></div>`
-    : `<div class="w-8 h-8 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 self-end">${initials}</div>`;
+    ? `<div class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end"><img src="${p.foto}" class="w-full h-full object-cover"/></div>`
+    : `<div class="w-8 h-8 rounded-xl ${isMe?'bg-[#061748]':'bg-[#001142]'} flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 self-end">${initials}</div>`;
 
-  let bubbleHtml = '';
-  if (p.tipeKonten === 'GAMBAR' && p.lampiran) {
-    bubbleHtml = `<div class="rounded-2xl overflow-hidden max-w-[260px]"><img src="${p.lampiran}" class="w-full object-cover cursor-pointer" onclick="window.open(this.src)"/></div>`;
-    if (p.isi) bubbleHtml += `<div class="${isMe ? 'msg-me' : 'msg-them'} px-4 py-2 text-[13px]">${escHtml(p.isi)}</div>`;
-  } else if (p.tipeKonten === 'FILE' && p.lampiran) {
-    bubbleHtml = `<a href="${p.lampiran}" target="_blank" class="${isMe ? 'msg-me' : 'msg-them'} px-4 py-3 flex items-center gap-3">
-      <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 1;">attach_file</span>
-      <div><p class="text-[13px] font-bold">${escHtml(p.namaFile || 'File')}</p><p class="text-[11px] opacity-70">Klik buka</p></div></a>`;
-    if (p.isi) bubbleHtml += `<div class="${isMe ? 'msg-me' : 'msg-them'} px-4 py-2 text-[13px] mt-1">${escHtml(p.isi)}</div>`;
+  let bubble = '';
+  if(p.tipeKonten==='GAMBAR' && p.lampiran){
+    bubble=`<div class="rounded-2xl overflow-hidden max-w-[240px] shadow-sm"><img src="${p.lampiran}" class="w-full object-cover cursor-pointer rounded-2xl" onclick="window.open(this.src)"/></div>`;
+    if(p.isi) bubble+=`<div class="${isMe?'msg-me':'msg-them'} px-4 py-2 text-[13px] mt-1">${escHtml(p.isi)}</div>`;
+  } else if(p.tipeKonten==='FILE' && p.lampiran){
+    bubble=`<a href="${p.lampiran}" target="_blank" class="${isMe?'msg-me':'msg-them'} px-4 py-2.5 flex items-center gap-2 no-underline"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">attach_file</span></div><div><p class="text-[12px] font-bold">${escHtml(p.namaFile||'File')}</p><p class="text-[10px] opacity-70">Klik buka</p></div></a>`;
+    if(p.isi) bubble+=`<div class="${isMe?'msg-me':'msg-them'} px-4 py-2 text-[12px] mt-1">${escHtml(p.isi)}</div>`;
   } else {
-    bubbleHtml = `<div class="${isMe ? 'msg-me' : 'msg-them'} px-4 py-3 text-[14px]">${escHtml(p.isi || '')}</div>`;
+    bubble=`<div class="${isMe?'msg-me':'msg-them'} px-4 py-2.5 text-[14px] leading-relaxed">${escHtml(p.isi||'')}</div>`;
   }
 
-  const time = p.waktu ? p.waktu.substring(11,16) : '';
+  const time = p.waktu ? p.waktu.substring(11,16)+', '+p.waktu.substring(8,10)+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'][parseInt(p.waktu.substring(5,7))-1] : '';
+  const check = isMe ? `<span class="material-symbols-outlined text-[12px] text-primary-container" style="font-variation-settings:'FILL' 1">done_all</span>` : '';
+
   wrap.innerHTML =
     (!isMe ? avatarHtml : '') +
-    `<div class="max-w-[65%] space-y-1">${bubbleHtml}
-      <p class="text-[10px] text-on-surface-variant ${isMe ? 'text-right' : ''}">${time}</p>
-    </div>` +
+    `<div class="max-w-[62%]">${bubble}<div class="${isMe?'flex items-center justify-end gap-1 mt-1':'mt-1'}"><span class="text-[10px] text-on-surface-variant font-medium">${time}</span>${check}</div></div>` +
     (isMe ? avatarHtml : '');
   return wrap;
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// Polling pesan baru setiap 4 detik
+// Polling 4 detik
 function pollPesan() {
-  fetch('/pesan/api/' + partnerId + '/terbaru?since=' + lastId)
-    .then(r => r.json())
-    .then(data => {
-      if (data.length > 0) {
-        data.forEach(p => {
-          if (p.id <= lastId) return;
-          lastId = p.id;
-          chatMessages.appendChild(buildBubble(p));
-        });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    })
-    .catch(() => {});
+  fetch('/pesan/api/'+partnerId+'/terbaru?since='+lastId)
+    .then(r=>r.json())
+    .then(data=>{
+      data.forEach(p=>{
+        if(p.id<=lastId) return;
+        lastId=p.id;
+        chatMessages.appendChild(buildBubble(p));
+        chatMessages.scrollTop=chatMessages.scrollHeight;
+      });
+    }).catch(()=>{});
 }
 setInterval(pollPesan, 4000);
+
+// ===== NAV SIDEBAR TOGGLE =====
+function toggleSidebar() {
+  const collapsed = document.body.classList.toggle('sb-collapsed');
+  localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
+  document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
+}
+// Init from localStorage
+(function() {
+  if (localStorage.getItem('jejak-sb') === '1') {
+    document.body.classList.add('sb-collapsed');
+    const icon = document.getElementById('sb-toggle-icon');
+    if (icon) icon.textContent = 'chevron_right';
+  }
+})();
 </script>
 </body>
 </html>

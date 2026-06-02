@@ -180,10 +180,10 @@ tailwind.config = {
     </div>
     <div class="h-8 w-[1px] bg-outline-variant"></div>
     <div class="flex items-center gap-3 cursor-pointer">
-      <div class="text-right"><p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p></div>
+      <div class="text-right"><p class="font-label-sm text-label-sm text-primary" th:text="${pengguna.namaLengkap}">Mentor</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mahasiswa != null and mahasiswa.asdos ? 'Asisten Dosen' : (mahasiswa != null and mahasiswa.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p></div>
       <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
-        <img th:if="${mentor.fotoProfil != null}" th:src="${mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-        <div th:unless="${mentor.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+        <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+        <div th:unless="${pengguna.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">ME</div>
       </div>
     </div>
   </div>
@@ -274,15 +274,15 @@ tailwind.config = {
                 id="formFoto" class="flex items-center gap-6">
             <!-- Avatar: tampilkan foto jika ada, fallback ke inisial -->
             <div class="relative flex-shrink-0 cursor-pointer" onclick="document.getElementById('inputFoto').click()">
-              <img th:if="${mentor.fotoProfil != null}"
-                   th:src="${mentor.fotoProfil}"
+              <img th:if="${pengguna.fotoProfil != null}"
+                   th:src="${pengguna.fotoProfil}"
                    id="previewFoto"
                    class="w-24 h-24 rounded-2xl object-cover border-4 border-primary-fixed-dim shadow-lg"
                    alt="Foto Profil"/>
-              <div th:unless="${mentor.fotoProfil != null}"
+              <div th:unless="${pengguna.fotoProfil != null}"
                    id="avatarInitial"
                    class="w-24 h-24 rounded-2xl bg-[#001142] flex items-center justify-center text-white font-black text-3xl border-4 border-primary-fixed-dim"
-                   th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
+                   th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">ME</div>
               <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-container text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform pointer-events-none">
                 <span class="material-symbols-outlined text-[16px]">photo_camera</span>
               </div>
@@ -301,7 +301,7 @@ tailwind.config = {
                         class="hidden px-5 py-2.5 bg-success-green text-white font-black text-[11px] uppercase tracking-widest rounded-lg hover:bg-success-green/90 transition-all active:scale-95">
                   Simpan Foto
                 </button>
-                <form th:if="${mentor.fotoProfil != null}" th:action="@{/profil/foto/hapus}" method="post" style="display:inline;">
+                <form th:if="${pengguna.fotoProfil != null}" th:action="@{/profil/foto/hapus}" method="post" style="display:inline;">
                   <button type="submit" onclick="return confirm('Hapus foto profil?')"
                           class="px-5 py-2.5 bg-error text-white font-black text-[11px] uppercase tracking-widest rounded-lg hover:bg-error/90 transition-all active:scale-95">
                     Hapus Foto
@@ -320,7 +320,7 @@ tailwind.config = {
             <h3 class="font-headline-md text-headline-md">Nama Lengkap</h3>
           </div>
           <input type="text" name="namaLengkap"
-                 th:value="${mentor.namaLengkap}"
+                 th:value="${pengguna.namaLengkap}"
                  class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed focus:border-transparent outline-none text-[14px]"
                  placeholder="Nama lengkap Anda..."/>
         </div>
@@ -336,20 +336,20 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bio Singkat</label>
               <textarea rows="3" name="bio"
                         class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl resize-none focus:ring-2 focus:ring-primary-fixed focus:border-transparent outline-none text-[14px] text-on-surface"
-                        th:text="${preferences?.bio ?: mentor.bio ?: ''}"
+                        th:text="${preferences?.bio ?: pengguna.bio ?: ''}"
                         placeholder="Tuliskan bio singkat yang menarik tentang keahlian dan pengalamanmu..."></textarea>
             </div>
             <div class="space-y-2">
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bidang Spesialisasi</label>
               <div class="flex flex-wrap gap-2 p-4 bg-surface-container-low rounded-xl border border-outline-variant/30 min-h-[56px]">
-                <span th:if="${mentor.mataKuliahKeahlian != null}"
-                      th:each="keahlian : ${#strings.arraySplit(mentor.mataKuliahKeahlian, ',')}"
+                <span th:if="${mahasiswa != null and mahasiswa.mataKuliahKeahlian != null}"
+                      th:each="keahlian : ${#strings.arraySplit(mahasiswa.mataKuliahKeahlian, ',')}"
                       class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-container/10 text-primary-container text-[11px] font-black uppercase tracking-wider rounded-full">
                   <span th:text="${#strings.trim(keahlian)}">Keahlian</span>
                   <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span>
                 </span>
                 <input type="text" name="keahlian" id="inputKeahlian"
-                       th:value="${preferences?.keahlian ?: mentor.mataKuliahKeahlian ?: ''}"
+                       th:value="${preferences?.keahlian ?: (mahasiswa != null ? mahasiswa.mataKuliahKeahlian : (siswa != null ? siswa.mataPelajaranKeahlian : '')) ?: ''}"
                        placeholder="Keahlian (pisahkan koma)..."
                        class="flex-1 min-w-[180px] bg-transparent border-none outline-none text-[13px] text-on-surface"/>
               </div>
@@ -369,7 +369,7 @@ tailwind.config = {
               <div class="flex items-center gap-3 bg-surface-container-low border border-outline-variant/30 rounded-xl px-4">
                 <span class="material-symbols-outlined text-on-surface-variant flex-shrink-0">account_balance</span>
                 <input type="text" name="universitas"
-                       th:value="${mentor.universitas ?: ''}"
+                       th:value="${mahasiswa != null ? (mahasiswa.universitas ?: '') : (siswa != null ? (siswa.namaSekolah ?: '') : '')}"
                        class="flex-1 py-3 bg-transparent border-none focus:ring-0 outline-none text-[14px]"
                        placeholder="Nama universitas..."/>
               </div>
@@ -378,7 +378,7 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">IPK Akhir (GPA)</label>
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-success-green">grade</span>
-                <span class="font-black text-success-green text-[16px]" th:text="${#numbers.formatDecimal(mentor.ipk, 1, 2)}">0.00</span>
+                <span class="font-black text-success-green text-[16px]" th:text="${mahasiswa != null ? #numbers.formatDecimal(mahasiswa.ipk, 1, 2) : '—'}">—</span>
                 <span class="ml-auto text-[10px] font-black text-success-green uppercase tracking-wider">VERIFIED</span>
               </div>
             </div>
@@ -387,7 +387,7 @@ tailwind.config = {
               <div class="flex items-center gap-3 bg-surface-container-low border border-outline-variant/30 rounded-xl px-4">
                 <span class="material-symbols-outlined text-on-surface-variant flex-shrink-0">school</span>
                 <input type="text" name="programStudi"
-                       th:value="${mentor.programStudi ?: ''}"
+                       th:value="${mahasiswa != null ? (mahasiswa.programStudi ?: '') : (siswa != null ? (siswa.kelas ?: '') : '')}"
                        class="flex-1 py-3 bg-transparent border-none focus:ring-0 outline-none text-[14px]"
                        placeholder="Program studi..."/>
               </div>
@@ -396,7 +396,7 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Semester</label>
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">calendar_month</span>
-                <span class="font-medium text-[14px]" th:text="${'Semester ' + mentor.semester}">—</span>
+                <span class="font-medium text-[14px]" th:text="${mahasiswa != null ? 'Semester ' + mahasiswa.semester : (siswa != null ? siswa.kelas : '—')}">—</span>
               </div>
             </div>
           </div>
@@ -412,7 +412,7 @@ tailwind.config = {
             <div class="space-y-2">
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Topik Keahlian</label>
               <input type="text" name="topikKeahlian"
-                     th:value="${preferences?.topikKeahlian ?: mentor.topikKeahlian ?: ''}"
+                     th:value="${preferences?.topikKeahlian ?: (mahasiswa != null ? mahasiswa.topikKeahlian : '') ?: ''}"
                      class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none text-[14px]"
                      placeholder="misal: Spring Boot, Machine Learning, Basis Data"/>
             </div>
@@ -429,11 +429,41 @@ tailwind.config = {
           </div>
         </div>
 
+        <!-- Statistik Mentor -->
+        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm mb-6" style="border-left-color:#10b981;">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="material-symbols-outlined text-success-green" style="font-variation-settings:'FILL' 1">analytics</span>
+            <h3 class="font-headline-md text-headline-md">Statistik Mentor</h3>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-primary-fixed/20 rounded-xl p-4 text-center">
+              <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Total Poin</p>
+              <p class="font-black text-[28px] text-primary-container"
+                 th:text="${mahasiswa != null ? mahasiswa.totalPoinProgres : (siswa != null ? siswa.totalPoinProgres : 0)}">0</p>
+            </div>
+            <div class="bg-warning-gold/10 rounded-xl p-4 text-center">
+              <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Rata-rata Rating</p>
+              <p class="font-black text-[28px] text-warning-gold"
+                 th:text="${mahasiswa != null ? #numbers.formatDecimal(mahasiswa.hitungRataRataRating(), 1, 1) : (siswa != null ? #numbers.formatDecimal(siswa.hitungRataRataRating(), 1, 1) : '0.0')}">0.0</p>
+            </div>
+            <div class="bg-success-green/10 rounded-xl p-4 text-center">
+              <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Sesi Selesai</p>
+              <p class="font-black text-[28px] text-success-green"
+                 th:text="${mahasiswa != null ? mahasiswa.sesiDiselesaikan : (siswa != null ? siswa.sesiDiselesaikan : 0)}">0</p>
+            </div>
+            <div class="bg-surface-container-low rounded-xl p-4 text-center">
+              <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Ulasan</p>
+              <p class="font-black text-[28px] text-on-surface"
+                 th:text="${mahasiswa != null ? mahasiswa.jumlahPenilaian : (siswa != null ? siswa.jumlahPenilaian : 0)}">0</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex gap-4 pb-4">
           <button type="submit" form="formProfil"
-                  class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-lg">
-            Simpan Perubahan
+                  class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
           </button>
           <button type="button" class="px-8 py-3 bg-white border border-outline-variant text-on-surface-variant font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-surface-container transition-all active:scale-95"
                   onclick="switchTab('account')">
@@ -452,7 +482,7 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Alamat Email</label>
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">mail</span>
-                <span class="font-body-md font-medium truncate" th:text="${mentor.email}">email@example.com</span>
+                <span class="font-body-md font-medium truncate" th:text="${pengguna.email}">email@example.com</span>
                 <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
               </div>
             </div>
@@ -491,7 +521,7 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">person</span>
-                <span class="font-body-md font-medium truncate" th:text="${mentor.namaLengkap}">Nama</span>
+                <span class="font-body-md font-medium truncate" th:text="${pengguna.namaLengkap}">Nama</span>
                 <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
               </div>
             </div>
@@ -499,7 +529,7 @@ tailwind.config = {
               <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Program Studi</label>
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">school</span>
-                <span class="font-body-md font-medium truncate" th:text="${mentor.programStudi}">Program Studi</span>
+                <span class="font-body-md font-medium truncate" th:text="${mahasiswa != null ? mahasiswa.programStudi : (siswa != null ? siswa.kelas : '—')}">Program Studi</span>
               </div>
             </div>
             <div class="space-y-2">
@@ -507,7 +537,7 @@ tailwind.config = {
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">badge</span>
                 <span class="font-body-md font-medium"
-                      th:text="${mentor.nim != null and !mentor.nim.isEmpty()} ? ${mentor.nim} : '—'">—</span>
+                      th:text="${mahasiswa != null and mahasiswa.nim != null and !mahasiswa.nim.isEmpty() ? mahasiswa.nim : (siswa != null and siswa.nisn != null ? siswa.nisn : '—')}">—</span>
               </div>
             </div>
             <div class="space-y-2">
@@ -515,7 +545,7 @@ tailwind.config = {
               <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
                 <span class="material-symbols-outlined text-on-surface-variant">stars</span>
                 <span class="font-body-md font-medium truncate"
-                      th:text="${mentor.mataKuliahKeahlian != null and !mentor.mataKuliahKeahlian.isEmpty()} ? ${mentor.mataKuliahKeahlian} : '—'">—</span>
+                      th:text="${mahasiswa != null and mahasiswa.mataKuliahKeahlian != null ? mahasiswa.mataKuliahKeahlian : (siswa != null and siswa.mataPelajaranKeahlian != null ? siswa.mataPelajaranKeahlian : '—')}">—</span>
                 <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
               </div>
             </div>
@@ -527,34 +557,37 @@ tailwind.config = {
       <section class="hidden space-y-6" id="section-notifications">
         <div class="premium-card gold bg-white p-7 rounded-2xl shadow-sm">
           <h3 class="font-headline-md text-headline-md mb-6">Preferensi Notifikasi</h3>
-          <div class="space-y-4">
+          <form th:action="@{/profil/preferensi}" method="post" class="space-y-4">
             <div class="flex items-center justify-between py-4 border-b border-outline-variant">
               <div>
-                <p class="font-body-md font-bold">Push Notifications</p>
-                <p class="text-sm text-on-surface-variant">Dapatkan update langsung di browser atau perangkat Anda.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
-              <div>
-                <p class="font-body-md font-bold">Email Mentorship</p>
+                <p class="font-body-md font-bold">Notifikasi Email</p>
                 <p class="text-sm text-on-surface-variant">Update mingguan mengenai kemajuan bimbingan akademik Anda.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
+                <input name="notifEmailAktif" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.notifEmailAktif}"/>
                 <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
             <div class="flex items-center justify-between py-4 border-b border-outline-variant">
               <div>
-                <p class="font-body-md font-bold">Pengingat Sesi Live</p>
-                <p class="text-sm text-on-surface-variant">Notifikasi 15 menit sebelum kelas atau sesi bimbingan dimulai.</p>
+                <p class="font-body-md font-bold">Pengingat Sesi</p>
+                <p class="text-sm text-on-surface-variant">Notifikasi sebelum sesi bimbingan dimulai.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input class="sr-only peer" type="checkbox"/>
+                <input name="notifPengingatSesi" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.notifPengingatSesi}"/>
+                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+              <div>
+                <p class="font-body-md font-bold">Pesan Baru</p>
+                <p class="text-sm text-on-surface-variant">Notifikasi ketika mentee mengirim pesan baru.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                <input name="notifPesanBaru" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.notifPesanBaru}"/>
                 <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
@@ -564,46 +597,44 @@ tailwind.config = {
                 <p class="text-sm text-on-surface-variant">Pemberitahuan ketika supervisor memvalidasi atau menolak sesi Anda.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
+                <input name="notifValidasiSesi" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.notifValidasiSesi}"/>
                 <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
-          </div>
+            <div class="pt-2">
+              <button type="submit" class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">save</span> Simpan Preferensi
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
       <!-- ── Section: Privasi ── -->
       <section class="hidden space-y-6" id="section-privacy">
         <div class="premium-card green bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Visibilitas Profil</h3>
-          <div class="space-y-4">
-            <div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-start gap-4">
-              <input checked="" class="mt-1 text-primary focus:ring-primary" id="p-public" name="privacy" type="radio"/>
-              <label for="p-public">
-                <p class="font-body-md font-bold">Publik <span class="text-success-green text-[11px] font-black">(Disarankan)</span></p>
-                <p class="text-sm text-on-surface-variant">Mentor dan institusi mitra dapat melihat pencapaian dan CV Anda.</p>
+          <h3 class="font-headline-md text-headline-md mb-6">Pengaturan Privasi &amp; Visibilitas</h3>
+          <form th:action="@{/profil/preferensi}" method="post" class="space-y-4">
+            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+              <div>
+                <p class="font-body-md font-bold">Profil Publik</p>
+                <p class="text-sm text-on-surface-variant">Mentee dan institusi mitra dapat melihat profil dan pencapaian Anda.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                <input name="profilPublik" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.profilPublik}"/>
+                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
-            <div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-start gap-4">
-              <input class="mt-1 text-primary focus:ring-primary" id="p-private" name="privacy" type="radio"/>
-              <label for="p-private">
-                <p class="font-body-md font-bold">Privat</p>
-                <p class="text-sm text-on-surface-variant">Profil Anda hanya dapat dilihat oleh Anda dan administrator sistem.</p>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="premium-card green bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Data &amp; Aktivitas</h3>
-          <div class="space-y-4">
             <div class="flex items-center justify-between py-4 border-b border-outline-variant">
               <div>
                 <p class="font-body-md font-bold">Tampilkan di Ranking Mentor</p>
                 <p class="text-sm text-on-surface-variant">Profil Anda muncul di papan peringkat mentor platform.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
+                <input name="tampilDiRanking" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.tampilDiRanking}"/>
                 <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
@@ -613,11 +644,17 @@ tailwind.config = {
                 <p class="text-sm text-on-surface-variant">Izinkan supervisor melihat histori dan statistik lengkap sesi Anda.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
+                <input name="bagikanStatistik" class="sr-only peer" type="checkbox"
+                       th:checked="${preferences != null and preferences.bagikanStatistik}"/>
                 <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
-          </div>
+            <div class="pt-2">
+              <button type="submit" class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">save</span> Simpan Privasi
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 

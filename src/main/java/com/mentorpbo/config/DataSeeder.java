@@ -55,14 +55,25 @@ public class DataSeeder implements CommandLineRunner {
         log.info("  DataSeeder: Memeriksa data awal...");
         log.info("======================================================");
 
-        // Idempoten: jika data sudah ada (misalnya restart server), lewati seeding.
+        // Idempoten: jika data sudah ada → lewati seeding.
+        //
+        // PERILAKU DI RAILWAY (cloud):
+        //   Filesystem Railway bersifat EPHEMERAL — file H2 database terhapus
+        //   setiap kali container di-restart atau di-redeploy.
+        //   Artinya siswaRepository.count() selalu 0 saat startup di Railway
+        //   → DataSeeder SELALU mengisi data tiruan secara otomatis. ✅
+        //
+        // PERILAKU DI LOKAL (development):
+        //   File H2 tersimpan di ./data/ dan persisten antar restart.
+        //   Jika data sudah ada, seeding dilewati (tidak ada duplikat). ✅
         if (siswaRepository.count() > 0) {
-            log.info("  Data sudah ada. Melewati proses seeding.");
+            log.info("  Data sudah ada. Melewati proses seeding (mode lokal/persisten).");
             log.info("======================================================");
             return;
         }
 
-        log.info("  Database kosong — mengisi data awal...");
+        log.info("  Database kosong — mengisi data awal (fresh deploy atau restart Railway)...");
+
 
         // === GURU ===
         Guru guru1 = new Guru("Budi Santoso, S.Pd.", "budi.guru@sekolah.id", "guru123",

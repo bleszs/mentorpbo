@@ -369,4 +369,16 @@ public class PenggunaService {
             .findByPenerimaIdOrderByTanggalDibuatDesc(penggunaId)
             .stream().limit(10).toList();
     }
+
+    /**
+     * Tandai semua notifikasi belum dibaca sebagai sudah dibaca.
+     */
+    public void tandaiSemuaNotifikasiDibaca(Long penggunaId) {
+        notifikasiRepository
+            .findByPenerimaIdAndSudahDibacaFalseOrderByTanggalDibuatDesc(penggunaId)
+            .forEach(n -> {
+                n.tandaiSudahDibaca();
+                notifikasiRepository.save(n);
+            });
+    }
 }

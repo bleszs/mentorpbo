@@ -128,13 +128,35 @@ public class DashboardController {
         Siswa siswa = (Siswa) pengguna;
         model.addAttribute("siswa", siswa);
 
-        List<SesiMentoring> sesiMendatang = mentoringService
-            .getSesiMendatangMentee(siswa.getId());
-        model.addAttribute("sesiMendatang", sesiMendatang);
-
-        List<SesiMentoring> semuaSesi = mentoringService
-            .getSemuaSesiPengguna(siswa.getId());
+        List<SesiMentoring> semuaSesi = mentoringService.getSemuaSesiPengguna(siswa.getId());
         model.addAttribute("semuaSesi", semuaSesi);
+
+        long sesiSelesai = semuaSesi.stream()
+            .filter(s -> s.getStatusSesi() == StatusSesi.SELESAI).count();
+        model.addAttribute("sesiSelesai", sesiSelesai);
+
+        if (siswa.isMentor()) {
+            // Data mentor siswa
+            List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentor(siswa.getId());
+            model.addAttribute("sesiMendatang", sesiMendatang);
+
+            List<SesiMentoring> sesiMenunggu = semuaSesi.stream()
+                .filter(s -> s.getStatusSesi() == StatusSesi.MENUNGGU_KONFIRMASI)
+                .toList();
+            model.addAttribute("sesiMenungguKonfirmasi", sesiMenunggu);
+        } else {
+            // Data mentee siswa
+            List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentee(siswa.getId());
+            model.addAttribute("sesiMendatang", sesiMendatang);
+
+            List<Pengguna> mentorSaya = semuaSesi.stream()
+                .map(SesiMentoring::getMentor)
+                .filter(Objects::nonNull)
+                .distinct()
+                .limit(3)
+                .collect(Collectors.toList());
+            model.addAttribute("mentorSaya", mentorSaya);
+        }
 
         model.addAttribute("totalPoin", siswa.getTotalPoinProgres());
         model.addAttribute("rataRating", siswa.hitungRataRataRating());
@@ -487,6 +509,20 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
+
+        // Siswa redirect ke pesan-chat jika ada percakapan
+        if (pengguna instanceof Siswa siswa) {
+            List<SesiMentoring> sesiSiswa = mentoringService.getSemuaSesiPengguna(penggunaId);
+            Optional<Long> firstPartner = sesiSiswa.stream()
+                .map(s -> s.getMentor() != null && !s.getMentor().getId().equals(penggunaId)
+                    ? s.getMentor() : (s.getMentee() != null && !s.getMentee().getId().equals(penggunaId) ? s.getMentee() : null))
+                .filter(Objects::nonNull)
+                .map(Pengguna::getId)
+                .findFirst();
+            if (firstPartner.isPresent()) return "redirect:/pesan/chat/" + firstPartner.get();
+            return "redirect:/dashboard";
+        }
+
         if (!(pengguna instanceof Mahasiswa mahasiswa)) {
             return "redirect:/dashboard";
         }
@@ -495,7 +531,7 @@ public class DashboardController {
         siapkanDataUmum(penggunaId, pengguna, model);
 
         if (mahasiswa.isMentor()) {
-            // ===== MENTOR: percakapan = mentee unik dari sesi =====
+            // ===== MENTOR =====
             model.addAttribute("mentor", pengguna);
             List<SesiMentoring> sesiMentor = mentoringService.getSemuaSesiPengguna(penggunaId).stream()
                 .filter(s -> s.getMentor() != null && s.getMentor().getId().equals(penggunaId))
@@ -504,26 +540,20 @@ public class DashboardController {
 
             Set<Long> menteeIds = new LinkedHashSet<>();
             List<Pengguna> menteeUnik = new ArrayList<>();
-            Map<Long, SesiMentoring> sesiTerakhirMentee = new LinkedHashMap<>();
             for (SesiMentoring s : sesiMentor) {
-                if (s.getMentee() != null && !menteeIds.contains(s.getMentee().getId())) {
-                    menteeIds.add(s.getMentee().getId());
+                if (s.getMentee() != null && menteeIds.add(s.getMentee().getId()))
                     menteeUnik.add(s.getMentee());
-                    sesiTerakhirMentee.put(s.getMentee().getId(), s);
-                }
             }
-            List<Map<String, Object>> percakapan = new ArrayList<>();
-            for (Pengguna mentee : menteeUnik) {
-                Map<String, Object> conv = new LinkedHashMap<>();
-                conv.put("mentee", mentee);
-                conv.put("sesiTerakhir", sesiTerakhirMentee.get(mentee.getId()));
-                percakapan.add(conv);
+
+            // Redirect langsung ke chat pertama jika ada
+            if (!menteeUnik.isEmpty()) {
+                return "redirect:/pesan/chat/" + menteeUnik.get(0).getId();
             }
-            model.addAttribute("percakapan", percakapan);
+            model.addAttribute("percakapan", new ArrayList<>());
             return "dashboard/pesan";
 
         } else {
-            // ===== MENTEE: percakapan = mentor unik dari sesi =====
+            // ===== MENTEE =====
             model.addAttribute("mahasiswa", mahasiswa);
             List<SesiMentoring> sesiMentee = mentoringService.getSemuaSesiPengguna(penggunaId).stream()
                 .filter(s -> s.getMentee() != null && s.getMentee().getId().equals(penggunaId))
@@ -532,22 +562,16 @@ public class DashboardController {
 
             Set<Long> mentorIds = new LinkedHashSet<>();
             List<Pengguna> mentorUnik = new ArrayList<>();
-            Map<Long, SesiMentoring> sesiTerakhirMentor = new LinkedHashMap<>();
             for (SesiMentoring s : sesiMentee) {
-                if (s.getMentor() != null && !mentorIds.contains(s.getMentor().getId())) {
-                    mentorIds.add(s.getMentor().getId());
+                if (s.getMentor() != null && mentorIds.add(s.getMentor().getId()))
                     mentorUnik.add(s.getMentor());
-                    sesiTerakhirMentor.put(s.getMentor().getId(), s);
-                }
             }
-            List<Map<String, Object>> percakapan = new ArrayList<>();
-            for (Pengguna mentor : mentorUnik) {
-                Map<String, Object> conv = new LinkedHashMap<>();
-                conv.put("mentor", mentor);
-                conv.put("sesiTerakhir", sesiTerakhirMentor.get(mentor.getId()));
-                percakapan.add(conv);
+
+            // Redirect ke chat pertama jika ada
+            if (!mentorUnik.isEmpty()) {
+                return "redirect:/pesan/chat/" + mentorUnik.get(0).getId();
             }
-            model.addAttribute("percakapan", percakapan);
+            model.addAttribute("percakapan", new ArrayList<>());
             return "dashboard/pesan-mentee";
         }
     }

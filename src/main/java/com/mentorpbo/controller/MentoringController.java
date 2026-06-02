@@ -197,6 +197,8 @@ public class MentoringController {
         } else if (sesi instanceof SesiVideo video) {
             model.addAttribute("tautanVideo",     video.getTautanVideo());
             model.addAttribute("platformVideo",   video.getPlatformVideo());
+            model.addAttribute("kualitasVideo",   video.getKualitasVideo());
+            model.addAttribute("memilikiSubtitle", video.isMemilikiSubtitle());
             model.addAttribute("jumlahTontonan",  video.getJumlahTontonan());
         }
 
@@ -430,6 +432,23 @@ public class MentoringController {
             flash.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/mentoring/sesi";
+    }
+
+    /** Mentor menolak permintaan sesi dari mentee: MENUNGGU_KONFIRMASI → DIBATALKAN + notif mentee. */
+    @PostMapping("/sesi/{id}/tolak")
+    public String tolakPermintaanSesi(@PathVariable Long id,
+                                      @RequestParam(required = false, defaultValue = "Permintaan ditolak oleh mentor.") String alasan,
+                                      HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = requireLogin(session);
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            mentoringService.tolakPermintaanSesi(id, penggunaId, alasan);
+            flash.addFlashAttribute("sukses", "Permintaan sesi ditolak.");
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/dashboard";
     }
 
     /** Mentee memberikan rating setelah sesi SELESAI. */

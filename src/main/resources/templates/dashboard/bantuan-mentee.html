@@ -158,12 +158,37 @@ tailwind.config = {
   </div>
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="relative">
-      <button class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+      <button onclick="togglePopup('notifPopup', event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
         <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
         <span th:if="${notifBelumDibaca > 0}"
-              class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center"
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5"
               th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
       </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
+          <h3 class="font-bold text-[15px] text-primary">Notifikasi</h3>
+          <form th:action="@{/notifikasi/baca-semua}" method="post">
+            <button type="submit" class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Dibaca</button>
+          </form>
+        </div>
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+          <div th:each="notif : ${daftarNotifikasi}"
+              class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"
+              th:classappend="${!notif.sudahDibaca} ? 'bg-primary-fixed/10'">
+            <div class="w-9 h-9 rounded-full bg-primary-container/10 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-primary-container text-[18px]" style="font-variation-settings:'FILL' 1">notifications</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[13px] font-bold truncate" th:text="${notif.judul}">Judul</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${notif.pesan}">Pesan</p>
+            </div>
+          </div>
+          <div th:if="${#lists.isEmpty(daftarNotifikasi)}" class="px-5 py-8 text-center">
+            <span class="material-symbols-outlined text-outline block mb-2" style="font-size:32px">notifications_off</span>
+            <p class="text-[13px] text-on-surface-variant">Tidak ada notifikasi.</p>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="h-8 w-[1px] bg-outline-variant"></div>
     <div class="flex items-center gap-3 cursor-pointer">
@@ -363,6 +388,16 @@ tailwind.config = {
     document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
     if (!isOpen) el.classList.add('open');
   }
+</script>
+<script>
+function togglePopup(id, event) {
+    event.stopPropagation();
+    document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+    document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click', function() {
+    document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+});
 </script>
 </body>
 </html>

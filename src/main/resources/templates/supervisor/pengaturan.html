@@ -1,634 +1,613 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Pengaturan | Jejak Ilmu - Platform Mentoring Akademik</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "outline-variant": "#c6c6d0",
-        "surface-variant": "#e1e3e4",
-        "secondary-container": "#fdb965",
-        "primary-fixed-dim": "#b6c4fe",
-        "glass-border": "rgba(255,255,255,0.4)",
-        "error": "#ba1a1a",
-        "surface-container-low": "#f3f4f5",
-        "surface-container-highest": "#e1e3e4",
-        "on-secondary-container": "#754900",
-        "inverse-on-surface": "#f0f1f2",
-        "success-green": "#10b981",
-        "surface-dim": "#d9dadb",
-        "on-error-container": "#93000a",
-        "warning-gold": "#fea619",
-        "surface-container-high": "#e7e8e9",
-        "error-crimson": "#ba1a1a",
-        "surface-container": "#edeeef",
-        "error-container": "#ffdad6",
-        "on-primary-fixed": "#061748",
-        "on-background": "#191c1d",
-        "on-primary": "#ffffff",
-        "surface": "#f8f9fa",
-        "outline": "#767680",
-        "primary": "#000000",
-        "background": "#f8f9fa",
-        "on-surface-variant": "#45464f",
-        "primary-container": "#061748",
-        "on-primary-container": "#7382b7",
-        "primary-fixed": "#dce1ff",
-        "on-primary-fixed-variant": "#364475",
-        "on-surface": "#191c1d",
-        "surface-container-lowest": "#ffffff"
-      },
-      spacing: {
-        "margin-mobile": "16px",
-        "topbar-height": "72px",
-        "base": "8px",
-        "margin-desktop": "32px",
-        "container-max": "1280px",
-        "sidebar-width": "280px",
-        "gutter": "24px"
-      },
-      fontFamily: {
-        "headline-md": ["Inter"],
-        "body-lg": ["Inter"],
-        "body-md": ["Inter"],
-        "label-sm": ["Inter"],
-        "caption-xs": ["Inter"],
-        "display-lg": ["Inter"]
-      },
-      fontSize: {
-        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "900"}],
-        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
-        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
-        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "800"}],
-        "caption-xs": ["10px", {"lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "900"}],
-        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
-      }
-    }
-  }
-}
-</script>
-<style>
-  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-  .premium-card { border-left: 4px solid #000; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .premium-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,17,66,0.1); }
-  .premium-card.gold { border-left-color: #fea619; }
-  .premium-card.green { border-left-color: #10b981; }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f1f1; }
-  ::-webkit-scrollbar-thumb { background: #c6c6c6; border-radius: 10px; }
-</style>
-</head>
-<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Pengaturan | Jejak Ilmu - Platform Mentoring Akademik</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "outline-variant": "#c6c6d0", "surface-variant": "#e1e3e4",
+                            "secondary-container": "#fdb965", "primary-fixed-dim": "#b6c4fe",
+                            "glass-border": "rgba(255,255,255,0.4)", error: "#ba1a1a",
+                            "surface-container-low": "#f3f4f5", "surface-container-highest": "#e1e3e4",
+                            "on-secondary-container": "#754900", "inverse-on-surface": "#f0f1f2",
+                            "success-green": "#10b981", "surface-dim": "#d9dadb",
+                            "on-error-container": "#93000a", "warning-gold": "#fea619",
+                            "surface-container-high": "#e7e8e9", "error-crimson": "#ba1a1a",
+                            "surface-container": "#edeeef", "error-container": "#ffdad6",
+                            "on-primary-fixed": "#061748", "on-background": "#191c1d",
+                            "on-primary": "#ffffff", surface: "#f8f9fa", outline: "#767680",
+                            primary: "#000000", background: "#f8f9fa",
+                            "on-surface-variant": "#45464f", "primary-container": "#061748",
+                            "on-primary-container": "#7382b7", "primary-fixed": "#dce1ff",
+                            "on-primary-fixed-variant": "#364475", "on-surface": "#191c1d",
+                            "surface-container-lowest": "#ffffff",
+                        },
+                        spacing: {
+                            "margin-mobile": "16px", "topbar-height": "72px", base: "8px",
+                            "margin-desktop": "32px", "container-max": "1280px",
+                            "sidebar-width": "280px", gutter: "24px",
+                        },
+                        fontFamily: { "headline-md": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "caption-xs": ["Inter"], "display-lg": ["Inter"] },
+                        fontSize: {
+                            "headline-md": ["24px", {"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+                            "body-lg": ["18px", {"lineHeight":"1.6","fontWeight":"500"}],
+                            "body-md": ["14px", {"lineHeight":"1.5","fontWeight":"400"}],
+                            "label-sm": ["12px", {"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+                            "caption-xs": ["10px", {"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}],
+                            "display-lg": ["48px", {"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"900"}],
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            body { font-family: "Inter", sans-serif; background-color: #f8f9fa; }
+            .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; vertical-align: middle; }
+            .card { box-shadow: 0 4px 20px rgba(0,17,66,0.04); border-radius: 1.25rem; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-thumb { background: #dce1ff; border-radius: 10px; }
+        </style>
+    </head>
+    <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
 
-<!-- ==================== SIDEBAR (Pengaturan active) ==================== -->
-<aside class="fixed left-0 top-0 h-screen w-[280px] flex flex-col py-8 px-6 gap-y-4 shadow-2xl z-50" style="background: linear-gradient(to bottom, #00081e, #001142);">
-  <div class="mb-8">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
-        <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">school</span>
-      </div>
-      <div>
-        <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-        <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
-      </div>
-    </div>
-    <div class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 border border-secondary-container/30">
-      <span class="text-[10px] font-black uppercase tracking-widest text-secondary-container">AKSES: DOSEN / SUPERVISOR</span>
-    </div>
-  </div>
-  <nav class="flex-grow space-y-1">
-    <a th:href="@{/dashboard}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-body-md text-body-md">Beranda</span>
-    </a>
-    <a th:href="@{/validasi-program}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">verified_user</span>
-      <span class="font-body-md text-body-md">Validasi Program</span>
-    </a>
-    <a th:href="@{/monitoring-mentor}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">monitoring</span>
-      <span class="font-body-md text-body-md">Monitoring Mentor</span>
-    </a>
-    <a th:href="@{/data-mahasiswa}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">badge</span>
-      <span class="font-body-md text-body-md">Data Mahasiswa</span>
-    </a>
-    <a th:href="@{/laporan-akademik}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">analytics</span>
-      <span class="font-body-md text-body-md">Laporan Akademik</span>
-    </a>
-    <!-- ACTIVE: Pengaturan -->
-    <a th:href="@{/pengaturan}" class="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl shadow-[0_0_15px_rgba(181,196,255,0.2)] transition-all">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">settings</span>
-      <span class="font-body-md text-body-md font-bold">Pengaturan</span>
-    </a>
-  </nav>
-  <div class="pt-6 border-t border-white/10 space-y-1">
-    <a th:href="@{/bantuan}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
-      <span class="material-symbols-outlined">help_center</span>
-      <span class="font-body-md text-body-md">Pusat Bantuan</span>
-    </a>
-    <a th:href="@{/logout}" class="flex items-center gap-3 p-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">logout</span>
-      <span class="font-body-md text-body-md">Keluar</span>
-    </a>
-  </div>
-</aside>
-
-<!-- ==================== TOPBAR ==================== -->
-<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex justify-between items-center px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
-  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
-    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
-    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari pengaturan..." type="text"/>
-  </div>
-  <div class="flex items-center gap-3 flex-shrink-0">
-    <div class="relative">
-      <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
-        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-      </button>
-      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
-        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-warning-gold/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-warning-gold text-[18px]" style="font-variation-settings:'FILL' 1;">pending_actions</span></div><div><p class="text-[13px] font-bold">Sesi Menunggu Validasi</p><p class="text-[12px] text-on-surface-variant mt-0.5">Ada sesi baru yang membutuhkan persetujuan Anda.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">Baru saja</p></div></div>
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-success-green/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-success-green text-[18px]" style="font-variation-settings:'FILL' 1;">workspace_premium</span></div><div><p class="text-[13px] font-bold">Kandidat Asdos Baru</p><p class="text-[12px] text-on-surface-variant mt-0.5">Mahasiswa baru memenuhi syarat sebagai Asisten Dosen.</p><p class="text-[11px] text-on-surface-variant/60 mt-1 font-medium">2 jam yang lalu</p></div></div>
-        </div>
-        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button></div>
-      </div>
-    </div>
-    <div class="relative">
-      <button onclick="togglePopup('inboxPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-on-surface-variant">mail</span></button>
-      <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
-        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-          <div class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"><div class="w-9 h-9 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-xs flex-shrink-0">SY</div><div class="min-w-0"><div class="flex items-center justify-between gap-2"><p class="text-[13px] font-bold truncate">Sistem</p><p class="text-[11px] text-on-surface-variant flex-shrink-0 font-medium">Hari ini</p></div><p class="text-[12px] text-on-surface-variant mt-0.5">Laporan mingguan program mentorship telah tersedia.</p></div></div>
-        </div>
-        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
-      </div>
-    </div>
-    <div class="h-8 w-[1px] bg-outline-variant"></div>
-    <div class="flex items-center gap-3 cursor-pointer" th:if="${pengguna != null}">
-      <div class="text-right">
-        <p class="font-label-sm text-label-sm text-primary" th:text="${pengguna.namaLengkap}">Supervisor</p>
-        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter">Supervisor Akademik</p>
-      </div>
-      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0"><img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${pengguna.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">SU</div></div>
-    </div>
-  </div>
-</header>
-
-<!-- ==================== MAIN CONTENT ==================== -->
-<main class="ml-[280px] pt-[72px] min-h-screen flex flex-col">
-<div class="p-margin-desktop flex-1 flex flex-col w-full">
-
-  <!-- Page Header -->
-  <div class="mb-8">
-    <h2 class="font-display-lg text-display-lg text-primary tracking-tight">Pengaturan</h2>
-    <p class="text-on-surface-variant font-body-lg mt-2">Kelola akun, privasi, dan preferensi supervisor Anda di Jejak Ilmu.</p>
-  </div>
-
-  <!-- Settings Grid -->
-  <div class="grid grid-cols-12 gap-gutter flex-1">
-
-    <!-- ===== LEFT: Internal Settings Nav ===== -->
-    <nav class="col-span-3 space-y-1 self-start sticky top-[104px]">
-      <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
-              id="tab-profil" onclick="switchTab('profil')">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined">account_circle</span>
-          <span class="font-body-md font-medium">Profil Supervisor</span>
-        </div>
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-      <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 bg-white shadow-sm border-l-4 border-primary text-primary"
-              id="tab-account" onclick="switchTab('account')">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-primary">manage_accounts</span>
-          <span class="font-body-md font-bold">Akun &amp; Keamanan</span>
-        </div>
-        <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-      </button>
-      <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
-              id="tab-notifications" onclick="switchTab('notifications')">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined">notifications_active</span>
-          <span class="font-body-md font-medium">Notifikasi</span>
-        </div>
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-      <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
-              id="tab-privacy" onclick="switchTab('privacy')">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined">shield_person</span>
-          <span class="font-body-md font-medium">Privasi Profil</span>
-        </div>
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-      <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
-              id="tab-session" onclick="switchTab('session')">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined">devices</span>
-          <span class="font-body-md font-medium">Sesi &amp; Perangkat</span>
-        </div>
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-    </nav>
-
-    <!-- ===== RIGHT: Settings Content ===== -->
-    <div class="col-span-9 space-y-8 pb-16" id="settings-content">
-
-      <!-- â”€â”€ Section: Profil Supervisor â”€â”€ -->
-      <section class="hidden space-y-6" id="section-profil">
-
-        <!-- Identitas Visual -->
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm" style="border-left-color:#7382b7;">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="material-symbols-outlined text-on-primary-container text-[22px]" style="font-variation-settings:'FILL' 1;">account_circle</span>
-            <h3 class="font-headline-md text-headline-md">Identitas Visual</h3>
-          </div>
-          <div class="flex items-center gap-6">
-            <div class="relative flex-shrink-0">
-              <div class="w-24 h-24 rounded-2xl bg-[#001142] flex items-center justify-center text-white font-black text-3xl border-4 border-primary-fixed-dim"
-                   th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">SU</div>
-              <button class="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-container text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-[16px]">photo_camera</span>
-              </button>
+        <!-- SIDEBAR -->
+        <aside class="fixed left-0 top-0 h-screen w-[280px] flex flex-col py-8 px-6 gap-y-4 shadow-2xl z-50"
+               style="background: linear-gradient(to bottom, #00081e, #001142)">
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <a th:href="@{/dashboard}">
+                        <img src="/images/logo.png" alt="Jejak Ilmu" style="height:52px;width:auto;flex-shrink:0;display:block;"/>
+                    </a>
+                    <div>
+                        <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
+                        <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 border border-secondary-container/30">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-secondary-container"
+                          th:text="${pengguna != null and pengguna.role.name() == 'GURU' ? 'AKSES: GURU / SUPERVISOR' : 'AKSES: DOSEN / SUPERVISOR'}">AKSES: SUPERVISOR</span>
+                </div>
             </div>
-            <div class="flex-1">
-              <p class="font-bold text-[14px] text-on-primary-container mb-1">Unggah Foto Baru</p>
-              <p class="text-[12px] text-on-surface-variant mb-4">Format JPG, PNG atau GIF. Maks. 5MB.</p>
-              <div class="flex gap-3">
-                <button class="px-5 py-2.5 bg-primary-container text-white font-black text-[11px] uppercase tracking-widest rounded-lg hover:bg-primary-container/90 transition-all active:scale-95">
-                  Pilih File
+            <nav class="flex-grow space-y-1">
+                <a th:href="@{/dashboard}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-body-md text-body-md">Beranda</span>
+                </a>
+                <a th:href="@{/validasi-program}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">verified_user</span>
+                    <span class="font-body-md text-body-md">Validasi Program</span>
+                </a>
+                <a th:href="@{/monitoring-mentor}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <span class="font-body-md text-body-md">Monitoring Mentor</span>
+                </a>
+                <a th:href="@{/data-mahasiswa}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">badge</span>
+                    <span class="font-body-md text-body-md">Data Mahasiswa</span>
+                </a>
+                <a th:href="@{/laporan-akademik}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span class="font-body-md text-body-md">Laporan Akademik</span>
+                </a>
+                <a th:href="@{/pengaturan}" class="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl shadow-[0_0_15px_rgba(181,196,255,0.2)] transition-all">
+                    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">settings</span>
+                    <span class="font-body-md text-body-md font-bold">Pengaturan</span>
+                </a>
+            </nav>
+            <div class="pt-6 border-t border-white/10 space-y-1">
+                <a th:href="@{/bantuan}" class="flex items-center gap-3 p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined">help_center</span>
+                    <span class="font-body-md text-body-md">Pusat Bantuan</span>
+                </a>
+                <a th:href="@{/logout}" class="flex items-center gap-3 p-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-xl transition-all">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-body-md text-body-md">Keluar</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- TOPBAR -->
+        <header class="fixed top-0 right-0 h-[72px] left-[280px] flex justify-between items-center px-8 bg-white/60 backdrop-blur-lg border-b border-glass-border shadow-sm z-40">
+            <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+                <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari pengaturan..." type="text"/>
+            </div>
+            <div class="flex items-center gap-4 ml-6">
+                <!-- Notif -->
+                <div class="relative">
+                    <button onclick="togglePopup('notifPopup', event)"
+                        class="relative w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors">
+                        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                        <span th:if="${notifBelumDibaca > 0}"
+                            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-error rounded-full flex items-center justify-center text-white text-[9px] font-black px-0.5"
+                            th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}"></span>
+                    </button>
+                    <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+                        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
+                            <h3 class="font-bold text-[15px] text-primary">Notifikasi</h3>
+                            <form th:action="@{/notifikasi/baca-semua}" method="post">
+                                <button type="submit" class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Dibaca</button>
+                            </form>
+                        </div>
+                        <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
+                            <div th:each="notif : ${daftarNotifikasi}"
+                                class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"
+                                th:classappend="${!notif.sudahDibaca} ? 'bg-primary-fixed/10'">
+                                <div class="w-9 h-9 rounded-full bg-primary-container/10 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-primary-container text-[18px]" style="font-variation-settings:'FILL' 1">notifications</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[13px] font-bold truncate" th:text="${notif.judul}">Judul</p>
+                                    <p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${notif.pesan}">Pesan</p>
+                                </div>
+                            </div>
+                            <div th:if="${#lists.isEmpty(daftarNotifikasi)}" class="px-5 py-8 text-center">
+                                <span class="material-symbols-outlined text-outline block mb-2" style="font-size:32px">notifications_off</span>
+                                <p class="text-[13px] text-on-surface-variant">Tidak ada notifikasi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mail -->
+                <button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors">
+                    <span class="material-symbols-outlined text-on-surface-variant">mail</span>
                 </button>
-                <button class="px-5 py-2.5 border border-outline-variant text-on-surface-variant font-black text-[11px] uppercase tracking-widest rounded-lg hover:bg-surface-container transition-all">
-                  Hapus
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Info Jabatan -->
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm" style="border-left-color:#fea619;">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="material-symbols-outlined text-warning-gold text-[22px]" style="font-variation-settings:'FILL' 1;">badge</span>
-            <h3 class="font-headline-md text-headline-md">Informasi Jabatan</h3>
-          </div>
-          <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">person</span>
-                <span class="font-body-md font-medium truncate" th:text="${pengguna.namaLengkap}">Nama</span>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Email</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">mail</span>
-                <span class="font-body-md font-medium truncate" th:text="${pengguna.email}">email</span>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Role</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">admin_panel_settings</span>
-                <span class="font-body-md font-medium" th:text="${pengguna.role}">SUPERVISOR</span>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Status Akun</label>
-              <div class="flex items-center gap-3 p-4 bg-success-green/5 rounded-xl border border-success-green/20">
-                <span class="w-2.5 h-2.5 rounded-full bg-success-green flex-shrink-0"></span>
-                <span class="font-body-md font-bold text-success-green">Aktif</span>
-                <span class="ml-auto text-[10px] font-black text-success-green uppercase tracking-wider">VERIFIED</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Riwayat Institusi -->
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm" style="border-left-color:#061748;">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="material-symbols-outlined text-primary-container text-[22px]" style="font-variation-settings:'FILL' 1;">account_balance</span>
-            <h3 class="font-headline-md text-headline-md">Institusi &amp; Tugas</h3>
-          </div>
-          <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2 col-span-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bidang Pengawasan</label>
-              <div class="flex flex-wrap gap-2 p-4 bg-surface-container-low rounded-xl border border-outline-variant/30 min-h-[56px]">
-                <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-container/10 text-primary-container text-[11px] font-black uppercase tracking-wider rounded-full">
-                  Validasi Program
-                </span>
-                <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-container/10 text-primary-container text-[11px] font-black uppercase tracking-wider rounded-full">
-                  Monitoring Mentor
-                </span>
-                <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-container/10 text-primary-container text-[11px] font-black uppercase tracking-wider rounded-full">
-                  Kandidat Asdos
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-4 pb-4">
-          <button class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-lg">
-            Simpan Perubahan
-          </button>
-          <button class="px-8 py-3 bg-white border border-outline-variant text-on-surface-variant font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-surface-container transition-all active:scale-95"
-                  onclick="switchTab('account')">
-            Batalkan
-          </button>
-        </div>
-
-      </section>
-
-      <!-- â”€â”€ Section: Akun & Keamanan â”€â”€ -->
-      <section class="space-y-6" id="section-account">
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Informasi Akun</h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Alamat Email</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">mail</span>
-                <span class="font-body-md font-medium truncate" th:text="${pengguna.email}">email@example.com</span>
-                <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Kata Sandi</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">lock</span>
-                <span class="font-body-md font-medium tracking-widest">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
-                <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Keamanan Dua Faktor</h3>
-          <div class="flex items-center justify-between p-4 bg-primary-fixed/20 rounded-xl border border-primary-fixed">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">verified_user</span>
-              </div>
-              <div>
-                <p class="font-body-md font-bold">Autentikasi 2FA Aktif</p>
-                <p class="text-sm text-on-surface-variant">Akun Anda dilindungi dengan verifikasi tambahan.</p>
-              </div>
-            </div>
-            <button class="px-6 py-2 bg-white text-primary border border-primary font-black text-[10px] rounded-lg hover:bg-surface transition-colors flex-shrink-0">NONAKTIFKAN</button>
-          </div>
-        </div>
-
-        <!-- Profil Supervisor Card -->
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Profil Supervisor</h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">person</span>
-                <span class="font-body-md font-medium truncate" th:text="${pengguna.namaLengkap}">Nama</span>
-                <button class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Role</label>
-              <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
-                <span class="material-symbols-outlined text-on-surface-variant">admin_panel_settings</span>
-                <span class="font-body-md font-medium" th:text="${pengguna.role}">SUPERVISOR</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- â”€â”€ Section: Notifikasi â”€â”€ -->
-      <section class="hidden space-y-6" id="section-notifications">
-        <div class="premium-card gold bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Preferensi Notifikasi</h3>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
-              <div>
-                <p class="font-body-md font-bold">Push Notifications</p>
-                <p class="text-sm text-on-surface-variant">Dapatkan update langsung di browser atau perangkat Anda.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
-              <div>
-                <p class="font-body-md font-bold">Email Laporan Mingguan</p>
-                <p class="text-sm text-on-surface-variant">Ringkasan aktivitas program mentorship setiap minggu.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
-              <div>
-                <p class="font-body-md font-bold">Sesi Menunggu Validasi</p>
-                <p class="text-sm text-on-surface-variant">Notifikasi saat ada sesi baru yang perlu disetujui.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between py-4">
-              <div>
-                <p class="font-body-md font-bold">Rekomendasi Kandidat Asdos</p>
-                <p class="text-sm text-on-surface-variant">Pemberitahuan ketika ada mahasiswa baru yang layak sebagai Asdos.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- â”€â”€ Section: Privasi â”€â”€ -->
-      <section class="hidden space-y-6" id="section-privacy">
-        <div class="premium-card green bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Visibilitas Data Supervisor</h3>
-          <div class="space-y-4">
-            <div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-start gap-4">
-              <input checked="" class="mt-1 text-primary focus:ring-primary" id="p-internal" name="privacy" type="radio"/>
-              <label for="p-internal">
-                <p class="font-body-md font-bold">Internal Platform <span class="text-success-green text-[11px] font-black">(Disarankan)</span></p>
-                <p class="text-sm text-on-surface-variant">Data aktivitas Anda hanya terlihat oleh tim pengelola dan administrator sistem.</p>
-              </label>
-            </div>
-            <div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-start gap-4">
-              <input class="mt-1 text-primary focus:ring-primary" id="p-private" name="privacy" type="radio"/>
-              <label for="p-private">
-                <p class="font-body-md font-bold">Privat Penuh</p>
-                <p class="text-sm text-on-surface-variant">Hanya Anda yang dapat melihat riwayat aksi validasi dan laporan.</p>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="premium-card green bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Data &amp; Aktivitas Pengawasan</h3>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between py-4 border-b border-outline-variant">
-              <div>
-                <p class="font-body-md font-bold">Tampilkan di Laporan Akademik</p>
-                <p class="text-sm text-on-surface-variant">Nama Anda muncul sebagai validator di laporan resmi program.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between py-4">
-              <div>
-                <p class="font-body-md font-bold">Bagikan Statistik Validasi</p>
-                <p class="text-sm text-on-surface-variant">Izinkan admin melihat histori dan statistik validasi sesi Anda.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                <input checked="" class="sr-only peer" type="checkbox"/>
-                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- â”€â”€ Section: Sesi & Perangkat â”€â”€ -->
-      <section class="hidden space-y-6" id="section-session">
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Preferensi Kehadiran</h3>
-          <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
-            <div class="flex items-center gap-4">
-              <div class="w-3 h-3 rounded-full bg-success-green ring-4 ring-success-green/20" id="status-indicator"></div>
-              <div>
-                <p class="font-body-md font-bold" id="status-text">Status: Online</p>
-                <p class="text-sm text-on-surface-variant">Anda terlihat aktif oleh sistem dan admin platform.</p>
-              </div>
-            </div>
-            <select class="bg-white border border-outline-variant rounded-lg text-sm font-bold focus:ring-primary focus:border-primary px-3 py-2"
-                    onchange="updateOnlineStatus(this.value)">
-              <option value="online">Online</option>
-              <option value="offline">Sembunyikan Status</option>
-              <option value="busy">Sibuk / Fokus</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="premium-card bg-white p-7 rounded-2xl shadow-sm">
-          <h3 class="font-headline-md text-headline-md mb-6">Sesi Aktif &amp; Perangkat</h3>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 border border-outline-variant rounded-xl bg-success-green/5">
-              <div class="flex items-center gap-4">
-                <span class="material-symbols-outlined text-3xl text-on-surface-variant">laptop_mac</span>
-                <div>
-                  <p class="font-body-md font-bold">Browser â€” Perangkat Ini</p>
-                  <p class="text-xs text-on-surface-variant">Chrome Â· Aktif Sekarang</p>
+                <!-- User -->
+                <div class="flex items-center gap-3 pl-4 border-l border-outline-variant" th:if="${pengguna != null}">
+                    <div class="text-right hidden sm:block">
+                        <p class="font-label-sm text-label-sm text-primary font-bold" th:text="${pengguna.namaLengkap}">Supervisor</p>
+                        <p class="font-caption-xs text-caption-xs text-on-surface-variant"
+                           th:text="${dosen != null ? (dosen.jabatanFungsional ?: 'Dosen Supervisor') : (guru != null ? (guru.mataPelajaranDiampu ?: 'Guru Supervisor') : 'Supervisor Akademik')}">Jabatan</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0">
+                        <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+                        <div th:unless="${pengguna.fotoProfil != null}"
+                            class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
+                            th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">SU</div>
+                    </div>
                 </div>
-              </div>
-              <span class="text-[10px] font-black text-success-green uppercase tracking-widest">PERANGKAT INI</span>
             </div>
-            <div class="flex items-center justify-between p-4 border border-outline-variant rounded-xl">
-              <div class="flex items-center gap-4">
-                <span class="material-symbols-outlined text-3xl text-on-surface-variant">smartphone</span>
-                <div>
-                  <p class="font-body-md font-bold">Perangkat Mobile</p>
-                  <p class="text-xs text-on-surface-variant">Jejak Ilmu App Â· 2 jam yang lalu</p>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="ml-[280px] pt-[72px] min-h-screen flex flex-col">
+            <div class="p-8 flex-1 flex flex-col w-full">
+
+                <!-- Flash Messages -->
+                <div th:if="${sukses}" class="mb-6 flex items-center gap-3 rounded-2xl border border-success-green bg-success-green/10 px-5 py-4">
+                    <span class="material-symbols-outlined text-success-green" style="font-variation-settings:'FILL' 1">check_circle</span>
+                    <p class="font-label-sm text-label-sm text-success-green" th:text="${sukses}">Berhasil!</p>
                 </div>
-              </div>
-              <button class="text-error font-black text-[10px] hover:underline">LOGOUT</button>
-            </div>
-            <div class="flex items-center justify-between p-4 border border-outline-variant rounded-xl">
-              <div class="flex items-center gap-4">
-                <span class="material-symbols-outlined text-3xl text-on-surface-variant">tablet_mac</span>
-                <div>
-                  <p class="font-body-md font-bold">Tablet</p>
-                  <p class="text-xs text-on-surface-variant">Safari Â· 1 hari yang lalu</p>
+                <div th:if="${error}" class="mb-6 flex items-center gap-3 rounded-2xl border border-error bg-error-container px-5 py-4">
+                    <span class="material-symbols-outlined text-on-error-container">error</span>
+                    <p class="font-label-sm text-label-sm text-on-error-container" th:text="${error}">Error</p>
                 </div>
-              </div>
-              <button class="text-error font-black text-[10px] hover:underline">LOGOUT</button>
+
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <h2 class="font-display-lg text-display-lg text-primary tracking-tight">Pengaturan</h2>
+                    <p class="text-on-surface-variant font-body-lg mt-2">Kelola profil, keamanan, dan preferensi akun supervisor Anda.</p>
+                </div>
+
+                <!-- Settings Grid -->
+                <div class="grid grid-cols-12 gap-6 flex-1">
+
+                    <!-- LEFT: Settings Nav -->
+                    <nav class="col-span-3 space-y-1 self-start sticky top-[104px]">
+                        <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
+                                id="tab-profil" onclick="switchTab('profil')">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">account_circle</span>
+                                <span class="font-body-md font-medium">Profil Supervisor</span>
+                            </div>
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                        <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 bg-white shadow-sm border-l-4 border-primary text-primary"
+                                id="tab-account" onclick="switchTab('account')">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">manage_accounts</span>
+                                <span class="font-body-md font-bold">Akun &amp; Keamanan</span>
+                            </div>
+                            <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                        </button>
+                        <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
+                                id="tab-notifications" onclick="switchTab('notifications')">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">notifications_active</span>
+                                <span class="font-body-md font-medium">Notifikasi</span>
+                            </div>
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                        <button class="settings-tab w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all duration-300 hover:bg-surface-container text-on-surface-variant"
+                                id="tab-privacy" onclick="switchTab('privacy')">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">shield_person</span>
+                                <span class="font-body-md font-medium">Privasi Profil</span>
+                            </div>
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </nav>
+
+                    <!-- RIGHT: Settings Content -->
+                    <div class="col-span-9 space-y-8 pb-16" id="settings-content">
+
+                        <!-- ── Section: Profil Supervisor ── -->
+                        <section class="hidden space-y-6" id="section-profil">
+
+                            <!-- Foto Profil -->
+                            <div class="card bg-white p-7" style="border-left: 4px solid #7382b7">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings:'FILL' 1">account_circle</span>
+                                    <h3 class="font-headline-md text-headline-md">Foto Profil</h3>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <div class="relative flex-shrink-0">
+                                        <div class="w-24 h-24 rounded-2xl overflow-hidden border-4 border-primary-fixed-dim flex-shrink-0">
+                                            <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto profil"/>
+                                            <div th:unless="${pengguna.fotoProfil != null}"
+                                                class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-3xl"
+                                                th:text="${#strings.substring(pengguna.namaLengkap, 0, 2).toUpperCase()}">SU</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-[14px] text-on-primary-container mb-1">Unggah Foto Baru</p>
+                                        <p class="text-[12px] text-on-surface-variant mb-4">Format JPG, PNG atau GIF. Maks. 5MB.</p>
+                                        <form th:action="@{/profil/foto}" method="post" enctype="multipart/form-data" class="flex gap-3 flex-wrap">
+                                            <label class="px-5 py-2.5 bg-primary-container text-white font-black text-[11px] uppercase tracking-widest rounded-lg hover:bg-primary-container/90 transition-all cursor-pointer active:scale-95">
+                                                Pilih &amp; Unggah
+                                                <input type="file" name="foto" accept="image/*" class="hidden" onchange="this.form.submit()"/>
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info Profil Dosen -->
+                            <div th:if="${dosen != null}" class="card bg-white p-7" style="border-left: 4px solid #fea619">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="material-symbols-outlined text-warning-gold" style="font-variation-settings:'FILL' 1">badge</span>
+                                    <h3 class="font-headline-md text-headline-md">Informasi Dosen</h3>
+                                </div>
+                                <form th:action="@{/profil/simpan}" method="post" class="grid grid-cols-2 gap-5">
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
+                                        <input type="text" name="namaLengkap" th:value="${pengguna.namaLengkap}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">NIDN</label>
+                                        <input type="text" name="nidn" th:value="${dosen.nidn}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Jabatan Fungsional</label>
+                                        <input type="text" name="jabatanFungsional" th:value="${dosen.jabatanFungsional}"
+                                            placeholder="cth: Lektor Kepala"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Program Studi</label>
+                                        <input type="text" name="programStudi" th:value="${dosen.programStudi}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Fakultas</label>
+                                        <input type="text" name="fakultas" th:value="${dosen.fakultas}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Universitas</label>
+                                        <input type="text" name="universitas" th:value="${dosen.universitas}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Mata Kuliah yang Diampu</label>
+                                        <input type="text" name="mataKuliahDiampu" th:value="${dosen.mataKuliahDiampu}"
+                                            placeholder="cth: Pemrograman Berorientasi Objek, Basis Data"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bidang Riset / Keahlian</label>
+                                        <input type="text" name="bidangRiset" th:value="${dosen.bidangRiset}"
+                                            placeholder="cth: Machine Learning, Computer Vision"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bio / Deskripsi</label>
+                                        <textarea name="bio" rows="3"
+                                            th:text="${pengguna.bio}"
+                                            placeholder="Ceritakan tentang diri Anda sebagai supervisor..."
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low resize-none"></textarea>
+                                    </div>
+                                    <div class="col-span-2 flex gap-4 pt-2">
+                                        <button type="submit"
+                                            class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Info Profil Guru -->
+                            <div th:if="${guru != null}" class="card bg-white p-7" style="border-left: 4px solid #fea619">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="material-symbols-outlined text-warning-gold" style="font-variation-settings:'FILL' 1">badge</span>
+                                    <h3 class="font-headline-md text-headline-md">Informasi Guru</h3>
+                                </div>
+                                <form th:action="@{/profil/simpan}" method="post" class="grid grid-cols-2 gap-5">
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
+                                        <input type="text" name="namaLengkap" th:value="${pengguna.namaLengkap}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">NIP</label>
+                                        <input type="text" name="nip" th:value="${guru.nip}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Sekolah</label>
+                                        <input type="text" name="namaSekolah" th:value="${guru.namaSekolah}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Mata Pelajaran yang Diampu</label>
+                                        <input type="text" name="mataPelajaranDiampu" th:value="${guru.mataPelajaranDiampu}"
+                                            placeholder="cth: Matematika, Fisika"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bidang Keahlian</label>
+                                        <input type="text" name="bidangKeahlian" th:value="${guru.bidangKeahlian}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low"/>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Bio / Deskripsi</label>
+                                        <textarea name="bio" rows="3" th:text="${pengguna.bio}"
+                                            class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md focus:ring-2 focus:ring-primary-fixed outline-none bg-surface-container-low resize-none"></textarea>
+                                    </div>
+                                    <div class="col-span-2 flex gap-4 pt-2">
+                                        <button type="submit"
+                                            class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Statistik Validasi (read-only) -->
+                            <div class="card bg-white p-7" style="border-left: 4px solid #061748">
+                                <div class="flex items-center gap-3 mb-5">
+                                    <span class="material-symbols-outlined text-primary-container" style="font-variation-settings:'FILL' 1">analytics</span>
+                                    <h3 class="font-headline-md text-headline-md">Statistik Akun</h3>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-primary-fixed/20 rounded-xl p-4 text-center">
+                                        <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Total Validasi</p>
+                                        <p class="font-black text-[28px] text-primary-container"
+                                           th:text="${dosen != null ? dosen.totalValidasi : (guru != null ? guru.totalValidasi : 0)}">0</p>
+                                    </div>
+                                    <div class="bg-success-green/10 rounded-xl p-4 text-center">
+                                        <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Status Akun</p>
+                                        <p class="font-black text-[18px] text-success-green">Aktif</p>
+                                        <p class="text-[10px] font-black text-success-green uppercase tracking-wider">VERIFIED</p>
+                                    </div>
+                                    <div th:if="${dosen != null}" class="bg-warning-gold/10 rounded-xl p-4 text-center">
+                                        <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Rekomendasi Asdos</p>
+                                        <p class="font-black text-[28px] text-warning-gold" th:text="${dosen.totalRekomendasiAsdos}">0</p>
+                                    </div>
+                                    <div class="bg-surface-container-low rounded-xl p-4 text-center">
+                                        <p class="text-caption-xs text-on-surface-variant uppercase tracking-widest mb-1">Terdaftar Sejak</p>
+                                        <p class="font-black text-[14px] text-on-surface"
+                                           th:text="${#temporals.format(pengguna.tanggalDaftar, 'dd MMM yyyy')}">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ── Section: Akun & Keamanan ── -->
+                        <section class="space-y-6" id="section-account">
+                            <div class="card bg-white p-7">
+                                <h3 class="font-headline-md text-headline-md mb-6">Informasi Akun</h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Alamat Email</label>
+                                        <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
+                                            <span class="material-symbols-outlined text-on-surface-variant">mail</span>
+                                            <span class="font-body-md font-medium truncate" th:text="${pengguna.email}">email@example.com</span>
+                                            <span class="ml-auto text-[10px] font-black text-success-green uppercase flex-shrink-0">VERIFIED</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Role</label>
+                                        <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
+                                            <span class="material-symbols-outlined text-on-surface-variant">admin_panel_settings</span>
+                                            <span class="font-body-md font-medium" th:text="${pengguna.role}">SUPERVISOR</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2 col-span-2">
+                                        <label class="text-caption-xs text-on-surface-variant uppercase font-bold tracking-widest">Nama Lengkap</label>
+                                        <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-xl">
+                                            <span class="material-symbols-outlined text-on-surface-variant">person</span>
+                                            <span class="font-body-md font-medium truncate" th:text="${pengguna.namaLengkap}">Nama</span>
+                                            <button type="button" onclick="switchTab('profil')"
+                                                class="ml-auto text-primary font-black text-[10px] hover:underline flex-shrink-0">UBAH</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card bg-white p-7">
+                                <h3 class="font-headline-md text-headline-md mb-4">Ganti Kata Sandi</h3>
+                                <p class="text-[13px] text-on-surface-variant mb-5">Gunakan kata sandi yang kuat dan unik untuk keamanan akun Anda.</p>
+                                <div class="flex items-center justify-between p-4 bg-primary-fixed/20 rounded-xl border border-primary-fixed">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
+                                            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">verified_user</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-body-md font-bold">Akun Anda Terproteksi</p>
+                                            <p class="text-sm text-on-surface-variant">Kata sandi tersimpan dengan aman di sistem.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ── Section: Notifikasi ── -->
+                        <section class="hidden space-y-6" id="section-notifications">
+                            <div class="card bg-white p-7" style="border-left: 4px solid #fea619">
+                                <h3 class="font-headline-md text-headline-md mb-6">Preferensi Notifikasi</h3>
+                                <form th:action="@{/profil/preferensi}" method="post">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+                                            <div>
+                                                <p class="font-body-md font-bold">Notifikasi Email</p>
+                                                <p class="text-sm text-on-surface-variant">Terima ringkasan aktivitas melalui email.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="notifEmailAktif" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.notifEmailAktif}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+                                            <div>
+                                                <p class="font-body-md font-bold">Sesi Menunggu Validasi</p>
+                                                <p class="text-sm text-on-surface-variant">Notifikasi saat ada sesi baru yang perlu disetujui.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="notifValidasiSesi" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.notifValidasiSesi}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+                                            <div>
+                                                <p class="font-body-md font-bold">Pesan Baru</p>
+                                                <p class="text-sm text-on-surface-variant">Pemberitahuan saat Anda menerima pesan baru.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="notifPesanBaru" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.notifPesanBaru}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center justify-between py-4">
+                                            <div>
+                                                <p class="font-body-md font-bold">Pengingat Sesi</p>
+                                                <p class="text-sm text-on-surface-variant">Pengingat otomatis sebelum sesi dimulai.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="notifPengingatSesi" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.notifPengingatSesi}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 flex gap-4">
+                                        <button type="submit"
+                                            class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[18px]">save</span> Simpan Preferensi
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+
+                        <!-- ── Section: Privasi ── -->
+                        <section class="hidden space-y-6" id="section-privacy">
+                            <div class="card bg-white p-7" style="border-left: 4px solid #10b981">
+                                <h3 class="font-headline-md text-headline-md mb-6">Pengaturan Privasi</h3>
+                                <form th:action="@{/profil/preferensi}" method="post">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+                                            <div>
+                                                <p class="font-body-md font-bold">Tampilkan di Laporan Akademik</p>
+                                                <p class="text-sm text-on-surface-variant">Nama Anda muncul sebagai validator di laporan resmi program.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="tampilDiRanking" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.tampilDiRanking}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center justify-between py-4 border-b border-outline-variant">
+                                            <div>
+                                                <p class="font-body-md font-bold">Bagikan Statistik Validasi</p>
+                                                <p class="text-sm text-on-surface-variant">Izinkan admin melihat histori dan statistik validasi Anda.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="bagikanStatistik" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.bagikanStatistik}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center justify-between py-4">
+                                            <div>
+                                                <p class="font-body-md font-bold">Profil Publik</p>
+                                                <p class="text-sm text-on-surface-variant">Profil Anda dapat dilihat oleh seluruh pengguna platform.</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input type="checkbox" name="profilPublik" class="sr-only peer"
+                                                       th:checked="${preferences != null and preferences.profilPublik}"/>
+                                                <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 flex gap-4">
+                                        <button type="submit"
+                                            class="px-8 py-3 bg-primary-container text-white font-black text-label-sm uppercase tracking-widest rounded-xl hover:bg-primary-container/90 transition-all active:scale-95 shadow-md flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[18px]">save</span> Simpan Privasi
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
             </div>
-          </div>
-          <button class="mt-6 w-full py-3 border border-error/30 text-error rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-error/5 transition-colors">
-            Logout dari Semua Perangkat Lain
-          </button>
-        </div>
-      </section>
+        </main>
 
-    </div>
-  </div>
+        <script>
+            const ALL_TABS = ["profil", "account", "notifications", "privacy"];
 
-</div>
+            function switchTab(tabId) {
+                ALL_TABS.forEach(s => {
+                    document.getElementById("section-" + s).classList.add("hidden");
+                    const t = document.getElementById("tab-" + s);
+                    t.classList.remove("bg-white", "shadow-sm", "border-l-4", "border-primary", "text-primary");
+                    t.classList.add("hover:bg-surface-container", "text-on-surface-variant");
+                    const icon = t.querySelector(".material-symbols-outlined");
+                    if (icon) icon.classList.remove("text-primary");
+                });
+                document.getElementById("section-" + tabId).classList.remove("hidden");
+                const active = document.getElementById("tab-" + tabId);
+                active.classList.remove("hover:bg-surface-container", "text-on-surface-variant");
+                active.classList.add("bg-white", "shadow-sm", "border-l-4", "border-primary", "text-primary");
+                const icon = active.querySelector(".material-symbols-outlined");
+                if (icon) icon.classList.add("text-primary");
+            }
 
-</main>
+            const urlTab = new URLSearchParams(window.location.search).get("tab");
+            if (urlTab && ALL_TABS.includes(urlTab)) switchTab(urlTab);
 
-<script>
-  const ALL_TABS = ['profil', 'account', 'notifications', 'privacy', 'session'];
-
-  function switchTab(tabId) {
-    ALL_TABS.forEach(s => {
-      document.getElementById('section-' + s).classList.add('hidden');
-      const t = document.getElementById('tab-' + s);
-      t.classList.remove('bg-white', 'shadow-sm', 'border-l-4', 'border-primary', 'text-primary');
-      t.classList.add('hover:bg-surface-container', 'text-on-surface-variant');
-      const icon = t.querySelector('.material-symbols-outlined');
-      if (icon) icon.classList.remove('text-primary');
-    });
-    document.getElementById('section-' + tabId).classList.remove('hidden');
-    const active = document.getElementById('tab-' + tabId);
-    active.classList.remove('hover:bg-surface-container', 'text-on-surface-variant');
-    active.classList.add('bg-white', 'shadow-sm', 'border-l-4', 'border-primary', 'text-primary');
-    const icon = active.querySelector('.material-symbols-outlined');
-    if (icon) icon.classList.add('text-primary');
-  }
-
-  const urlTab = new URLSearchParams(window.location.search).get('tab');
-  if (urlTab && ALL_TABS.includes(urlTab)) switchTab(urlTab);
-
-  function updateOnlineStatus(val) {
-    const ind = document.getElementById('status-indicator');
-    const txt = document.getElementById('status-text');
-    if (val === 'online') {
-      ind.className = 'w-3 h-3 rounded-full bg-success-green ring-4 ring-success-green/20';
-      txt.innerText = 'Status: Online';
-    } else if (val === 'offline') {
-      ind.className = 'w-3 h-3 rounded-full bg-outline-variant ring-4 ring-outline-variant/20';
-      txt.innerText = 'Status: Offline';
-    } else {
-      ind.className = 'w-3 h-3 rounded-full bg-error-crimson ring-4 ring-error-crimson/20';
-      txt.innerText = 'Status: Sibuk';
-    }
-  }
-</script>
-
-<script>
-function togglePopup(id, event) {
-  event.stopPropagation();
-  document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
-  document.getElementById(id).classList.toggle('hidden');
-}
-document.addEventListener('click', function() {
-  document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
-});
-</script>
-</body>
+            function togglePopup(id, event) {
+                event.stopPropagation();
+                document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+                document.getElementById(id).classList.toggle('hidden');
+            }
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+            });
+        </script>
+    </body>
 </html>
