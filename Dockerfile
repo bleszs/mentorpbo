@@ -40,12 +40,14 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Buat user non-root untuk keamanan
-RUN addgroup -S spring && adduser -S spring -G spring
+# Buat user non-root dan folder data dengan ownership yang benar
+RUN addgroup -S spring && adduser -S spring -G spring && \
+    mkdir -p /app/data /app/uploads && \
+    chown -R spring:spring /app
 USER spring:spring
 
 # Copy hanya JAR dari stage builder
-COPY --from=builder /app/target/*.jar app.jar
+COPY --chown=spring:spring --from=builder /app/target/*.jar app.jar
 
 # Port dideklarasikan (Railway override via $PORT)
 EXPOSE 8080
