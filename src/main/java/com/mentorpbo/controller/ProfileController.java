@@ -327,7 +327,6 @@ public class ProfileController {
                     materi.setJudul(judul.trim());
                     materi.setDeskripsi(deskripsi);
                     mentoringService.unggahMateri(materi);
-                    String tipe = "SUMBER_DAYA".equals(materi.getTipeKonten()) ? "sumber-daya" : "materi";
                     flash.addFlashAttribute("sukses", "Berhasil diperbarui.");
                 }
             }, () -> flash.addFlashAttribute("error", "Materi tidak ditemukan."));

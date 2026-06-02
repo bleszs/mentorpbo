@@ -125,32 +125,6 @@ tailwind.config = {
       </p>
       <p class="font-bold text-primary-container mb-6 text-[15px]" th:text="${email}">email@example.com</p>
 
-      <!-- ============ BANNER OTP DEV MODE ============ -->
-      <!-- Tampil jika email SMTP gagal dikirim â€” user bisa salin kode dari sini -->
-      <div th:if="${devOtp != null and !devOtp.isEmpty()}"
-           class="mb-6 rounded-2xl border-2 border-warning-gold bg-[#fffbeb] px-5 py-4">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined text-[18px]" style="color:#92400e;font-variation-settings:'FILL' 1;">bolt</span>
-          <span class="font-label-sm text-label-sm uppercase tracking-wider" style="color:#92400e;">Kode Anda (email SMTP)</span>
-        </div>
-        <p class="font-body-md text-body-md mb-3" style="color:#78350f;">
-          Email tidak sampai? Gunakan kode ini langsung:
-        </p>
-        <!-- Kotak OTP besar yang bisa diklik untuk auto-isi -->
-        <div class="flex gap-2 justify-center my-3 cursor-pointer" id="devOtpBoxes"
-             th:attr="data-otp=${devOtp}" onclick="autoFillOtp(this.dataset.otp)">
-          <th:block th:each="i : ${#numbers.sequence(0,5)}">
-            <span style="display:inline-flex;align-items:center;justify-content:center;
-                         width:44px;height:52px;font-size:26px;font-weight:900;
-                         background:#fef3c7;border:2px solid #fea619;border-radius:10px;
-                         color:#92400e;"
-                  th:text="${#strings.substring(devOtp, i, i+1)}"></span>
-          </th:block>
-        </div>
-        <p class="text-center font-caption-xs text-caption-xs mt-2" style="color:#a16207;">
-          KLIK KODE DI ATAS UNTUK MENGISI OTOMATIS
-        </p>
-      </div>
 
       <!-- Alert Error -->
       <div th:if="${error}"
