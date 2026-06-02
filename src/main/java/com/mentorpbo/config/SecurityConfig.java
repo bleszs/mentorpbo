@@ -23,40 +23,37 @@ public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired private OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    @Autowired
-    private OAuth2SuccessHandler oAuth2SuccessHandler;
-
-    // Dibaca dari JVM system property -D (diset oleh Dockerfile ENTRYPOINT dari shell env var)
     @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
     private String clientId;
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret:PLACEHOLDER}")
     private String clientSecret;
 
+    private boolean isOAuthValid() {
+        String id  = clientId  != null ? clientId.trim()  : "";
+        String sec = clientSecret != null ? clientSecret.trim() : "";
+        boolean ok = id.endsWith(".apps.googleusercontent.com")
+                  && !sec.equals("PLACEHOLDER") && !sec.isBlank();
+        log.info("[OAuth2] id-valid={} sec-valid={} -> oauth={}",
+                 id.endsWith(".apps.googleusercontent.com"),
+                 !sec.equals("PLACEHOLDER") && !sec.isBlank(), ok);
+        return ok;
+    }
+
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
-        String id  = clientId  != null ? clientId.trim()  : "PLACEHOLDER";
-        String sec = clientSecret != null ? clientSecret.trim() : "PLACEHOLDER";
-
-        log.info("[OAuth2] client-id  : {}",
-                 id.endsWith(".apps.googleusercontent.com")
-                     ? id.substring(0, 20) + "...(valid)" : id);
-        log.info("[OAuth2] client-sec : {}",
-                 (!sec.equals("PLACEHOLDER") && !sec.isBlank()) ? "set" : "PLACEHOLDER/empty");
-
-        if (!id.endsWith(".apps.googleusercontent.com") || sec.equals("PLACEHOLDER") || sec.isBlank()) {
-            log.warn("[OAuth2] Credentials not available — OAuth2 disabled");
-            return registrationId -> null;
+        if (!isOAuthValid()) {
+            log.warn("[OAuth2] Credentials missing — repository empty");
+            return new InMemoryClientRegistrationRepository();  // empty, tidak crash
         }
-
         log.info("[OAuth2] Google OAuth2 configured OK");
         return new InMemoryClientRegistrationRepository(
             ClientRegistration.withRegistrationId("google")
-                .clientId(id)
-                .clientSecret(sec)
+                .clientId(clientId.trim())
+                .clientSecret(clientSecret.trim())
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .scope("email", "profile")
@@ -78,13 +75,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
-            .logout(logout -> logout.disable())
-            .oauth2Login(oauth2 -> oauth2
+            .logout(logout -> logout.disable());
+
+        if (isOAuthValid()) {
+            http.oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
-                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
                 .failureUrl("/login?error=oauth")
             );
+        }
 
         return http.build();
     }
