@@ -2,9 +2,12 @@ package com.mentorpbo.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,9 +40,19 @@ public class SearchController {
     @Value("${app.api.coid.base-url}")
     private String baseUrl;
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     private final ObjectMapper mapper = new ObjectMapper();
     private volatile List<String> sekolahCache    = null;
     private volatile List<String> universitasCache = null;
+
+    private RestTemplate buildRestTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3000);
+        factory.setReadTimeout(5000);
+        return new RestTemplate(factory);
+    }
 
     // ============================================================
     // SEARCH SEKOLAH — SMA / SMK / MAN
@@ -131,7 +144,7 @@ public class SearchController {
 
         // Fallback: PDDikti Kemdikbud
         try {
-            RestTemplate rt = new RestTemplate();
+            RestTemplate rt = buildRestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("User-Agent", "Mozilla/5.0");
             headers.set("Accept", "application/json");
@@ -194,7 +207,7 @@ public class SearchController {
      */
     private JsonNode panggilApi(String url) {
         try {
-            RestTemplate rt = new RestTemplate();
+            RestTemplate rt = buildRestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("x-api-co-id", apiKey);
             headers.set("Accept", "application/json");
@@ -263,7 +276,7 @@ public class SearchController {
 
     private synchronized void muatUniversitas() throws Exception {
         if (universitasCache != null) return;
-        ClassPathResource res = new ClassPathResource("static/data/universitas-indonesia.json");
+        Resource res = resourceLoader.getResource("classpath:static/data/universitas-indonesia.json");
         try (InputStream in = res.getInputStream()) {
             JsonNode arr = mapper.readTree(in);
             universitasCache = StreamSupport.stream(arr.spliterator(), false)
@@ -273,7 +286,7 @@ public class SearchController {
 
     private synchronized void muatSekolah() throws Exception {
         if (sekolahCache != null) return;
-        ClassPathResource res = new ClassPathResource("static/data/sekolah-indonesia.json");
+        Resource res = resourceLoader.getResource("classpath:static/data/sekolah-indonesia.json");
         try (InputStream in = res.getInputStream()) {
             JsonNode arr = mapper.readTree(in);
             sekolahCache = StreamSupport.stream(arr.spliterator(), false)

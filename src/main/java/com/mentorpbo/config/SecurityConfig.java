@@ -6,6 +6,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +23,8 @@ import java.io.IOException;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -42,12 +46,15 @@ public class SecurityConfig {
      * dan client secret tidak boleh placeholder.
      */
     private boolean isOAuth2Ready() {
-        return googleOAuth2Enabled
-            && googleClientId != null
-            && googleClientId.endsWith(".apps.googleusercontent.com")
-            && googleClientSecret != null
-            && !googleClientSecret.startsWith("GANTI")
-            && !googleClientSecret.equals("PLACEHOLDER");
+        boolean enabled   = googleOAuth2Enabled;
+        boolean idOk      = googleClientId != null && googleClientId.endsWith(".apps.googleusercontent.com");
+        boolean secretOk  = googleClientSecret != null
+                            && !googleClientSecret.startsWith("GANTI")
+                            && !googleClientSecret.equals("PLACEHOLDER");
+        boolean ready = enabled && idOk && secretOk;
+        log.info("[OAuth2] enabled={} idOk={} secretOk={} -> ready={}",
+                 enabled, idOk, secretOk, ready);
+        return ready;
     }
 
     @Bean
