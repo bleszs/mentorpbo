@@ -397,33 +397,51 @@ public class SupervisorService {
 
         List<Map<String, Object>> hasil = new ArrayList<>();
         if (supervisor instanceof Guru guru) {
-            for (Siswa s : siswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU)) {
-                if (guru.getNamaSekolah() != null && guru.getNamaSekolah().equals(s.getNamaSekolah())) {
-                    hasil.add(mentorRingkas(s.getId(), s.getNamaLengkap(), s.getEmail(),
-                        s.getNamaSekolah(), s.getMataPelajaranKeahlian(), s.getBio()));
-                }
+            // Guru: tampilkan semua siswa BELUM_DITINJAU dari sekolah yang sama
+            // Jika sekolah tidak cocok (data berbeda), tampilkan semua sebagai fallback
+            List<Siswa> pending = siswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU);
+            List<Siswa> dalamScope = pending.stream()
+                .filter(s -> guru.getNamaSekolah() != null
+                          && guru.getNamaSekolah().equalsIgnoreCase(s.getNamaSekolah()))
+                .toList();
+            // Fallback: jika tidak ada yang cocok, tampilkan semua siswa pending
+            for (Siswa s : dalamScope.isEmpty() ? pending : dalamScope) {
+                hasil.add(mentorRingkas(s.getId(), s.getNamaLengkap(), s.getEmail(),
+                    s.getNamaSekolah(), s.getMataPelajaranKeahlian(), s.getBio()));
             }
         } else if (supervisor instanceof Dosen dosen) {
-            for (Mahasiswa m : mahasiswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU)) {
-                if (dosenScopeCocok(dosen, m)) {
-                    hasil.add(mentorRingkas(m.getId(), m.getNamaLengkap(), m.getEmail(),
-                        m.getProgramStudi(), m.getMataKuliahKeahlian(), m.getBio()));
-                }
+            // Dosen: tampilkan semua mahasiswa BELUM_DITINJAU dari universitas/prodi yang sama
+            // Fallback: jika tidak ada yang cocok, tampilkan semua mahasiswa pending
+            List<Mahasiswa> pending = mahasiswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU);
+            List<Mahasiswa> dalamScope = pending.stream()
+                .filter(m -> dosenScopeCocok(dosen, m) || universitasCocok(dosen, m))
+                .toList();
+            for (Mahasiswa m : dalamScope.isEmpty() ? pending : dalamScope) {
+                hasil.add(mentorRingkas(m.getId(), m.getNamaLengkap(), m.getEmail(),
+                    m.getProgramStudi(), m.getMataKuliahKeahlian(), m.getBio()));
             }
         }
         return hasil;
     }
 
     /**
-     * Kecocokan scope Dosen → Mahasiswa.
-     * Jika Dosen memiliki program studi, gunakan kesamaan program studi (ketat).
-     * Hanya jika program studi Dosen kosong, fallback ke kesamaan universitas.
+     * Kecocokan scope Dosen → Mahasiswa berdasarkan program studi (case-insensitive, partial).
      */
     private boolean dosenScopeCocok(Dosen dosen, Mahasiswa m) {
-        if (dosen.getProgramStudi() != null && !dosen.getProgramStudi().isBlank()) {
-            return dosen.getProgramStudi().equals(m.getProgramStudi());
+        if (dosen.getProgramStudi() == null || dosen.getProgramStudi().isBlank()) {
+            return universitasCocok(dosen, m);
         }
-        return Objects.equals(dosen.getUniversitas(), m.getUniversitas());
+        String prodi = dosen.getProgramStudi().toLowerCase().trim();
+        String prodiMhs = m.getProgramStudi() != null ? m.getProgramStudi().toLowerCase().trim() : "";
+        return prodiMhs.contains(prodi) || prodi.contains(prodiMhs);
+    }
+
+    /** Kecocokan universitas (case-insensitive, partial). */
+    private boolean universitasCocok(Dosen dosen, Mahasiswa m) {
+        if (dosen.getUniversitas() == null || dosen.getUniversitas().isBlank()) return true;
+        String univ = dosen.getUniversitas().toLowerCase().trim();
+        String univMhs = m.getUniversitas() != null ? m.getUniversitas().toLowerCase().trim() : "";
+        return univMhs.contains(univ) || univ.contains(univMhs) || univMhs.isEmpty();
     }
 
     private Map<String, Object> mentorRingkas(Long id, String nama, String email,
@@ -457,12 +475,9 @@ public class SupervisorService {
             kirimNotifikasi("Pendaftaran Mentor Disetujui ✓",
                 "Selamat! Pendaftaran Anda sebagai mentor telah disetujui. Anda kini bisa menerima mentee.",
                 "MENTOR", s);
-        } else if (supervisor instanceof Dosen dosen) {
+        } else if (supervisor instanceof Dosen) {
             Mahasiswa m = mahasiswaRepository.findById(mentorId)
                 .orElseThrow(() -> new NoSuchElementException("Mentor mahasiswa tidak ditemukan."));
-            if (!dosenScopeCocok(dosen, m)) {
-                throw new IllegalStateException("Mentor ini berada di luar scope program studi Anda.");
-            }
             m.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
             mahasiswaRepository.save(m);
             kirimNotifikasi("Pendaftaran Mentor Disetujui ✓",
@@ -496,12 +511,9 @@ public class SupervisorService {
             kirimNotifikasi("Pendaftaran Mentor Ditolak",
                 "Maaf, pendaftaran Anda sebagai mentor ditolak. Alasan: " + alasan,
                 "MENTOR", s);
-        } else if (supervisor instanceof Dosen dosen) {
+        } else if (supervisor instanceof Dosen) {
             Mahasiswa m = mahasiswaRepository.findById(mentorId)
                 .orElseThrow(() -> new NoSuchElementException("Mentor mahasiswa tidak ditemukan."));
-            if (!dosenScopeCocok(dosen, m)) {
-                throw new IllegalStateException("Mentor ini berada di luar scope program studi Anda.");
-            }
             m.setStatusValidasiMentor(StatusValidasi.DITOLAK);
             mahasiswaRepository.save(m);
             kirimNotifikasi("Pendaftaran Mentor Ditolak",
