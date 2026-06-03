@@ -78,6 +78,10 @@ tailwind.config = {
   /* ===== COLLAPSIBLE SIDEBAR ===== */
   #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
   body.sb-collapsed #mainSidebar { width:64px; }
+  #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainTopbar { left:64px; }
+  #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); margin-top:72px; height:calc(100vh - 72px); }
+  body.sb-collapsed #mainContent { margin-left:64px; }
   .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
   body.sb-collapsed .sb-label { opacity:0; max-width:0; }
   .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
@@ -90,16 +94,15 @@ tailwind.config = {
   body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
 </style>
 </head>
-<body class="bg-surface text-on-surface font-body-md overflow-hidden">
-<div class="flex h-screen overflow-hidden">
+<body class="font-body-md text-on-background overflow-hidden">
 
 <!-- ==================== SIDEBAR (Pesan active) ==================== -->
-<nav id="mainSidebar" class="h-screen flex-shrink-0 flex flex-col py-6 px-3 shadow-2xl z-50" style="background:#001142;">
+<nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
   <div class="flex items-center justify-between gap-2 px-3 mb-8 flex-shrink-0">
     <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
       <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
       <div class="sb-logo-text">
-        <h1 class="font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+        <h1 class="font-headline-md font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
         <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
       </div>
     </a>
@@ -120,11 +123,6 @@ tailwind.config = {
       <span class="material-symbols-outlined flex-shrink-0">person_search</span>
       <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
     </a>
-    <!-- ACTIVE: Pesan -->
-    <span class="sb-item text-white bg-white/10 border border-white/30 cursor-default" data-tip="Pesan">
-      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">mail</span>
-      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
-    </span>
     <a th:href="@{/dashboard/materi}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Materi">
       <span class="material-symbols-outlined flex-shrink-0">school</span>
       <span class="sb-label font-label-sm text-label-sm">Materi</span>
@@ -133,6 +131,11 @@ tailwind.config = {
       <span class="material-symbols-outlined flex-shrink-0">library_books</span>
       <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
     </a>
+    <!-- ACTIVE: Pesan -->
+    <span class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-default" data-tip="Pesan">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">mail</span>
+      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
+    </span>
     <a th:href="@{/dashboard/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
       <span class="material-symbols-outlined flex-shrink-0">settings</span>
       <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
@@ -150,11 +153,8 @@ tailwind.config = {
   </div>
 </nav>
 
-<!-- ==================== MAIN AREA ==================== -->
-<main class="flex-1 flex flex-col h-screen relative bg-surface-container-low overflow-hidden">
-
-  <!-- TOPBAR -->
-  <header class="h-[72px] flex-shrink-0 bg-white/60 backdrop-blur-md border-b border-glass-border shadow-sm flex items-center gap-4 px-gutter z-40">
+<!-- ==================== TOPBAR ==================== -->
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/60 backdrop-blur-md border-b border-glass-border shadow-sm flex items-center gap-4 px-gutter">
     <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
       <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
       <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari pesan atau mentor..." type="text"/>
@@ -182,8 +182,8 @@ tailwind.config = {
     </div>
   </header>
 
-  <!-- MESSAGE CENTER LAYOUT -->
-  <div class="flex flex-1 overflow-hidden">
+<!-- ==================== MAIN CONTENT ==================== -->
+<div id="mainContent" class="flex bg-surface-container-low overflow-hidden">
 
     <!-- CONVERSATIONS LIST -->
     <section class="w-[380px] flex-shrink-0 border-r border-outline-variant bg-white flex flex-col overflow-hidden">
@@ -359,9 +359,6 @@ tailwind.config = {
       </div>
 
     </section>
-  </div>
-
-</main>
 </div>
 
 <script>
@@ -403,17 +400,20 @@ tailwind.config = {
 </script>
 <script>
 function toggleSidebar() {
-  const collapsed = document.body.classList.toggle('sb-collapsed');
-  localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
-  document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
 }
-(function() {
-  if (localStorage.getItem('jejak-sb') === '1') {
-    document.body.classList.add('sb-collapsed');
-    const icon = document.getElementById('sb-toggle-icon');
-    if (icon) icon.textContent = 'chevron_right';
-  }
-})();
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+});
 </script>
 </body>
 </html>

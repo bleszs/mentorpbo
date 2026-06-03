@@ -8,19 +8,47 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-tailwind.config={darkMode:"class",theme:{extend:{colors:{
-  "outline-variant":"#c6c6d0","primary-fixed-dim":"#b6c4fe","error":"#ba1a1a",
-  "surface-container-low":"#f3f4f5","success-green":"#10b981","warning-gold":"#fea619",
-  "surface-container-high":"#e7e8e9","surface-container":"#edeeef",
-  "on-primary-fixed":"#061748","on-background":"#191c1d","on-primary":"#ffffff",
-  "surface":"#f8f9fa","outline":"#767680","primary":"#000000","background":"#f8f9fa",
-  "on-surface-variant":"#45464f","primary-container":"#061748",
-  "on-primary-container":"#7382b7","primary-fixed":"#dce1ff",
-  "on-surface":"#191c1d","surface-container-lowest":"#ffffff",
-  "label-sm":["Inter"]
-},fontFamily:{"label-sm":["Inter"],"body-md":["Inter"]},
-fontSize:{"label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],"body-md":["14px",{"lineHeight":"1.5","fontWeight":"400"}]}
-}}}
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0", "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965", "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)", "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5", "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900", "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981", "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a", "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9", "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef", "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748", "on-background": "#191c1d",
+        "on-primary": "#ffffff", "surface": "#f8f9fa", "outline": "#767680",
+        "primary": "#000000", "background": "#f8f9fa",
+        "on-surface-variant": "#45464f", "primary-container": "#061748",
+        "on-primary-container": "#7382b7", "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475", "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff"
+      },
+      spacing: {
+        "margin-mobile": "16px", "topbar-height": "72px", "base": "8px",
+        "margin-desktop": "32px", "container-max": "1280px",
+        "sidebar-width": "280px", "gutter": "24px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"],
+        "label-sm": ["Inter"], "caption-xs": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+        "body-lg": ["18px", {"lineHeight":"1.6","fontWeight":"500"}],
+        "body-md": ["14px", {"lineHeight":"1.5","fontWeight":"400"}],
+        "label-sm": ["12px", {"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+        "caption-xs": ["10px", {"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}]
+      }
+    }
+  }
+}
 </script>
 <style>
 body { font-family:'Inter',sans-serif; }
@@ -30,206 +58,107 @@ body { font-family:'Inter',sans-serif; }
 .chat-bg  { background-color:#f8f9fa; background-image:radial-gradient(#e9eaec 1px, transparent 1px); background-size:20px 20px; }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:10px; }
-#emojiPanel { display:none; position:absolute; bottom:68px; right:56px; z-index:50;
+#emojiPanel { display:none; position:absolute; bottom:calc(100% + 8px); right:8px; z-index:200;
   background:white; border:1px solid #e5e7eb; border-radius:16px;
-  padding:12px; width:300px; box-shadow:0 8px 32px rgba(0,0,0,.12); }
+  padding:12px; width:300px; box-shadow:0 8px 32px rgba(0,0,0,.15); }
 
-/* ===== COLLAPSIBLE NAV SIDEBAR ===== */
-#mainSidebar {
-  width: 280px;
-  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
-  overflow: hidden;
-  flex-shrink: 0;
-}
-body.sb-collapsed #mainSidebar { width: 64px; }
-
-#contentWrapper {
-  margin-left: 280px;
-  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-body.sb-collapsed #contentWrapper { margin-left: 64px; }
-
-.sb-label {
-  white-space: nowrap;
-  overflow: hidden;
-  transition: opacity 0.2s, max-width 0.25s cubic-bezier(0.4,0,0.2,1);
-  max-width: 200px;
-}
-body.sb-collapsed .sb-label { opacity: 0; max-width: 0; }
-
-.sb-logo-text {
-  overflow: hidden;
-  transition: opacity 0.2s, max-width 0.25s cubic-bezier(0.4,0,0.2,1);
-  max-width: 180px;
-  white-space: nowrap;
-}
-body.sb-collapsed .sb-logo-text { opacity: 0; max-width: 0; }
-
-.sb-logo-img { transition: height 0.3s; }
-body.sb-collapsed .sb-logo-img { height: 36px !important; }
-
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  transition: all 0.2s;
-  text-decoration: none;
-  white-space: nowrap;
-  position: relative;
-}
-body.sb-collapsed .sb-item {
-  justify-content: center;
-  gap: 0;
-  padding: 10px 8px;
-}
-body.sb-collapsed .sb-item[data-tip]::after {
-  content: attr(data-tip);
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
-  background: #001142;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s;
-  z-index: 1000;
-  border: 1px solid rgba(255,255,255,0.15);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-body.sb-collapsed .sb-item[data-tip]:hover::after { opacity: 1; }
-
-#panelToggleBtn {
-  left: 280px;
-  transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-body.sb-collapsed #panelToggleBtn { left: 64px; }
+/* ===== COLLAPSIBLE SIDEBAR ===== */
+#mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
+body.sb-collapsed #mainSidebar { width:64px; }
+#contentWrapper { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+body.sb-collapsed #contentWrapper { margin-left:64px; }
+.sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+.sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
+body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
+.sb-logo-img { transition:height 0.3s; }
+body.sb-collapsed .sb-logo-img { height:36px !important; }
+.sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
+#panelToggleBtn { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+body.sb-collapsed #panelToggleBtn { left:64px; }
 </style>
 </head>
-<body class="bg-surface text-on-surface overflow-hidden">
+<body class="font-body-md text-on-background overflow-hidden">
 
 <!-- ==================== NAV SIDEBAR ==================== -->
-<nav id="mainSidebar" class="fixed left-0 top-0 h-screen flex flex-col z-50 shadow-2xl" style="background:#001142;">
+<nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
 
   <!-- Header: Logo + Toggle -->
-  <div class="flex items-center gap-3 px-4 pt-6 pb-4 flex-shrink-0">
+  <div class="flex items-center justify-between gap-2 px-3 mb-8 flex-shrink-0">
     <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
-      <img src="/images/logo.png" alt="Logo" class="sb-logo-img flex-shrink-0" style="height:48px;width:auto;"/>
+      <img src="/images/logo.png" alt="Logo" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
       <div class="sb-logo-text">
-        <h1 class="font-black text-white text-[15px] leading-none">Jejak Ilmu</h1>
-        <p class="text-blue-200/60 text-[9px] uppercase tracking-widest font-bold mt-0.5">Platform Mentoring Akademik</p>
+        <h1 class="font-headline-md font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+        <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
       </div>
     </a>
     <button onclick="toggleSidebar()"
-            class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0 ml-auto">
+            class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0">
       <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
     </button>
   </div>
 
   <!-- Nav items -->
-  <div class="flex-1 px-3 space-y-0.5 overflow-hidden mt-2">
-    <a th:href="@{/dashboard}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Beranda">
-      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">dashboard</span>
+  <div class="space-y-0.5 flex-1 overflow-hidden">
+    <a th:href="@{/dashboard}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
       <span class="sb-label font-label-sm text-label-sm">Beranda</span>
     </a>
 
-    <!-- Mentor mahasiswa -->
-    <a th:if="${mahasiswa != null and mahasiswa.mentor}"
+    <!-- Mentor mahasiswa/siswa -->
+    <a th:if="${(mahasiswa != null and mahasiswa.mentor) or (siswa != null and siswa.mentor)}"
        th:href="@{/dashboard/mentorship}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Mentorship">
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Mentorship">
       <span class="material-symbols-outlined flex-shrink-0">groups</span>
       <span class="sb-label font-label-sm text-label-sm">Mentorship</span>
     </a>
 
-    <!-- Mentor siswa -->
-    <a th:if="${siswa != null and siswa.mentor}"
-       th:href="@{/dashboard/mentorship}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Mentorship">
-      <span class="material-symbols-outlined flex-shrink-0">groups</span>
-      <span class="sb-label font-label-sm text-label-sm">Mentorship</span>
-    </a>
-
-    <!-- Mentee mahasiswa -->
-    <a th:if="${mahasiswa != null and !mahasiswa.mentor}"
+    <!-- Mentee: Sesi Saya -->
+    <a th:if="${(mahasiswa != null and !mahasiswa.mentor) or (siswa != null and !siswa.mentor)}"
        th:href="@{/mentoring/sesi}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Sesi Saya">
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sesi Saya">
       <span class="material-symbols-outlined flex-shrink-0">calendar_month</span>
       <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
     </a>
-    <a th:if="${mahasiswa != null and !mahasiswa.mentor}"
+    <!-- Mentee: Cari Mentor -->
+    <a th:if="${(mahasiswa != null and !mahasiswa.mentor) or (siswa != null and !siswa.mentor)}"
        th:href="@{/mentoring/cari-mentor}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Cari Mentor">
+       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Cari Mentor">
       <span class="material-symbols-outlined flex-shrink-0">person_search</span>
       <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
     </a>
 
-    <!-- Mentee siswa -->
-    <a th:if="${siswa != null and !siswa.mentor}"
-       th:href="@{/mentoring/sesi}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Sesi Saya">
-      <span class="material-symbols-outlined flex-shrink-0">calendar_month</span>
-      <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
+    <a th:href="@{/dashboard/materi}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Materi">
+      <span class="material-symbols-outlined flex-shrink-0">school</span>
+      <span class="sb-label font-label-sm text-label-sm">Materi</span>
     </a>
-    <a th:if="${siswa != null and !siswa.mentor}"
-       th:href="@{/mentoring/cari-mentor}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Cari Mentor">
-      <span class="material-symbols-outlined flex-shrink-0">person_search</span>
-      <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
+    <a th:href="@{/dashboard/sumber-daya}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sumber Daya">
+      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
+      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
     </a>
 
     <!-- ACTIVE: Pesan -->
-    <span class="sb-item text-white bg-white/10 border border-white/20 cursor-default" data-tip="Pesan">
+    <span class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-default" data-tip="Pesan">
       <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">mail</span>
       <span class="sb-label font-label-sm text-label-sm">Pesan</span>
     </span>
 
-    <a th:href="@{/dashboard/materi}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Materi">
-      <span class="material-symbols-outlined flex-shrink-0">school</span>
-      <span class="sb-label font-label-sm text-label-sm">Materi</span>
-    </a>
-    <a th:href="@{/dashboard/sumber-daya}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Sumber Daya">
-      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
-      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
-    </a>
-    <a th:href="@{/dashboard/pengaturan}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Pengaturan">
+    <a th:href="@{/dashboard/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
       <span class="material-symbols-outlined flex-shrink-0">settings</span>
       <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
   </div>
 
   <!-- Bottom items -->
-  <div class="border-t border-white/10 px-3 py-4 space-y-0.5 flex-shrink-0">
-    <a th:href="@{/dashboard/bantuan}"
-       class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5"
-       data-tip="Bantuan">
+  <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+    <a th:href="@{/dashboard/bantuan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Bantuan">
       <span class="material-symbols-outlined flex-shrink-0">help</span>
       <span class="sb-label font-label-sm text-label-sm">Bantuan</span>
     </a>
-    <a th:href="@{/logout}"
-       class="sb-item text-red-400 hover:text-red-300"
-       data-tip="Keluar">
+    <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
       <span class="material-symbols-outlined flex-shrink-0">logout</span>
       <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
@@ -247,6 +176,10 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
   <div class="h-[64px] flex items-center justify-between px-5 border-b border-outline-variant">
     <h2 class="font-black text-primary text-[18px]">Pesan</h2>
     <div class="flex gap-1">
+      <button onclick="bukaModalGrup()"
+              class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Buat Grup">
+        <span class="material-symbols-outlined text-[18px]">group_add</span>
+      </button>
       <button onclick="togglePanel()"
               class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors" title="Sembunyikan">
         <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -274,11 +207,15 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
 
   <!-- Conversation list -->
   <div class="flex-1 overflow-y-auto divide-y divide-outline-variant/20" id="convList">
-    <div th:if="${#lists.isEmpty(daftarPartner)}"
+
+    <!-- Daftar 1-on-1 -->
+    <div th:if="${#lists.isEmpty(daftarPartner) and #lists.isEmpty(daftarGrup)}"
          class="flex flex-col items-center justify-center py-12 px-5 text-center">
       <span class="material-symbols-outlined text-outline mb-2" style="font-size:36px;">chat_bubble_outline</span>
       <p class="font-bold text-on-surface-variant text-[13px]">Belum ada percakapan</p>
     </div>
+
+    <!-- Percakapan pribadi -->
     <a th:each="item : ${daftarPartner}"
        th:href="@{/pesan/chat/{id}(id=${item.partner.id})}"
        class="conv-item flex gap-3 px-4 py-3.5 hover:bg-surface-container-low transition-all no-underline border-l-2 border-transparent"
@@ -303,6 +240,25 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
         </div>
         <p class="text-[11px] text-on-surface-variant truncate"
            th:text="${item.partner.role.name() == 'MAHASISWA' or item.partner.role.name() == 'SISWA' ? 'Mentee' : 'Mentor'}">Mentee</p>
+      </div>
+    </a>
+
+    <!-- Grup chat -->
+    <a th:each="g : ${daftarGrup}"
+       th:href="@{/pesan/grup/{id}(id=${g.id})}"
+       class="conv-item flex gap-3 px-4 py-3.5 hover:bg-surface-container-low transition-all no-underline border-l-2 border-transparent">
+      <div class="flex-shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-primary-container/20 border-2 border-primary-fixed flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary-container text-[20px]" style="font-variation-settings:'FILL' 1">group</span>
+        </div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1 mb-0.5">
+          <h3 class="font-bold text-primary text-[13px] truncate" th:text="${g.nama}">Grup</h3>
+          <span class="text-[9px] font-black uppercase tracking-wider text-primary-container bg-primary-fixed/20 px-1.5 py-0.5 rounded-full">GRUP</span>
+        </div>
+        <p class="text-[11px] text-on-surface-variant truncate"
+           th:text="${#lists.size(g.anggota)} + ' anggota'">Anggota</p>
       </div>
     </a>
   </div>
@@ -420,11 +376,11 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
 
     <div th:each="pesan : ${percakapan}"
          th:data-id="${pesan.id}"
-         th:class="${pesan.pengirim.id == pengguna.id} ? 'flex flex-row-reverse gap-2 items-end' : 'flex gap-2 items-end'">
+         th:class="${pesan.pengirim.id == pengguna.id} ? 'flex flex-row-reverse gap-2 items-start' : 'flex gap-2 items-start'">
 
       <!-- Avatar them -->
       <div th:unless="${pesan.pengirim.id == pengguna.id}"
-           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end">
+           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 mt-1">
         <img th:if="${partner.fotoProfil != null}" th:src="${partner.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
         <div th:unless="${partner.fotoProfil != null}"
              class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-[10px]"
@@ -474,7 +430,7 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
 
       <!-- Avatar me -->
       <div th:if="${pesan.pengirim.id == pengguna.id}"
-           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end">
+           class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 mt-1">
         <img th:if="${pengguna.fotoProfil != null}" th:src="${pengguna.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
         <div th:unless="${pengguna.fotoProfil != null}"
              class="w-full h-full bg-[#061748] flex items-center justify-center text-white font-black text-[10px]"
@@ -490,41 +446,67 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
 
     <!-- Emoji Panel -->
     <div id="emojiPanel">
-      <div class="grid grid-cols-10 gap-1">
-        <button type="button" th:each="e : ${'😊,😂,❤️,👍,🎉,🙏,🤔,😅,👀,💪,🔥,✅,📚,💡,🎯,⭐,🙌,😎,😭,🤝'.split(',')}"
-                class="text-lg hover:bg-surface-container rounded p-1"
-                th:onclick="'insertEmoji(\\'' + ${e} + '\\'')" th:text="${e}">😊</button>
+      <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">Emoji</p>
+      <div class="grid grid-cols-10 gap-0.5">
+        <button type="button" onclick="insertEmoji('😊')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😊</button>
+        <button type="button" onclick="insertEmoji('😂')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😂</button>
+        <button type="button" onclick="insertEmoji('❤️')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">❤️</button>
+        <button type="button" onclick="insertEmoji('👍')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">👍</button>
+        <button type="button" onclick="insertEmoji('🎉')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🎉</button>
+        <button type="button" onclick="insertEmoji('🙏')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🙏</button>
+        <button type="button" onclick="insertEmoji('🤔')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🤔</button>
+        <button type="button" onclick="insertEmoji('😅')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😅</button>
+        <button type="button" onclick="insertEmoji('👀')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">👀</button>
+        <button type="button" onclick="insertEmoji('💪')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">💪</button>
+        <button type="button" onclick="insertEmoji('🔥')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🔥</button>
+        <button type="button" onclick="insertEmoji('✅')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">✅</button>
+        <button type="button" onclick="insertEmoji('📚')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">📚</button>
+        <button type="button" onclick="insertEmoji('💡')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">💡</button>
+        <button type="button" onclick="insertEmoji('🎯')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🎯</button>
+        <button type="button" onclick="insertEmoji('⭐')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">⭐</button>
+        <button type="button" onclick="insertEmoji('🙌')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🙌</button>
+        <button type="button" onclick="insertEmoji('😎')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😎</button>
+        <button type="button" onclick="insertEmoji('😭')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😭</button>
+        <button type="button" onclick="insertEmoji('🤝')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🤝</button>
+        <button type="button" onclick="insertEmoji('😍')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😍</button>
+        <button type="button" onclick="insertEmoji('🥰')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🥰</button>
+        <button type="button" onclick="insertEmoji('😤')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">😤</button>
+        <button type="button" onclick="insertEmoji('🤯')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🤯</button>
+        <button type="button" onclick="insertEmoji('👏')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">👏</button>
+        <button type="button" onclick="insertEmoji('🎓')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🎓</button>
+        <button type="button" onclick="insertEmoji('📝')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">📝</button>
+        <button type="button" onclick="insertEmoji('💯')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">💯</button>
+        <button type="button" onclick="insertEmoji('🚀')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">🚀</button>
+        <button type="button" onclick="insertEmoji('💎')" class="text-xl hover:bg-surface-container rounded p-1 leading-none">💎</button>
       </div>
     </div>
 
-    <!-- File preview -->
-    <div id="filePreview" class="hidden items-center gap-2 px-3 py-2 bg-primary-fixed/30 border border-primary-fixed rounded-xl">
-      <span class="material-symbols-outlined text-primary-container text-[16px]" style="font-variation-settings:'FILL' 1">attach_file</span>
-      <span id="filePreviewName" class="text-[12px] font-bold text-primary-container flex-1 truncate">file</span>
-      <button type="button" onclick="clearFile()"
-              class="w-5 h-5 rounded-full bg-error/10 text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors">
-        <span class="material-symbols-outlined text-[12px]">close</span>
-      </button>
+    <!-- File preview inline (tampil saat file dipilih) -->
+    <div id="filePreview" class="hidden flex-col gap-1.5">
+      <!-- Gambar thumbnail -->
+      <div id="imgPreviewWrap" class="hidden relative inline-block">
+        <img id="imgPreviewEl" class="max-h-28 rounded-xl border border-outline-variant/30 object-cover shadow-sm" alt="preview"/>
+        <button type="button" onclick="clearFile()"
+                class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-error text-white rounded-full flex items-center justify-center shadow hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-[11px]">close</span>
+        </button>
+      </div>
+      <!-- File bukan gambar -->
+      <div id="fileNameWrap" class="hidden items-center gap-2 px-3 py-2 bg-surface-container-low border border-outline-variant/30 rounded-xl max-w-[260px]">
+        <span class="material-symbols-outlined text-primary-container text-[16px]" style="font-variation-settings:'FILL' 1">attach_file</span>
+        <span id="filePreviewName" class="text-[12px] font-bold text-primary-container flex-1 truncate">file</span>
+        <button type="button" onclick="clearFile()"
+                class="w-5 h-5 rounded-full bg-error/10 text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined text-[11px]">close</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Form file caption -->
-    <form th:action="@{/pesan/kirim-file}" method="post" enctype="multipart/form-data" id="formFile"
-          class="hidden items-center gap-2">
+    <!-- Form utama (handle teks + file) -->
+    <form th:action="@{/pesan/kirim}" method="post" enctype="multipart/form-data" id="formPesan" class="flex items-end gap-2">
       <input type="hidden" name="penerimaId" th:value="${partner.id}"/>
       <input type="file" id="fileInput" name="lampiran" class="hidden"
              accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"/>
-      <input type="text" name="isi" id="filePesanCaption"
-             class="flex-1 px-4 py-2 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none text-[13px]"
-             th:placeholder="'Keterangan untuk ' + ${partner.namaLengkap} + ' (opsional)...'"/>
-      <button type="submit"
-              class="h-9 px-4 bg-success-green text-white rounded-xl flex items-center gap-1.5 font-black text-[11px] uppercase tracking-wider hover:bg-success-green/90 transition-all active:scale-95">
-        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">send</span>Kirim
-      </button>
-    </form>
-
-    <!-- Baris utama -->
-    <form th:action="@{/pesan/kirim}" method="post" id="formPesan" class="flex items-end gap-2">
-      <input type="hidden" name="penerimaId" th:value="${partner.id}"/>
       <label for="fileInput" title="Lampirkan"
              class="w-9 h-9 rounded-xl hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 self-end cursor-pointer">
         <span class="material-symbols-outlined text-[21px]">attach_file</span>
@@ -546,6 +528,61 @@ body.sb-collapsed #panelToggleBtn { left: 64px; }
   </div>
 
 </main>
+
+<!-- ===== MODAL BUAT GRUP ===== -->
+<div id="modalGrup" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant/30">
+      <h3 class="font-black text-[18px] text-primary flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary-container" style="font-variation-settings:'FILL' 1">group_add</span>
+        Buat Grup Baru
+      </h3>
+      <button onclick="tutupModalGrup()" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <form th:action="@{/pesan/buat-grup}" method="post" class="p-6 space-y-5">
+      <!-- Nama grup -->
+      <div>
+        <label class="block text-caption-xs text-on-surface-variant uppercase tracking-widest mb-2">Nama Grup</label>
+        <input type="text" name="namaGrup" required maxlength="50"
+               class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary-fixed outline-none text-[14px]"
+               placeholder="cth. Kelompok Belajar Algoritma..."/>
+      </div>
+      <!-- Pilih anggota -->
+      <div>
+        <label class="block text-caption-xs text-on-surface-variant uppercase tracking-widest mb-2">Pilih Anggota</label>
+        <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+          <label th:each="p : ${daftarPartner}"
+                 class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container-low cursor-pointer border border-transparent hover:border-outline-variant/30 transition-all">
+            <input type="checkbox" name="anggotaIds" th:value="${p.partner.id}"
+                   class="w-4 h-4 rounded accent-[#061748]"/>
+            <div class="w-9 h-9 rounded-xl bg-[#001142] flex items-center justify-center text-white font-black text-[11px] flex-shrink-0"
+                 th:text="${#strings.substring(p.partner.namaLengkap,0,2).toUpperCase()}">??</div>
+            <div class="min-w-0">
+              <p class="font-bold text-[13px] text-primary truncate" th:text="${p.partner.namaLengkap}">Nama</p>
+              <p class="text-[11px] text-on-surface-variant"
+                 th:text="${p.partner.role.name() == 'MAHASISWA' or p.partner.role.name() == 'SISWA' ? 'Mentee' : 'Mentor'}">-</p>
+            </div>
+          </label>
+          <p th:if="${#lists.isEmpty(daftarPartner)}" class="text-[13px] text-on-surface-variant text-center py-4">
+            Belum ada kontak untuk ditambahkan.
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-1">
+        <button type="button" onclick="tutupModalGrup()"
+                class="flex-1 py-3 bg-surface-container text-on-surface font-black text-label-sm rounded-xl hover:bg-surface-container-high transition-all">
+          Batal
+        </button>
+        <button type="submit"
+                class="flex-1 py-3 bg-[#061748] text-white font-black text-label-sm rounded-xl hover:bg-primary-container transition-all">
+          Buat Grup
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 </div><!-- /contentWrapper -->
 
 <script th:inline="javascript">
@@ -592,42 +629,89 @@ function togglePanel() {
 }
 
 // Emoji
+let emojiOpen = false;
 function toggleEmoji() {
-  const p = document.getElementById('emojiPanel');
-  p.style.display = p.style.display==='block' ? 'none' : 'block';
+  emojiOpen = !emojiOpen;
+  document.getElementById('emojiPanel').style.display = emojiOpen ? 'block' : 'none';
 }
 function insertEmoji(e) {
   const inp = document.getElementById('inputPesan');
-  const s = inp.selectionStart;
-  inp.value = inp.value.substring(0,s)+e+inp.value.substring(inp.selectionEnd);
+  const s = inp.selectionStart || 0;
+  inp.value = inp.value.substring(0, s) + e + inp.value.substring(inp.selectionEnd || s);
   inp.focus();
-  document.getElementById('emojiPanel').style.display='none';
+  inp.setSelectionRange(s + e.length, s + e.length);
+  inp.dispatchEvent(new Event('input'));
 }
 document.addEventListener('click', ev => {
-  const p = document.getElementById('emojiPanel');
-  if(p.style.display==='block' && !p.contains(ev.target) && !ev.target.closest('[onclick="toggleEmoji()"]'))
-    p.style.display='none';
+  if (!emojiOpen) return;
+  const panel = document.getElementById('emojiPanel');
+  const btn = ev.target.closest('[onclick="toggleEmoji()"]');
+  if (!btn && !panel.contains(ev.target)) {
+    emojiOpen = false;
+    panel.style.display = 'none';
+  }
 });
 
-// File picker
+// File picker — inline preview
 document.getElementById('fileInput').addEventListener('change', function() {
   const file = this.files[0];
-  if(!file) return clearFile();
+  if (!file) return clearFile();
+
   const prev = document.getElementById('filePreview');
   prev.classList.remove('hidden'); prev.classList.add('flex');
-  document.getElementById('filePreviewName').textContent = file.name;
-  const ff = document.getElementById('formFile');
-  ff.classList.remove('hidden'); ff.classList.add('flex');
-  document.getElementById('filePesanCaption').focus();
+
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('imgPreviewEl').src = ev.target.result;
+      document.getElementById('imgPreviewWrap').classList.remove('hidden');
+      document.getElementById('fileNameWrap').classList.add('hidden');
+      document.getElementById('fileNameWrap').classList.remove('flex');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    document.getElementById('filePreviewName').textContent = file.name;
+    document.getElementById('fileNameWrap').classList.remove('hidden');
+    document.getElementById('fileNameWrap').classList.add('flex');
+    document.getElementById('imgPreviewWrap').classList.add('hidden');
+  }
+
+  // Ubah action form ke kirim-file
+  document.getElementById('formPesan').setAttribute('action', '/pesan/kirim-file');
+  document.getElementById('inputPesan').placeholder = 'Tulis keterangan (opsional)...';
+  document.getElementById('inputPesan').focus();
 });
+
 function clearFile() {
-  document.getElementById('fileInput').value='';
+  document.getElementById('fileInput').value = '';
   const prev = document.getElementById('filePreview');
   prev.classList.add('hidden'); prev.classList.remove('flex');
-  const ff = document.getElementById('formFile');
-  ff.classList.add('hidden'); ff.classList.remove('flex');
-  document.getElementById('filePesanCaption').value='';
+  document.getElementById('imgPreviewWrap').classList.add('hidden');
+  document.getElementById('fileNameWrap').classList.add('hidden');
+  document.getElementById('fileNameWrap').classList.remove('flex');
+  const form = document.getElementById('formPesan');
+  const origAction = form.dataset.origAction || '/pesan/kirim';
+  form.setAttribute('action', origAction);
+  const partnerName = document.title.replace('Pesan — ','').replace(' | Jejak Ilmu','');
+  document.getElementById('inputPesan').placeholder = 'Tulis pesan untuk ' + partnerName + '...';
 }
+
+// Simpan action asal
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('formPesan');
+  if (form) form.dataset.origAction = form.action;
+});
+
+// Modal Grup
+function bukaModalGrup() {
+  document.getElementById('modalGrup').classList.remove('hidden');
+}
+function tutupModalGrup() {
+  document.getElementById('modalGrup').classList.add('hidden');
+}
+document.getElementById('modalGrup').addEventListener('click', function(e) {
+  if (e.target === this) tutupModalGrup();
+});
 
 // Notif popup
 function togglePopup(id, event) {
@@ -659,12 +743,12 @@ function buildBubble(p) {
   const isMe = p.dariku;
   const wrap = document.createElement('div');
   wrap.setAttribute('data-id', p.id);
-  wrap.className = isMe ? 'flex flex-row-reverse gap-2 items-end' : 'flex gap-2 items-end';
+  wrap.className = isMe ? 'flex flex-row-reverse gap-2 items-start' : 'flex gap-2 items-start';
 
   const initials = (p.nama||'?').substring(0,1).toUpperCase();
   const avatarHtml = p.foto
-    ? `<div class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 self-end"><img src="${p.foto}" class="w-full h-full object-cover"/></div>`
-    : `<div class="w-8 h-8 rounded-xl ${isMe?'bg-[#061748]':'bg-[#001142]'} flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 self-end">${initials}</div>`;
+    ? `<div class="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 mt-1"><img src="${p.foto}" class="w-full h-full object-cover"/></div>`
+    : `<div class="w-8 h-8 rounded-xl ${isMe?'bg-[#061748]':'bg-[#001142]'} flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 mt-1">${initials}</div>`;
 
   let bubble = '';
   if(p.tipeKonten==='GAMBAR' && p.lampiran){
@@ -706,17 +790,20 @@ setInterval(pollPesan, 4000);
 
 // ===== NAV SIDEBAR TOGGLE =====
 function toggleSidebar() {
-  const collapsed = document.body.classList.toggle('sb-collapsed');
-  localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
-  document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
 }
 // Init from localStorage
 (function() {
-  if (localStorage.getItem('jejak-sb') === '1') {
-    document.body.classList.add('sb-collapsed');
-    const icon = document.getElementById('sb-toggle-icon');
-    if (icon) icon.textContent = 'chevron_right';
-  }
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
 })();
 </script>
 </body>

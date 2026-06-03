@@ -51,7 +51,8 @@ tailwind.config = {
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .mesh-gradient {
-    background: linear-gradient(to bottom, rgba(0, 17, 66, 0.88), rgba(0, 27, 15, 0.88)), url('/images/background mentor.jpg') center/cover no-repeat;
+    background: linear-gradient(to bottom, rgba(0,17,66,0.88), rgba(0,27,15,0.88)),
+                url('/images/background-login.jpg') center/cover no-repeat;
     background-blend-mode: multiply;
   }
   input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(6,23,72,0.15); }
@@ -241,40 +242,101 @@ tailwind.config = {
 </main>
 <script>
 (function() {
-  const input = document.getElementById('institusiInput');
+  const input    = document.getElementById('institusiInput');
   const dropdown = document.getElementById('institusiDropdown');
+  const select   = document.querySelector('select[name="tingkatPendidikan"]') ||
+                   document.getElementById('tingkatPendidikanInput');
   if (!input || !dropdown) return;
-  let list = [];
 
-  fetch('/data/universitas-indonesia.json')
-    .then(r => r.json())
-    .then(d => { list = d; });
+  let debounceTimer = null;
 
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
+  const PLACEHOLDERS = {
+    universitas: 'Ketik nama kampus / universitas...',
+    sekolah:     'Ketik nama sekolah SMA / SMK...',
+  };
+
+  // Returns { type: 'universitas'|'sekolah', grade: 'SMA'|'SMK'|null }
+  function getCtx() {
+    if (!select) return { type: 'universitas', grade: null };
+    const val = (select.value || '').toUpperCase();
+    if (val.startsWith('SMA'))  return { type: 'sekolah', grade: 'SMA' };
+    if (val.startsWith('SMK'))  return { type: 'sekolah', grade: 'SMK' };
+    if (val.startsWith('SMP'))  return { type: 'sekolah', grade: 'SMP' };
+    return { type: 'universitas', grade: null };
+  }
+
+  function updatePlaceholder() {
+    const { type } = getCtx();
+    input.placeholder = PLACEHOLDERS[type] || PLACEHOLDERS.universitas;
+  }
+
+  function renderDropdown(results) {
     dropdown.innerHTML = '';
-    if (q.length < 2) { dropdown.classList.add('hidden'); return; }
-    const hits = list.filter(u => u.toLowerCase().includes(q)).slice(0, 8);
-    if (!hits.length) { dropdown.classList.add('hidden'); return; }
-    hits.forEach(u => {
+    if (!results.length) {
+      dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400 italic">Tidak ditemukan. Coba kata lain.</div>';
+      dropdown.classList.remove('hidden');
+      return;
+    }
+    results.forEach(r => {
       const item = document.createElement('div');
-      item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 text-sm text-gray-800 border-b border-gray-100 last:border-0 transition-colors';
-      item.textContent = u;
-      item.addEventListener('mousedown', (e) => {
+      item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors';
+      item.innerHTML =
+        '<p class="text-sm font-semibold text-gray-800">' + esc(r.label) + '</p>' +
+        (r.sub ? '<p class="text-xs text-gray-400 mt-0.5">' + esc(r.sub) + '</p>' : '');
+      item.addEventListener('mousedown', e => {
         e.preventDefault();
-        input.value = u;
+        input.value = r.label;
         dropdown.classList.add('hidden');
       });
       dropdown.appendChild(item);
     });
     dropdown.classList.remove('hidden');
-  });
+  }
 
-  document.addEventListener('click', (e) => {
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showLoading() {
+    dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Mencari...</div>';
+    dropdown.classList.remove('hidden');
+  }
+
+  function doSearch() {
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+    showLoading();
+    debounceTimer = setTimeout(() => {
+      const { type, grade } = getCtx();
+      let url = type === 'sekolah'
+        ? '/api/cari/sekolah?q=' + encodeURIComponent(q) + (grade ? '&grade=' + grade : '')
+        : '/api/cari/universitas?q=' + encodeURIComponent(q);
+      fetch(url)
+        .then(r => r.ok ? r.json() : [])
+        .then(items => renderDropdown(items.map(s => ({ label: s, sub: null }))))
+        .catch(() => dropdown.classList.add('hidden'));
+    }, 280);
+  }
+
+  input.addEventListener('input', doSearch);
+
+  if (select) {
+    select.addEventListener('change', () => {
+      updatePlaceholder();
+      input.value = '';          // reset field saat level berubah
+      dropdown.classList.add('hidden');
+    });
+  }
+
+  document.addEventListener('click', e => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.classList.add('hidden');
     }
   });
+
+  // Set placeholder sesuai pilihan awal
+  updatePlaceholder();
 })();
 </script>
 </body>

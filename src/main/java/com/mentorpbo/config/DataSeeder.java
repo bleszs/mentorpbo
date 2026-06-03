@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * DataSeeder — Mengisi database H2 in-memory dengan data awal setiap startup.
+ * DataSeeder — Mengisi database H2 file dengan data awal saat database kosong.
  *
- * Karena konfigurasi ddl-auto=create-drop, database selalu kosong saat aplikasi start.
- * Seeder ini membuat data representatif untuk semua role dan lifecycle sesi,
- * sehingga semua fitur langsung bisa diuji tanpa input manual.
+ * Konfigurasi aktual: ddl-auto=update + H2 file (jdbc:h2:file:./data/...).
+ * Database bersifat persisten antar restart lokal; seeder berjalan idempoten
+ * (lewati jika data sudah ada).
  *
  * Data yang dibuat:
  * - 2 Guru (dari 2 sekolah berbeda untuk menguji scope filtering)
  * - 2 Dosen (dari 2 program studi berbeda)
- * - 3 Siswa mentor + 1 siswa mentee
- * - 3 Mahasiswa mentor + 2 mahasiswa mentee
+ * - 3 Siswa mentor (statusValidasiMentor=DIVALIDASI) + 1 siswa mentee + 1 siswa mentor PENDING
+ * - 3 Mahasiswa mentor (DIVALIDASI) + 2 mahasiswa mentee + 1 mahasiswa mentor PENDING
  * - Sesi dalam berbagai state: MENUNGGU_KONFIRMASI, DIJADWALKAN, BERLANGSUNG, SELESAI
  */
 @Component
@@ -109,6 +109,7 @@ public class DataSeeder implements CommandLineRunner {
         Siswa siswa1 = new Siswa("Andi Prasetyo", "andi@siswa.id", "siswa123",
             "XII IPA 1", "SMA Negeri 1 Jakarta", "0012345001");
         siswa1.aktifkanSebagaiMentor("Matematika, Fisika, Kimia");
+        siswa1.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         siswa1.setTotalPoinProgres(350);
         siswa1.setTotalRating(22.5);
         siswa1.setJumlahPenilaian(5);
@@ -119,6 +120,7 @@ public class DataSeeder implements CommandLineRunner {
         Siswa siswa2 = new Siswa("Dewi Lestari", "dewi@siswa.id", "siswa123",
             "XI IPA 2", "SMA Negeri 1 Jakarta", "0012345002");
         siswa2.aktifkanSebagaiMentor("Bahasa Inggris, Bahasa Indonesia");
+        siswa2.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         siswa2.setTotalPoinProgres(280);
         siswa2.setTotalRating(18.0);
         siswa2.setJumlahPenilaian(4);
@@ -128,6 +130,7 @@ public class DataSeeder implements CommandLineRunner {
         Siswa siswa3 = new Siswa("Faiz Ramadhan", "faiz@siswa.id", "siswa123",
             "XII IPS 1", "SMA Negeri 2 Bandung", "0012345005");
         siswa3.aktifkanSebagaiMentor("Ekonomi, Akuntansi, Sosiologi");
+        siswa3.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         siswa3.setTotalPoinProgres(190);
         siswa3.setTotalRating(12.0);
         siswa3.setJumlahPenilaian(3);
@@ -147,6 +150,7 @@ public class DataSeeder implements CommandLineRunner {
         mhs1.setIpk(3.85);
         mhs1.aktifkanSebagaiMentor("Pemrograman Java, Struktur Data, OOP",
             "Spring Boot, Design Patterns, Clean Code");
+        mhs1.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         mhs1.setTotalPoinProgres(480);
         mhs1.setTotalRating(23.5);
         mhs1.setJumlahPenilaian(5);
@@ -159,6 +163,7 @@ public class DataSeeder implements CommandLineRunner {
         mhs2.setIpk(3.72);
         mhs2.aktifkanSebagaiMentor("Basis Data, SQL, Data Analytics",
             "PostgreSQL, MySQL, Data Visualization");
+        mhs2.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         mhs2.setTotalPoinProgres(320);
         mhs2.setTotalRating(21.0);
         mhs2.setJumlahPenilaian(5);
@@ -170,6 +175,7 @@ public class DataSeeder implements CommandLineRunner {
         mhs3.setIpk(3.90);
         mhs3.aktifkanSebagaiMentor("Algoritma, Matematika Diskrit",
             "Competitive Programming, Problem Solving");
+        mhs3.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
         mhs3.setTotalPoinProgres(400);
         mhs3.setTotalRating(24.0);
         mhs3.setJumlahPenilaian(6);
@@ -190,6 +196,27 @@ public class DataSeeder implements CommandLineRunner {
         mhs5.setTotalPoinProgres(30);
         mhs5.setBio("Butuh bimbingan Basis Data dan Analisis Sistem.");
         mahasiswaRepository.save(mhs5);
+
+        // === MENTOR PENDING (menunggu persetujuan supervisor) ===
+        // Siswa pendaftar mentor baru di SMA Negeri 1 Jakarta → divalidasi oleh Guru Budi.
+        Siswa siswaPending = new Siswa("Gilang Pratama", "gilang@siswa.id", "siswa123",
+            "XII IPA 3", "SMA Negeri 1 Jakarta", "0012345009");
+        siswaPending.setMentor(true);
+        siswaPending.setStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU);
+        siswaPending.setMataPelajaranKeahlian("Biologi, Kimia");
+        siswaPending.setBio("Mendaftar sebagai mentor, menunggu persetujuan.");
+        siswaRepository.save(siswaPending);
+
+        // Mahasiswa pendaftar mentor baru di Informatika → divalidasi oleh Dosen Ahmad.
+        Mahasiswa mhsPending = new Mahasiswa("Hana Wijaya", "hana@mahasiswa.id", "mhs123",
+            "A11.2022.009", "Informatika", "Fakultas Teknik", "Universitas Indonesia", 5);
+        mhsPending.setIpk(3.60);
+        mhsPending.setMentor(true);
+        mhsPending.setStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU);
+        mhsPending.setMataKuliahKeahlian("Pemrograman Web, JavaScript");
+        mhsPending.setTopikKeahlian("React, Node.js");
+        mhsPending.setBio("Mendaftar sebagai mentor, menunggu persetujuan.");
+        mahasiswaRepository.save(mhsPending);
 
         // ============================================================
         // SESI MENTORING — berbagai state untuk demo lengkap

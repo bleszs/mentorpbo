@@ -75,114 +75,153 @@ tailwind.config = {
   ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
   ::-webkit-scrollbar-thumb:hover { background: #c6c6d0; }
   .chat-bg { background-color: #f8f9fa; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
+  /* ===== COLLAPSIBLE SIDEBAR ===== */
+  #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
+  body.sb-collapsed #mainSidebar { width:64px; }
+  #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainTopbar { left:64px; }
+  #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); margin-top:72px; height:calc(100vh - 72px); }
+  body.sb-collapsed #mainContent { margin-left:64px; }
+  .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+  body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+  .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
+  body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
+  .sb-logo-img { transition:height 0.3s; }
+  body.sb-collapsed .sb-logo-img { height:36px !important; }
+  .sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+  body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+  body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+  body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
 </style>
 </head>
 <body class="bg-surface text-on-surface font-body-md overflow-hidden">
-<div class="flex h-screen overflow-hidden">
 
 <!-- ==================== SIDEBAR (Pesan active) ==================== -->
-<nav class="w-[280px] h-screen flex-shrink-0 flex flex-col py-8 px-6 shadow-2xl z-50" style="background:#001142;">
-  <div class="mb-12 flex items-center gap-3">
-    <a th:href="@{/dashboard}">
-      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;flex-shrink:0;display:block;"/>
+<nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
+  <div class="flex items-center justify-between gap-2 px-3 mb-8 flex-shrink-0">
+    <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
+      <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
+      <div class="sb-logo-text">
+        <h1 class="font-headline-md font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+        <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
+      </div>
     </a>
-    <div>
-      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
-    </div>
+    <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0">
+      <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
+    </button>
   </div>
-
-  <div class="space-y-2 flex-1">
-    <a th:href="@{/dashboard}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-label-sm text-label-sm">Beranda</span>
+  <div class="space-y-0.5 flex-1 overflow-hidden">
+    <a th:href="@{/dashboard}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+      <span class="sb-label font-label-sm text-label-sm">Beranda</span>
     </a>
-    <a th:href="@{/dashboard/mentorship}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">groups</span>
-      <span class="font-label-sm text-label-sm">Mentorship</span>
+    <a th:href="@{/dashboard/mentorship}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Mentorship">
+      <span class="material-symbols-outlined flex-shrink-0">groups</span>
+      <span class="sb-label font-label-sm text-label-sm">Mentorship</span>
     </a>
     <!-- ACTIVE: Pesan -->
-    <a th:href="@{/dashboard/pesan}" class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">mail</span>
-      <span class="font-label-sm text-label-sm">Pesan</span>
+    <a th:href="@{/dashboard/pesan}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Pesan">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">mail</span>
+      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
     </a>
-    <a th:href="@{/dashboard/materi}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">school</span>
-      <span class="font-label-sm text-label-sm">Materi</span>
+    <a th:href="@{/dashboard/materi}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Materi">
+      <span class="material-symbols-outlined flex-shrink-0">school</span>
+      <span class="sb-label font-label-sm text-label-sm">Materi</span>
     </a>
-    <a th:href="@{/dashboard/sumber-daya}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">library_books</span>
-      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    <a th:href="@{/dashboard/sumber-daya}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sumber Daya">
+      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
+      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
     </a>
-    <a th:href="@{/dashboard/pengaturan}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">settings</span>
-      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    <a th:href="@{/dashboard/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+      <span class="material-symbols-outlined flex-shrink-0">settings</span>
+      <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
   </div>
-
-  <div class="pt-8 border-t border-white/10 space-y-2">
-    <a th:href="@{/dashboard/bantuan}" class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">help</span>
-      <span class="font-label-sm text-label-sm">Bantuan</span>
+  <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+    <a th:href="@{/dashboard/bantuan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Bantuan">
+      <span class="material-symbols-outlined flex-shrink-0">help</span>
+      <span class="sb-label font-label-sm text-label-sm">Bantuan</span>
     </a>
-    <a th:href="@{/logout}" class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
-      <span class="material-symbols-outlined">logout</span>
-      <span class="font-label-sm text-label-sm">Keluar</span>
+    <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+      <span class="material-symbols-outlined flex-shrink-0">logout</span>
+      <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
   </div>
 </nav>
 
-<!-- ==================== MAIN CONTENT ==================== -->
-<main class="flex-1 flex flex-col h-screen relative bg-surface-container-low overflow-hidden">
+<!-- ==================== TOPBAR ==================== -->
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/60 backdrop-blur-md border-b border-glass-border shadow-sm flex items-center gap-4 px-gutter">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari percakapan atau mentee..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
 
-  <!-- TOPBAR -->
-  <header class="h-[72px] flex-shrink-0 bg-white/60 backdrop-blur-md border-b border-glass-border shadow-sm flex items-center gap-4 px-gutter z-40">
-    <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
-      <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
-      <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari percakapan atau mentee..." type="text"/>
-    </div>
-    <div class="flex items-center gap-3 flex-shrink-0">
-      <div class="relative">
-        <button onclick="togglePopup('notifPopup',event)" class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
-          <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-          <span th:if="${notifBelumDibaca > 0}" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center" th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
-        </button>
-        <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high"><h3 class="font-bold text-[15px] text-primary">Notifikasi</h3><button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Semua Dibaca</button></div>
-          <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-            <div th:if="${notifBelumDibaca > 0}" class="px-5 py-4 flex gap-3 bg-primary/5"><div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings:'FILL' 1;">notifications</span></div><div><p class="text-[13px] font-bold text-primary"><span th:text="${notifBelumDibaca}">0</span> notifikasi belum dibaca</p><p class="text-[12px] text-on-surface-variant mt-0.5">Periksa halaman notifikasi untuk detail</p></div></div>
-          <!-- NOTIF DINAMIS dari database -->
-          <div th:if="${#lists.isEmpty(daftarNotifikasi)}" class="px-5 py-8 text-center text-on-surface-variant text-[13px]">Tidak ada notifikasi baru</div>
-          <div th:each="notif : ${daftarNotifikasi}" class="px-5 py-4 flex gap-3 cursor-pointer transition-colors"
+    <!-- Notifikasi -->
+    <div class="relative">
+      <button onclick="togglePopup('notifPopup',event)"
+              class="relative w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span th:if="${notifBelumDibaca > 0}"
+              class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none"
+              th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}"></span>
+      </button>
+      <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
+          <h3 class="font-bold text-[15px] text-primary">Notifikasi</h3>
+          <button class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Dibaca</button>
+        </div>
+        <!-- Scrollable list -->
+        <div class="max-h-[320px] overflow-y-auto divide-y divide-surface-container-high">
+          <div th:if="${daftarNotifikasi == null or #lists.isEmpty(daftarNotifikasi)}"
+               class="px-5 py-10 text-center">
+            <span class="material-symbols-outlined text-outline block mb-2" style="font-size:32px;">notifications_off</span>
+            <p class="text-[13px] text-on-surface-variant">Tidak ada notifikasi baru</p>
+          </div>
+          <div th:each="notif : ${daftarNotifikasi}"
+               class="px-5 py-4 flex gap-3 cursor-pointer transition-colors"
                th:classappend="${!notif.sudahDibaca} ? 'bg-primary/5 hover:bg-primary/8' : 'hover:bg-surface-container-low'">
             <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                 th:classappend="${notif.kategori == 'VALIDASI' ? 'bg-success-green/10' : (notif.kategori == 'RATING' ? 'bg-warning-gold/10' : 'bg-primary/10')}">
-              <span class="material-symbols-outlined text-[18px]"
-                    th:classappend="${notif.kategori == 'VALIDASI' ? 'text-success-green' : (notif.kategori == 'RATING' ? 'text-warning-gold' : 'text-primary')}"
-                    style="font-variation-settings:'FILL' 1;"
+                 th:classappend="${notif.kategori == 'VALIDASI'} ? 'bg-success-green/10' : (${notif.kategori == 'RATING'} ? 'bg-warning-gold/10' : 'bg-primary/10')">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;"
+                    th:classappend="${notif.kategori == 'VALIDASI'} ? 'text-success-green' : (${notif.kategori == 'RATING'} ? 'text-warning-gold' : 'text-primary')"
                     th:text="${notif.kategori == 'VALIDASI' ? 'verified' : (notif.kategori == 'RATING' ? 'star' : (notif.kategori == 'JADWAL' ? 'calendar_month' : 'notifications'))}">notifications</span>
             </div>
-            <div>
-              <p class="text-[13px] font-bold" th:text="${notif.judul}">-</p>
-              <p class="text-[12px] text-on-surface-variant mt-0.5" th:text="${notif.pesan}">-</p>
+            <div class="min-w-0">
+              <p class="text-[13px] font-bold truncate" th:text="${notif.judul}">-</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${notif.pesan}">-</p>
             </div>
           </div>
-          <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50"><button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Pesan</button></div>
+        </div>
+        <!-- Footer — di luar scrollable -->
+        <div class="px-5 py-3 border-t border-surface-container-high bg-surface-container-low/50">
+          <button class="w-full text-center text-primary font-black text-[11px] uppercase tracking-wider hover:underline py-1">Lihat Semua Notifikasi</button>
         </div>
       </div>
-      <div class="h-8 w-[1px] bg-outline-variant"></div>
-      <div class="flex items-center gap-3 cursor-pointer">
-        <div class="text-right">
-          <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter" th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
-        </div>
-        <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0"><img th:if="${mentor.fotoProfil != null}" th:src="${mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/><div th:unless="${mentor.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div></div>
+    </div><!-- closes .relative (notifikasi) -->
+
+    <div class="h-8 w-px bg-outline-variant"></div>
+
+    <!-- User info -->
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary" th:text="${mentor.namaLengkap}">Mentor</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
+           th:text="${mentor.asdos ? 'Asisten Dosen' : (mentor.kandidatAsdos ? 'Kandidat Asdos' : 'Senior Mentor')}">Senior Mentor</p>
+      </div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
+        <img th:if="${mentor.fotoProfil != null}" th:src="${mentor.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
+        <div th:unless="${mentor.fotoProfil != null}"
+             class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
+             th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
       </div>
     </div>
-  </header>
 
-  <!-- MESSAGE CENTER LAYOUT -->
-  <div class="flex flex-1 overflow-hidden">
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<div id="mainContent" class="flex bg-surface-container-low overflow-hidden">
 
     <!-- CONVERSATION LIST -->
     <section class="w-[380px] flex-shrink-0 border-r border-outline-variant bg-white flex flex-col overflow-hidden">
@@ -266,104 +305,63 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- Messages -->
-      <div class="flex-1 overflow-y-auto p-7 space-y-6 chat-bg" id="chatMessages">
-        <div class="flex justify-center">
-          <span class="px-4 py-1 bg-surface-container text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-widest">Senin, 14 Oktober</span>
-        </div>
+      <!-- Messages / Empty State -->
+      <div class="flex-1 overflow-y-auto chat-bg flex flex-col items-center justify-center p-7" id="chatMessages">
 
-        <!-- Incoming -->
-        <div class="flex gap-3 max-w-2xl">
-          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
+        <!-- State: Tidak ada percakapan sama sekali -->
+        <div th:if="${#lists.isEmpty(percakapan)}" class="flex flex-col items-center text-center max-w-sm gap-5">
+          <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:40px;font-variation-settings:'FILL' 1;">forum</span>
+          </div>
           <div>
-            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm">
-              <p class="text-[14px] leading-relaxed text-on-surface">Selamat siang. Mohon maaf mengganggu waktunya. Saya ingin menanyakan terkait progres penelitian saya untuk bab 3.</p>
-            </div>
-            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">09:30</span>
+            <h3 class="font-bold text-primary text-[18px] mb-2">Belum Ada Percakapan</h3>
+            <p class="text-on-surface-variant text-[14px] leading-relaxed">
+              Percakapan akan muncul setelah ada sesi mentoring bersama mentee. Jadwalkan sesi pertama Anda sekarang!
+            </p>
           </div>
+          <a th:href="@{/mentoring/jadwal-sesi}"
+             class="px-6 py-3 bg-primary text-white font-black text-[12px] uppercase tracking-widest rounded-xl hover:bg-primary-container transition-all active:scale-95 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            Jadwalkan Sesi
+          </a>
         </div>
 
-        <div class="flex gap-3 max-w-2xl">
-          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
+        <!-- State: Ada percakapan, pilih salah satu -->
+        <div th:unless="${#lists.isEmpty(percakapan)}" class="flex flex-col items-center text-center max-w-sm gap-5">
+          <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:40px;">chat_bubble_outline</span>
+          </div>
           <div>
-            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm">
-              <p class="text-[14px] leading-relaxed text-on-surface">Apakah ada waktu untuk diskusi singkat via Zoom besok sore?</p>
-            </div>
-            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">09:31</span>
+            <h3 class="font-bold text-primary text-[18px] mb-2">Pilih Percakapan</h3>
+            <p class="text-on-surface-variant text-[14px] leading-relaxed">Klik salah satu percakapan di sebelah kiri untuk mulai berkomunikasi dengan mentee Anda.</p>
           </div>
         </div>
 
-        <!-- Outgoing (mentor) -->
-        <div class="flex flex-row-reverse gap-3 max-w-2xl ml-auto">
-          <div class="w-9 h-9 rounded-xl bg-primary flex-shrink-0 mt-1 flex items-center justify-center" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
-          <div class="flex flex-col items-end">
-            <div class="bg-primary-container text-white p-4 rounded-2xl rounded-tr-none shadow-md">
-              <p class="text-[14px] leading-relaxed">Selamat siang. Progres penelitianmu sejauh ini sudah cukup bagus. Saya ada waktu jam 15.00 WIB besok.</p>
-            </div>
-            <div class="flex items-center gap-1 mt-1">
-              <span class="text-[10px] text-on-surface-variant font-medium">10:05</span>
-              <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings:'FILL' 1;">done_all</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-row-reverse gap-3 max-w-2xl ml-auto">
-          <div class="w-9 h-9 rounded-xl bg-primary flex-shrink-0 mt-1 flex items-center justify-center" th:text="${#strings.substring(mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
-          <div class="flex flex-col items-end">
-            <div class="bg-primary-container text-white p-4 rounded-2xl rounded-tr-none shadow-md">
-              <p class="text-[14px] leading-relaxed">Coba fokuskan lagi pada metodologi pengambilan sampelnya ya.</p>
-            </div>
-            <div class="flex items-center gap-1 mt-1">
-              <span class="text-[10px] text-on-surface-variant font-medium">10:06</span>
-              <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings:'FILL' 1;">done_all</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Incoming with quote -->
-        <div class="flex gap-3 max-w-2xl">
-          <div class="w-9 h-9 rounded-xl bg-[#001142] flex-shrink-0 mt-1 flex items-center justify-center text-white font-black text-xs">BS</div>
-          <div>
-            <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-none shadow-sm border-l-4 border-l-secondary-container">
-              <p class="text-[13px] leading-relaxed text-on-surface italic bg-surface-container-low p-2 rounded-lg mb-2 border-l-2 border-primary/20">"Saya ada waktu jam 15.00 WIB besok."</p>
-              <p class="text-[14px] leading-relaxed text-on-surface">Baik pak, revisi bab 3 sudah saya unggah di portal. Sampai jumpa besok jam 3 sore!</p>
-            </div>
-            <span class="text-[10px] text-on-surface-variant mt-1 inline-block font-medium">10:42 · Terkirim</span>
-          </div>
-        </div>
-
-        <div class="h-2"></div>
       </div>
 
-      <!-- Chat Input -->
+      <!-- Chat Input — disabled saat belum ada percakapan dipilih -->
       <div class="flex-shrink-0 px-7 py-4 bg-white border-t border-outline-variant">
-        <div class="flex items-end gap-3">
+        <div class="flex items-end gap-3 opacity-50 pointer-events-none select-none">
           <div class="flex items-center gap-2 pb-1.5">
-            <button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+            <button class="w-9 h-9 flex items-center justify-center rounded-full text-on-surface-variant" disabled>
               <span class="material-symbols-outlined text-[22px]">add_circle</span>
             </button>
-            <button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+            <button class="w-9 h-9 flex items-center justify-center rounded-full text-on-surface-variant" disabled>
               <span class="material-symbols-outlined text-[22px]">image</span>
             </button>
           </div>
-          <div class="flex-1 relative rounded-2xl shadow-sm">
-            <textarea class="w-full bg-surface-container-low border-none rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary-fixed resize-none overflow-hidden max-h-32 font-body-md text-body-md outline-none" id="messageInput"
-                      th:placeholder="${!#lists.isEmpty(percakapan) ? 'Tulis pesan untuk ' + percakapan[0].mentee.namaLengkap + '...' : 'Tulis pesan...'}"
-                      placeholder="Tulis pesan..." rows="1"></textarea>
-            <button class="absolute right-3 bottom-3 text-on-surface-variant hover:text-primary transition-colors">
-              <span class="material-symbols-outlined text-[20px]">sentiment_satisfied</span>
-            </button>
+          <div class="flex-1 relative rounded-2xl">
+            <div class="w-full bg-surface-container-low rounded-2xl py-3 px-5 text-[14px] text-on-surface-variant">
+              Pilih percakapan untuk mulai menulis pesan...
+            </div>
           </div>
-          <button class="bg-primary text-white w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex-shrink-0">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">send</span>
-          </button>
+          <div class="bg-surface-container w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings:'FILL' 1;">send</span>
+          </div>
         </div>
       </div>
 
     </section>
-  </div>
-
-</main>
 </div>
 
 <script>
@@ -398,6 +396,23 @@ tailwind.config = {
   document.addEventListener('click', function() {
     document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
   });
+</script>
+<script>
+function toggleSidebar() {
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+});
 </script>
 
 </body>

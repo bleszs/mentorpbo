@@ -34,10 +34,10 @@ import java.util.stream.StreamSupport;
 @RequestMapping("/api/cari")
 public class SearchController {
 
-    @Value("${app.api.coid.key}")
+    @Value("${app.api.coid.key:Uwp6sB81fQBX8571QsqMpccvHc4SBjWuLUggHGuph3gcePEd3T}")
     private String apiKey;
 
-    @Value("${app.api.coid.base-url}")
+    @Value("${app.api.coid.base-url:https://use.api.co.id}")
     private String baseUrl;
 
     @Autowired
@@ -64,12 +64,13 @@ public class SearchController {
      * Sumber: api.co.id → fallback JSON lokal.
      */
     @GetMapping("/sekolah")
-    public ResponseEntity<List<String>> cariSekolah(@RequestParam String q) {
+    public ResponseEntity<List<String>> cariSekolah(
+            @RequestParam String q,
+            @RequestParam(required = false) String grade) {
         if (q == null || q.trim().length() < 2) return ResponseEntity.ok(List.of());
 
         try {
-            // api.co.id: cari dengan filter grade SMA + SMK
-            List<String> hasil = cariSekolahDariApi(q, null); // tanpa filter grade → lebih banyak hasil
+            List<String> hasil = cariSekolahDariApi(q, grade);
             if (!hasil.isEmpty()) return ResponseEntity.ok(hasil);
         } catch (Exception ignored) {}
 

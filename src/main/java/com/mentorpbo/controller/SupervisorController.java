@@ -74,6 +74,23 @@ public class SupervisorController {
         return "redirect:/validasi-program";
     }
 
+    /** POST /tinjau-sesi/{id} — Mulai tinjauan: BELUM_DITINJAU → SEDANG_DITINJAU */
+    @PostMapping("/tinjau-sesi/{sesiId}")
+    public String mulaiTinjauSesi(@PathVariable Long sesiId,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            supervisorService.mulaiTinjauSesi(sesiId, penggunaId);
+            redirectAttributes.addFlashAttribute("sukses", "Laporan mulai ditinjau.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/validasi-program";
+    }
+
     /** POST /tolak-sesi/{id} — Tolak validasi */
     @PostMapping("/tolak-sesi/{sesiId}")
     public String tolakSesi(@PathVariable Long sesiId,
@@ -90,6 +107,53 @@ public class SupervisorController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/validasi-program";
+    }
+
+    /** GET /validasi-mentor — Daftar pendaftaran mentor menunggu persetujuan (scoped) */
+    @GetMapping("/validasi-mentor")
+    public String halamanValidasiMentor(HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
+        siapkanDataUmumSupervisor(penggunaId, model);
+        model.addAttribute("mentorPending", supervisorService.getMentorPendingDalamScope(penggunaId));
+        return "supervisor/validasi-mentor";
+    }
+
+    /** POST /validasi-mentor/{id}/setujui — Setujui pendaftaran mentor */
+    @PostMapping("/validasi-mentor/{mentorId}/setujui")
+    public String setujuiMentor(@PathVariable Long mentorId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            supervisorService.setujuiMentor(mentorId, penggunaId);
+            redirectAttributes.addFlashAttribute("sukses", "Pendaftaran mentor berhasil disetujui.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/validasi-mentor";
+    }
+
+    /** POST /validasi-mentor/{id}/tolak — Tolak pendaftaran mentor */
+    @PostMapping("/validasi-mentor/{mentorId}/tolak")
+    public String tolakMentor(@PathVariable Long mentorId,
+                              @RequestParam String alasan,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            supervisorService.tolakMentor(mentorId, penggunaId, alasan);
+            redirectAttributes.addFlashAttribute("sukses", "Pendaftaran mentor ditolak.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/validasi-mentor";
     }
 
     /** GET /monitoring-mentor — Monitoring & ranking mentor */
@@ -127,9 +191,9 @@ public class SupervisorController {
         penggunaService.getPenggunaById(penggunaId).ifPresent(p -> model.addAttribute("pengguna", p));
         siapkanDataUmumSupervisor(penggunaId, model);
 
-        List<Mahasiswa> kandidat = supervisorService.cariKandidatAsdos(minIpk, 5, minSesi, minRating);
+        List<Mahasiswa> kandidat = supervisorService.cariKandidatAsdos(penggunaId, minIpk, 5, minSesi, minRating);
         model.addAttribute("kandidatAsdos", kandidat);
-        model.addAttribute("asdosAktif", supervisorService.getAsdosAktif());
+        model.addAttribute("asdosAktif", supervisorService.getAsdosAktif(penggunaId));
         model.addAttribute("minIpk", minIpk);
         model.addAttribute("minRating", minRating);
         model.addAttribute("minSesi", minSesi);

@@ -59,10 +59,11 @@ public class MentoringService {
      * Mencari mentor siswa berdasarkan mata pelajaran keahlian.
      */
     public List<Siswa> cariMentorSiswa(String mataPelajaran) {
-        if (mataPelajaran == null || mataPelajaran.isBlank()) {
-            return siswaRepository.findByIsMentorTrue();
-        }
-        return siswaRepository.cariMentorBerdasarkanMataPelajaran(mataPelajaran);
+        List<Siswa> hasil = (mataPelajaran == null || mataPelajaran.isBlank())
+            ? siswaRepository.findByIsMentorTrue()
+            : siswaRepository.cariMentorBerdasarkanMataPelajaran(mataPelajaran);
+        // Hanya tampilkan mentor yang sudah disetujui supervisor
+        return hasil.stream().filter(Siswa::isMentorTervalidasi).toList();
     }
 
     /**
@@ -72,7 +73,8 @@ public class MentoringService {
      */
     public List<Mahasiswa> cariMentorMahasiswa(String kataKunci) {
         if (kataKunci == null || kataKunci.isBlank()) {
-            return mahasiswaRepository.findByIsMentorTrue();
+            return mahasiswaRepository.findByIsMentorTrue().stream()
+                .filter(Mahasiswa::isMentorTervalidasi).toList();
         }
         List<Mahasiswa> dariMataKuliah = mahasiswaRepository.cariMentorBerdasarkanMataKuliah(kataKunci);
         List<Mahasiswa> dariTopik      = mahasiswaRepository.cariMentorBerdasarkanTopik(kataKunci);
@@ -81,7 +83,8 @@ public class MentoringService {
         List<Mahasiswa> gabungan = new ArrayList<>();
         for (Mahasiswa m : dariMataKuliah) { if (sudahAda.add(m.getId())) gabungan.add(m); }
         for (Mahasiswa m : dariTopik)      { if (sudahAda.add(m.getId())) gabungan.add(m); }
-        return gabungan;
+        // Hanya tampilkan mentor yang sudah disetujui supervisor
+        return gabungan.stream().filter(Mahasiswa::isMentorTervalidasi).toList();
     }
 
     public List<Siswa>     getRankingMentorSiswa()     { return siswaRepository.getRankingMentorSiswa(); }
@@ -245,6 +248,7 @@ public class MentoringService {
      * [STEP 4 — MENTOR] Menyelesaikan sesi yang sedang berlangsung.
      * Transisi: BERLANGSUNG → SELESAI
      *
+     * Otorisasi: hanya mentor sesi ini yang boleh menyelesaikan.
      * Validasi bisnis ketat: sesi WAJIB berstatus BERLANGSUNG.
      * Setelah selesai: poin dialokasikan dan supervisor dinotifikasi
      * untuk memproses laporan akademik.
@@ -253,9 +257,17 @@ public class MentoringService {
      *   < 30 mnt  → 5 poin mentor, 3 poin mentee
      *   30–60 mnt → 10 poin mentor, 7 poin mentee
      *   > 60 mnt  → 15 poin mentor, 10 poin mentee
+     *
+     * @param sesiId   id sesi yang diselesaikan
+     * @param mentorId id pengguna yang sedang login (harus mentor sesi ini)
      */
-    public SesiMentoring selesaikanSesi(Long sesiId) {
+    public SesiMentoring selesaikanSesi(Long sesiId, Long mentorId) {
         SesiMentoring sesi = getSesiAtauLempar(sesiId);
+
+        // === OTORISASI: hanya mentor sesi ini ===
+        if (sesi.getMentor() == null || !sesi.getMentor().getId().equals(mentorId)) {
+            throw new IllegalStateException("Hanya mentor sesi ini yang bisa menyelesaikan sesi.");
+        }
 
         // === VALIDASI BISNIS KETAT ===
         if (sesi.getStatusSesi() != StatusSesi.BERLANGSUNG) {
@@ -273,10 +285,10 @@ public class MentoringService {
 
         // Poin mentee: selesai sesi +10, tepat waktu +2 (jika waktu mulai sudah lewat ≤ 5 menit)
         int poinMentee = 10;
-        boolean tepakWaktu = sesi.getWaktuMulai() != null &&
+        boolean tepatWaktu = sesi.getWaktuMulai() != null &&
             !LocalDateTime.now().isBefore(sesi.getWaktuMulai()) &&
             LocalDateTime.now().isBefore(sesi.getWaktuMulai().plusMinutes(sesi.getDurasiMenit() + 5));
-        if (tepakWaktu) poinMentee += 2;
+        if (tepatWaktu) poinMentee += 2;
 
         // Panggil method entity — mengubah status ke SELESAI dan menyimpan poin
         sesi.selesaikanSesi(poinMentor, poinMentee);
@@ -302,7 +314,7 @@ public class MentoringService {
         }
 
         // Notifikasi mentee: minta review
-        String bonusInfo = tepakWaktu ? " (+2 poin tepat waktu)" : "";
+        String bonusInfo = tepatWaktu ? " (+2 poin tepat waktu)" : "";
         kirimNotifikasi(
             "Sesi Selesai — Berikan Rating",
             "Sesi \"" + sesi.getTopikPembahasan() + "\" telah selesai. " +
@@ -313,7 +325,7 @@ public class MentoringService {
 
         // Notifikasi mentor
         kirimNotifikasi(
-            "Sesi Selesai ++" + poinMentor + " Poin",
+            "Sesi Selesai +" + poinMentor + " Poin",
             "Sesi \"" + sesi.getTopikPembahasan() + "\" telah selesai. Terima kasih!",
             "SESI",
             sesi.getMentor()
@@ -325,9 +337,24 @@ public class MentoringService {
     /**
      * Membatalkan sesi mentoring.
      * Bisa dilakukan selama sesi masih dalam status aktif (bukan SELESAI/DIBATALKAN).
+     *
+     * Otorisasi: hanya peserta sesi (mentor ATAU mentee) yang boleh membatalkan.
+     * Penalti pembatalan mendadak (-25 poin) dikenakan kepada PIHAK YANG MEMBATALKAN,
+     * bukan selalu mentee — agar adil.
+     *
+     * @param sesiId    id sesi
+     * @param pembatalId id pengguna yang sedang login (harus mentor/mentee sesi ini)
+     * @param alasan    alasan pembatalan
      */
-    public SesiMentoring batalkanSesi(Long sesiId, String alasan) {
+    public SesiMentoring batalkanSesi(Long sesiId, Long pembatalId, String alasan) {
         SesiMentoring sesi = getSesiAtauLempar(sesiId);
+
+        // === OTORISASI: hanya peserta sesi ===
+        boolean isMentor = sesi.getMentor() != null && sesi.getMentor().getId().equals(pembatalId);
+        boolean isMentee = sesi.getMentee() != null && sesi.getMentee().getId().equals(pembatalId);
+        if (!isMentor && !isMentee) {
+            throw new IllegalStateException("Hanya peserta sesi ini yang bisa membatalkan sesi.");
+        }
 
         if (!sesi.getStatusSesi().isAktif()) {
             throw new IllegalStateException(
@@ -338,33 +365,35 @@ public class MentoringService {
         // Delegasi ke interface Schedulable
         sesi.batalkanJadwal(alasan);
 
-        // Batal mendadak (< 24 jam sebelum sesi) = -25 poin untuk yang membatalkan
+        // Batal mendadak (< 24 jam sebelum sesi) = -25 poin untuk PIHAK YANG MEMBATALKAN
         boolean mendadak = sesi.getWaktuMulai() != null &&
             sesi.getWaktuMulai().isBefore(LocalDateTime.now().plusHours(24));
         if (mendadak) {
-            // Kurangi poin mentee jika pembatalan mendadak
-            Pengguna mentee = sesi.getMentee();
-            if (mentee instanceof Siswa s) {
+            Pengguna pembatal = isMentor ? sesi.getMentor() : sesi.getMentee();
+            if (pembatal instanceof Siswa s) {
                 s.setTotalPoinProgres(Math.max(0, s.getTotalPoinProgres() - 25));
                 siswaRepository.save(s);
-            } else if (mentee instanceof Mahasiswa m) {
+            } else if (pembatal instanceof Mahasiswa m) {
                 m.setTotalPoinProgres(Math.max(0, m.getTotalPoinProgres() - 25));
                 mahasiswaRepository.save(m);
             }
         }
 
+        String penaltiInfo = mendadak ? " (-25 poin untuk pihak yang membatalkan karena pembatalan mendadak)" : "";
+        // Notifikasi ke pihak yang membatalkan (sertakan info penalti)
         kirimNotifikasi(
             "Sesi Dibatalkan",
-            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan +
-                (mendadak ? " (-25 poin karena pembatalan mendadak)" : ""),
+            "Anda membatalkan sesi \"" + sesi.getTopikPembahasan() + "\". Alasan: " + alasan + penaltiInfo,
             "JADWAL",
-            sesi.getMentee()
+            isMentor ? sesi.getMentor() : sesi.getMentee()
         );
+        // Notifikasi ke pihak lawan (tanpa penalti)
         kirimNotifikasi(
             "Sesi Dibatalkan",
-            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan. Alasan: " + alasan,
+            "Sesi \"" + sesi.getTopikPembahasan() + "\" dibatalkan oleh "
+                + (isMentor ? "mentor" : "mentee") + ". Alasan: " + alasan,
             "JADWAL",
-            sesi.getMentor()
+            isMentor ? sesi.getMentee() : sesi.getMentor()
         );
 
         return sesiRepository.save(sesi);
@@ -387,7 +416,8 @@ public class MentoringService {
         }
 
         sesi.setStatusSesi(StatusSesi.DIBATALKAN);
-        sesi.setDeskripsi("Ditolak mentor: " + (alasan != null ? alasan : "-"));
+        // Simpan alasan ke alasanPembatalan, BUKAN menimpa deskripsi asli mentee
+        sesi.setAlasanPembatalan("Ditolak mentor: " + (alasan != null ? alasan : "-"));
 
         kirimNotifikasi(
             "Permintaan Sesi Ditolak",
@@ -413,6 +443,15 @@ public class MentoringService {
             throw new IllegalStateException(
                 "Jadwal tidak dapat diubah. Sesi mungkin sudah berlangsung atau selesai.");
         }
+
+        // Notifikasi mentee tentang perubahan jadwal
+        kirimNotifikasi(
+            "Jadwal Sesi Diperbarui",
+            "Mentor telah memperbarui jadwal sesi \"" + sesi.getTopikPembahasan() + "\". " +
+                "Cek detail sesi untuk jadwal baru.",
+            "JADWAL",
+            sesi.getMentee()
+        );
 
         return sesiRepository.save(sesi);
     }

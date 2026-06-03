@@ -1,6 +1,7 @@
 package com.mentorpbo.repository;
 
 import com.mentorpbo.model.Mahasiswa;
+import com.mentorpbo.model.enums.StatusValidasi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,12 @@ public interface MahasiswaRepository extends JpaRepository<Mahasiswa, Long> {
      * Mendapatkan daftar mahasiswa mentor di program studi tertentu.
      */
     List<Mahasiswa> findByIsMentorTrueAndProgramStudi(String programStudi);
+
+    /**
+     * Mendapatkan daftar mahasiswa mentor berdasarkan status validasi mentor
+     * (mis. BELUM_DITINJAU untuk antrean persetujuan supervisor).
+     */
+    List<Mahasiswa> findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi statusValidasiMentor);
 
     /**
      * Mencari mentor mahasiswa berdasarkan mata kuliah keahlian (pencarian parsial).

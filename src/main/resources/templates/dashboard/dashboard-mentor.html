@@ -91,6 +91,7 @@ tailwind.config = {
   .premium-card-shadow:hover { box-shadow: 0 12px 30px rgba(0,17,66,0.1); transform: translateY(-2px); }
   .glass-panel { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); }
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
   .sidebar-gradient { background: linear-gradient(to bottom, #001142, #001c6b); }
 
   /* ===== COLLAPSIBLE SIDEBAR ===== */
@@ -494,7 +495,7 @@ tailwind.config = {
         </div>
       </div>
 
-      <a th:href="@{/pengaturan(tab='profil')}"
+      <a th:href="@{/dashboard/pengaturan}"
          class="block w-full mt-8 py-3 bg-primary text-white font-black text-label-sm rounded-xl hover:bg-primary-container transition-all text-center">EDIT PROFIL</a>
     </section>
 

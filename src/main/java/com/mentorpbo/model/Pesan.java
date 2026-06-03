@@ -32,6 +32,10 @@ public class Pesan {
     @Column(length = 255)
     private String namaFile;
 
+    /** ID grup jika pesan ini untuk grup chat (null = pesan pribadi) */
+    @Column(name = "grup_id")
+    private Long grupId;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime waktuKirim;
 
@@ -43,7 +47,7 @@ public class Pesan {
     private Pengguna pengirim;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "penerima_id", nullable = false)
+    @JoinColumn(name = "penerima_id", nullable = true)
     private Pengguna penerima;
 
     public Pesan() {
@@ -75,4 +79,6 @@ public class Pesan {
     public void setPengirim(Pengguna pengirim) { this.pengirim = pengirim; }
     public Pengguna getPenerima() { return penerima; }
     public void setPenerima(Pengguna penerima) { this.penerima = penerima; }
+    public Long getGrupId() { return grupId; }
+    public void setGrupId(Long grupId) { this.grupId = grupId; }
 }

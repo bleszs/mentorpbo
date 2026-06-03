@@ -1,6 +1,7 @@
 package com.mentorpbo.controller;
 
 import com.mentorpbo.model.*;
+import com.mentorpbo.repository.GrupChatRepository;
 import com.mentorpbo.repository.PesanRepository;
 import com.mentorpbo.service.MentoringService;
 import com.mentorpbo.service.PenggunaService;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 
 /**
  * PesanController â€” mengelola halaman pesan dan API chat antara mentor dan mentee.
@@ -25,14 +28,17 @@ import java.util.stream.Collectors;
 public class PesanController {
 
     private final PesanRepository pesanRepository;
+    private final GrupChatRepository grupChatRepository;
     private final PenggunaService penggunaService;
     private final MentoringService mentoringService;
 
     @Autowired
     public PesanController(PesanRepository pesanRepository,
+                           GrupChatRepository grupChatRepository,
                            PenggunaService penggunaService,
                            MentoringService mentoringService) {
         this.pesanRepository = pesanRepository;
+        this.grupChatRepository = grupChatRepository;
         this.penggunaService = penggunaService;
         this.mentoringService = mentoringService;
     }
@@ -72,6 +78,8 @@ public class PesanController {
         model.addAttribute("notifBelumDibaca", penggunaService.hitungNotifikasiBelumDibaca(penggunaId));
         model.addAttribute("preferences", penggunaService.getOrCreatePreferences(penggunaId));
         model.addAttribute("inboxPercakapan", buildInboxPercakapan(penggunaId));
+        try { model.addAttribute("daftarGrup", grupChatRepository.findByAnggotaId(penggunaId)); }
+        catch (Exception e) { model.addAttribute("daftarGrup", Collections.emptyList()); }
 
         // Role
         if (pengguna instanceof Mahasiswa mhs) {
@@ -159,6 +167,137 @@ public class PesanController {
         return "redirect:/pesan/chat/" + penerimaId;
     }
 
+    /**
+     * Buat grup percakapan baru — simpan ke GrupChat entity.
+     * POST /pesan/buat-grup
+     */
+    @PostMapping("/buat-grup")
+    public String buatGrup(@RequestParam String namaGrup,
+                           @RequestParam(required = false) List<Long> anggotaIds,
+                           HttpSession session,
+                           RedirectAttributes flash) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+        if (anggotaIds == null || anggotaIds.isEmpty()) {
+            flash.addFlashAttribute("error", "Pilih minimal satu anggota grup.");
+            return "redirect:/dashboard";
+        }
+
+        Pengguna pembuat = penggunaService.getPenggunaById(penggunaId).orElse(null);
+        if (pembuat == null) return "redirect:/login";
+
+        GrupChat grup = new GrupChat();
+        grup.setNama(namaGrup);
+        grup.setDibuatOleh(pembuat);
+
+        List<Pengguna> anggota = new ArrayList<>();
+        anggota.add(pembuat);
+        for (Long anggotaId : anggotaIds) {
+            penggunaService.getPenggunaById(anggotaId).ifPresent(anggota::add);
+        }
+        grup.setAnggota(anggota);
+        GrupChat saved = grupChatRepository.save(grup);
+
+        // Kirim pesan sistem ke grup
+        Pesan p = new Pesan();
+        p.setPengirim(pembuat);
+        p.setGrupId(saved.getId());
+        p.setIsi("📢 Grup \"" + namaGrup + "\" dibuat. Selamat berdiskusi!");
+        p.setTipeKonten("TEKS");
+        pesanRepository.save(p);
+
+        flash.addFlashAttribute("sukses", "Grup \"" + namaGrup + "\" berhasil dibuat!");
+        return "redirect:/pesan/grup/" + saved.getId();
+    }
+
+    /**
+     * Halaman grup chat.
+     * GET /pesan/grup/{grupId}
+     */
+    @GetMapping("/grup/{grupId}")
+    public String grupChat(@PathVariable Long grupId,
+                           HttpSession session, Model model) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        Pengguna pengguna = penggunaService.getPenggunaById(penggunaId).orElse(null);
+        if (pengguna == null) return "redirect:/login";
+
+        GrupChat grup = grupChatRepository.findById(grupId).orElse(null);
+        if (grup == null || !grup.getAnggota().stream().anyMatch(a -> a.getId().equals(penggunaId)))
+            return "redirect:/dashboard";
+
+        List<Pesan> percakapan = pesanRepository.findByGrupId(grupId);
+        List<GrupChat> daftarGrup = grupChatRepository.findByAnggotaId(penggunaId);
+        List<Map<String, Object>> daftarPartner = getDaftarPartner(penggunaId, pengguna);
+
+        model.addAttribute("pengguna", pengguna);
+        model.addAttribute("grup", grup);
+        model.addAttribute("percakapan", percakapan);
+        model.addAttribute("daftarGrup", daftarGrup);
+        model.addAttribute("daftarPartner", daftarPartner);
+        model.addAttribute("notifBelumDibaca", penggunaService.hitungNotifikasiBelumDibaca(penggunaId));
+
+        if (pengguna instanceof Mahasiswa mhs) {
+            model.addAttribute("mahasiswa", mhs);
+            if (mhs.isMentor()) model.addAttribute("mentor", pengguna);
+        } else if (pengguna instanceof Siswa siswa) {
+            model.addAttribute("siswa", siswa);
+            if (siswa.isMentor()) model.addAttribute("mentor", pengguna);
+        }
+        return "dashboard/pesan-grup";
+    }
+
+    /**
+     * Kirim pesan ke grup.
+     * POST /pesan/grup/{grupId}/kirim
+     */
+    @PostMapping("/grup/{grupId}/kirim")
+    public String kirimPesanGrup(@PathVariable Long grupId,
+                                  @RequestParam String isi,
+                                  HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return "redirect:/login";
+
+        Pengguna pengirim = penggunaService.getPenggunaById(penggunaId).orElse(null);
+        if (pengirim == null || isi == null || isi.isBlank()) return "redirect:/pesan/grup/" + grupId;
+
+        Pesan p = new Pesan();
+        p.setPengirim(pengirim);
+        p.setGrupId(grupId);
+        p.setIsi(isi.trim());
+        p.setTipeKonten("TEKS");
+        pesanRepository.save(p);
+        return "redirect:/pesan/grup/" + grupId;
+    }
+
+    /**
+     * API polling pesan grup terbaru.
+     * GET /pesan/grup/{grupId}/terbaru?since={id}
+     */
+    @GetMapping("/grup/{grupId}/terbaru")
+    @ResponseBody
+    public List<Map<String, Object>> pesanGrupTerbaru(@PathVariable Long grupId,
+                                                       @RequestParam(defaultValue = "0") Long since,
+                                                       HttpSession session) {
+        Long penggunaId = (Long) session.getAttribute("penggunaId");
+        if (penggunaId == null) return Collections.emptyList();
+
+        return pesanRepository.findByGrupIdAfter(grupId, since).stream().map(p -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", p.getId());
+            m.put("isi", p.getIsi());
+            m.put("tipeKonten", p.getTipeKonten());
+            m.put("lampiran", p.getLampiran());
+            m.put("namaFile", p.getNamaFile());
+            m.put("waktu", p.getWaktuKirim() != null ? p.getWaktuKirim().toString() : "");
+            m.put("dariku", p.getPengirim() != null && p.getPengirim().getId().equals(penggunaId));
+            m.put("nama", p.getPengirim() != null ? p.getPengirim().getNamaLengkap() : "");
+            m.put("foto", p.getPengirim() != null ? p.getPengirim().getFotoProfil() : null);
+            return m;
+        }).collect(java.util.stream.Collectors.toList());
+    }
+
     private String getExtension(String filename) {
         if (filename == null || !filename.contains(".")) return "";
         return filename.substring(filename.lastIndexOf('.'));
@@ -214,10 +353,12 @@ public class PesanController {
                 partners.add(partner);
         }
 
-        // Tambahkan partner dari pesan langsung
+        // Tambahkan partner dari pesan langsung (skip grup messages yang penerima null)
         pesanRepository.findSemuaPesanPengguna(penggunaId).forEach(p -> {
-            Pengguna partner = p.getPengirim().getId().equals(penggunaId) ? p.getPenerima() : p.getPengirim();
-            if (partnerIds.add(partner.getId())) partners.add(partner);
+            if (p.getGrupId() != null) return; // skip group messages
+            Pengguna partner = p.getPengirim() != null && p.getPengirim().getId().equals(penggunaId)
+                ? p.getPenerima() : p.getPengirim();
+            if (partner != null && partnerIds.add(partner.getId())) partners.add(partner);
         });
 
         List<Map<String, Object>> result = new ArrayList<>();

@@ -52,10 +52,9 @@ tailwind.config = {
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .mesh-gradient {
-    background-color: #001142;
-    background-image: radial-gradient(at 0% 0%, hsla(225,100%,13%,1) 0,transparent 50%),
-      radial-gradient(at 50% 0%, hsla(155,100%,10%,1) 0,transparent 50%),
-      radial-gradient(at 100% 0%, hsla(225,100%,15%,1) 0,transparent 50%);
+    background: linear-gradient(to bottom, rgba(0,17,66,0.88), rgba(0,27,15,0.88)),
+                url('/images/background-login.jpg') center/cover no-repeat;
+    background-blend-mode: multiply;
   }
   input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(6,23,72,0.15); }
 </style>
@@ -66,6 +65,7 @@ tailwind.config = {
 
   <!-- Kiri: Visual -->
   <section class="hidden md:flex md:w-5/12 mesh-gradient p-12 flex-col justify-between relative overflow-hidden">
+    <div class="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_80%_20%,rgba(253,185,101,0.15),transparent_60%)]"></div>
     <div class="relative z-10">
       <div class="mb-12">
         <div class="mb-4 flex items-center gap-4">
@@ -308,59 +308,78 @@ tailwind.config = {
   });
 </script>
 <script>
-// Autocomplete pengawas: sekolah atau universitas sesuai tipe institusi
 (function() {
-  const input = document.getElementById('institusiPengawas') || document.getElementById('namaInstitusi');
+  const input    = document.getElementById('institusiPengawas');
   const dropdown = document.getElementById('institusiPengawasDropdown');
-  const labelEl = document.getElementById('labelInstitusi');
   if (!input || !dropdown) return;
   let timer;
 
-  function getApiPath() {
+  function getType() {
     const sel = document.querySelector('input[name="tipeInstitusi"]:checked');
-    return sel && sel.value === 'SEKOLAH' ? '/api/cari/sekolah' : '/api/cari/universitas';
+    return (sel && sel.value === 'SEKOLAH') ? 'sekolah' : 'universitas';
   }
 
-  function updateLabel() {
-    const sel = document.querySelector('input[name="tipeInstitusi"]:checked');
-    const isSekolah = sel && sel.value === 'SEKOLAH';
-    if (labelEl) labelEl.textContent = isSekolah ? 'Nama Sekolah (SMA / SMK / MAN)' : 'Nama Universitas / Perguruan Tinggi';
-    input.placeholder = isSekolah ? 'Ketik nama sekolah (SMA/SMK/MAN)...' : 'Ketik nama universitas...';
-    input.value = '';
-    dropdown.classList.add('hidden');
+  function updatePlaceholder() {
+    input.placeholder = getType() === 'sekolah'
+      ? 'Ketik nama sekolah (SMA, SMK, SMP)...'
+      : 'Ketik nama kampus / universitas...';
   }
 
-  document.querySelectorAll('input[name="tipeInstitusi"]').forEach(r => {
-    r.addEventListener('change', updateLabel);
-  });
+  function renderDropdown(results) {
+    dropdown.innerHTML = '';
+    if (!results.length) {
+      dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400 italic">Tidak ditemukan. Coba kata lain.</div>';
+      dropdown.classList.remove('hidden');
+      return;
+    }
+    results.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors';
+      item.innerHTML = '<p class="text-sm font-semibold text-gray-800">' + esc(r.label) + '</p>' +
+                       (r.sub ? '<p class="text-xs text-gray-400 mt-0.5">' + esc(r.sub) + '</p>' : '');
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = r.label; dropdown.classList.add('hidden'); });
+      dropdown.appendChild(item);
+    });
+    dropdown.classList.remove('hidden');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
   input.addEventListener('input', () => {
     clearTimeout(timer);
     const q = input.value.trim();
-    dropdown.innerHTML = '';
     if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+    dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Mencari...</div>';
+    dropdown.classList.remove('hidden');
     timer = setTimeout(() => {
-      fetch(getApiPath() + '?q=' + encodeURIComponent(q))
-        .then(r => r.json())
-        .then(list => {
-          dropdown.innerHTML = '';
-          if (!list.length) { dropdown.classList.add('hidden'); return; }
-          list.forEach(u => {
-            const item = document.createElement('div');
-            item.className = 'px-4 py-3 cursor-pointer hover:bg-blue-50 text-sm text-gray-800 border-b border-gray-100 last:border-0 transition-colors';
-            item.textContent = u;
-            item.addEventListener('mousedown', e => { e.preventDefault(); input.value = u; dropdown.classList.add('hidden'); });
-            dropdown.appendChild(item);
-          });
-          dropdown.classList.remove('hidden');
-        })
+      const type = getType();
+      // Pengawas sekolah: cari semua jenjang (tanpa filter grade)
+      const url = type === 'sekolah'
+        ? '/api/cari/sekolah?q=' + encodeURIComponent(q)
+        : '/api/cari/universitas?q=' + encodeURIComponent(q);
+      fetch(url)
+        .then(r => r.ok ? r.json() : [])
+        .then(items => renderDropdown(items.map(s => ({ label: s, sub: null }))))
         .catch(() => dropdown.classList.add('hidden'));
-    }, 350);
+    }, 280);
+  });
+
+  // Saat radio KAMPUS / SEKOLAH berubah → reset field + update placeholder
+  document.querySelectorAll('input[name="tipeInstitusi"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      updatePlaceholder();
+      input.value = '';
+      dropdown.classList.add('hidden');
+    });
   });
 
   document.addEventListener('click', e => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
   });
+
+  updatePlaceholder();
 })();
 </script>
 </body>

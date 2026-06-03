@@ -219,6 +219,7 @@ public class ProfileController {
                                 @RequestParam(required = false) String mataPelajaran,
                                 @RequestParam(required = false) String tautanMateri,
                                 @RequestParam(value = "fileMateri", required = false) MultipartFile fileMateri,
+                                @RequestParam(value = "sampulFile", required = false) MultipartFile sampulFile,
                                 HttpSession session, RedirectAttributes flash) {
         Long id = (Long) session.getAttribute("penggunaId");
         if (id == null) return "redirect:/login";
@@ -233,7 +234,9 @@ public class ProfileController {
             materi.setJenisMateri(jenisMateri);
             materi.setMataPelajaran(mataPelajaran);
             materi.setPengunggah(pengguna);
+            materi.setTipeKonten("MATERI");
 
+            // Upload file materi
             if (fileMateri != null && !fileMateri.isEmpty()) {
                 Path uploadPath = Paths.get(UPLOAD_DIR + "materi/");
                 Files.createDirectories(uploadPath);
@@ -246,6 +249,17 @@ public class ProfileController {
                 materi.setUkuranFile(fileMateri.getSize());
             } else if (tautanMateri != null && !tautanMateri.isBlank()) {
                 materi.setTautanMateri(tautanMateri.trim());
+            }
+
+            // Upload sampul/cover image
+            if (sampulFile != null && !sampulFile.isEmpty()) {
+                Path sampulPath = Paths.get(UPLOAD_DIR + "sampul/");
+                Files.createDirectories(sampulPath);
+                String sampulFilename = "sampul_" + id + "_" + System.currentTimeMillis()
+                    + getExtension(sampulFile.getOriginalFilename());
+                Path sampulTarget = sampulPath.resolve(sampulFilename);
+                Files.copy(sampulFile.getInputStream(), sampulTarget, StandardCopyOption.REPLACE_EXISTING);
+                materi.setSampulUrl("/uploads/sampul/" + sampulFilename);
             }
 
             mentoringService.unggahMateri(materi);
@@ -354,25 +368,50 @@ public class ProfileController {
     public String editMateri(@PathVariable Long id,
                               @RequestParam String judul,
                               @RequestParam(required = false) String deskripsi,
+                              @RequestParam(required = false) String mataPelajaran,
+                              @RequestParam(required = false) String jenisMateri,
+                              @RequestParam(value = "sampulFile", required = false) MultipartFile sampulFile,
                               HttpSession session, RedirectAttributes flash) {
         Long penggunaId = (Long) session.getAttribute("penggunaId");
         if (penggunaId == null) return "redirect:/login";
 
+        final String[] tipeKonten = {null};
         try {
             mentoringService.getMateriById(id).ifPresentOrElse(materi -> {
                 if (!materi.getPengunggah().getId().equals(penggunaId)) {
                     flash.addFlashAttribute("error", "Materi bukan milik Anda.");
-                } else {
-                    materi.setJudul(judul.trim());
-                    materi.setDeskripsi(deskripsi);
-                    mentoringService.unggahMateri(materi);
-                    flash.addFlashAttribute("sukses", "Berhasil diperbarui.");
+                    return;
                 }
-            }, () -> flash.addFlashAttribute("error", "Materi tidak ditemukan."));
+                tipeKonten[0] = materi.getTipeKonten();
+                materi.setJudul(judul.trim());
+                materi.setDeskripsi(deskripsi);
+                if (mataPelajaran != null) materi.setMataPelajaran(mataPelajaran);
+                if (jenisMateri != null && !jenisMateri.isBlank()) materi.setJenisMateri(jenisMateri);
+
+                // Update sampul jika ada file baru
+                if (sampulFile != null && !sampulFile.isEmpty()) {
+                    try {
+                        Path sampulPath = Paths.get(UPLOAD_DIR + "sampul/");
+                        Files.createDirectories(sampulPath);
+                        String sampulFilename = "sampul_" + penggunaId + "_" + System.currentTimeMillis()
+                            + getExtension(sampulFile.getOriginalFilename());
+                        Files.copy(sampulFile.getInputStream(), sampulPath.resolve(sampulFilename),
+                            StandardCopyOption.REPLACE_EXISTING);
+                        materi.setSampulUrl("/uploads/sampul/" + sampulFilename);
+                    } catch (java.io.IOException ex) {
+                        flash.addFlashAttribute("error", "Gagal upload sampul: " + ex.getMessage());
+                        return;
+                    }
+                }
+                mentoringService.unggahMateri(materi);
+                flash.addFlashAttribute("sukses", "\"" + judul + "\" berhasil diperbarui!");
+            }, () -> flash.addFlashAttribute("error", "Item tidak ditemukan."));
         } catch (Exception e) {
             flash.addFlashAttribute("error", "Gagal mengedit: " + e.getMessage());
         }
-        return "redirect:/dashboard/materi";
+        return "SUMBER_DAYA".equals(tipeKonten[0])
+                ? "redirect:/dashboard/sumber-daya"
+                : "redirect:/dashboard/materi";
     }
 
     // ============================================================

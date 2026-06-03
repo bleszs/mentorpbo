@@ -1,6 +1,7 @@
 package com.mentorpbo.repository;
 
 import com.mentorpbo.model.Siswa;
+import com.mentorpbo.model.enums.StatusValidasi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,6 +35,12 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
     List<Siswa> findByIsMentorTrueAndNamaSekolah(String namaSekolah);
 
     /**
+     * Mendapatkan daftar siswa mentor berdasarkan status validasi mentor
+     * (mis. BELUM_DITINJAU untuk antrean persetujuan supervisor).
+     */
+    List<Siswa> findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi statusValidasiMentor);
+
+    /**
      * Mencari mentor siswa berdasarkan mata pelajaran keahlian (pencarian parsial).
      *
      * @param mataPelajaran kata kunci mata pelajaran
@@ -52,9 +59,14 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
     List<Siswa> getRankingMentorSiswa();
 
     /**
-     * Mendapatkan daftar siswa berprestasi berdasarkan total poin progres.
+     * Mendapatkan daftar siswa berprestasi berdasarkan total poin progres (semua sekolah).
      */
     List<Siswa> findByAktifTrueOrderByTotalPoinProgresDesc();
+
+    /**
+     * Mendapatkan daftar siswa berprestasi dari sekolah tertentu (scoped untuk Guru).
+     */
+    List<Siswa> findByAktifTrueAndNamaSekolahOrderByTotalPoinProgresDesc(String namaSekolah);
 
     /**
      * Mendapatkan daftar siswa berdasarkan sekolah tertentu.

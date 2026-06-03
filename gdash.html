@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<html lang="id">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -78,7 +78,7 @@ tailwind.config = {
 <!-- ==================== SIDEBAR ==================== -->
 <aside id="mainSidebar" class="fixed left-0 top-0 h-screen flex flex-col py-6 px-3 shadow-2xl z-50" style="background: linear-gradient(to bottom, #00081e, #001142);">
   <div class="flex items-center justify-between gap-2 px-3 mb-6 flex-shrink-0">
-    <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
+    <a href="/dashboard" class="flex items-center gap-3 overflow-hidden min-w-0">
       <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
       <div class="sb-logo-text">
         <h1 class="font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
@@ -95,41 +95,41 @@ tailwind.config = {
     </div>
   </div>
   <nav class="flex-grow space-y-0.5 overflow-hidden">
-    <a th:href="@{/dashboard}" class="sb-item text-white bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(181,196,255,0.2)]" data-tip="Beranda">
+    <a href="/dashboard" class="sb-item text-white bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(181,196,255,0.2)]" data-tip="Beranda">
       <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">dashboard</span>
       <span class="sb-label font-label-sm text-label-sm">Beranda</span>
     </a>
-    <a th:href="@{/validasi-program}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
+    <a href="/validasi-program" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
       <span class="material-symbols-outlined flex-shrink-0">verified_user</span>
       <span class="sb-label font-label-sm text-label-sm">Validasi Program</span>
     </a>
-    <a th:href="@{/validasi-mentor}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Mentor">
+    <a href="/validasi-mentor" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Mentor">
       <span class="material-symbols-outlined flex-shrink-0">how_to_reg</span>
       <span class="sb-label font-label-sm text-label-sm">Validasi Mentor</span>
     </a>
-    <a th:href="@{/monitoring-mentor(lingkungan=SEKOLAH)}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
+    <a href="/monitoring-mentor?lingkungan=SEKOLAH" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
       <span class="material-symbols-outlined flex-shrink-0">monitoring</span>
       <span class="sb-label font-label-sm text-label-sm">Monitoring Mentor</span>
     </a>
-    <a th:href="@{/data-mahasiswa}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Data Siswa">
+    <a href="/data-mahasiswa" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Data Siswa">
       <span class="material-symbols-outlined flex-shrink-0">badge</span>
       <span class="sb-label font-label-sm text-label-sm">Data Siswa</span>
     </a>
-    <a th:href="@{/laporan-akademik}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
+    <a href="/laporan-akademik" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
       <span class="material-symbols-outlined flex-shrink-0">analytics</span>
       <span class="sb-label font-label-sm text-label-sm">Laporan Akademik</span>
     </a>
-    <a th:href="@{/pengaturan}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+    <a href="/pengaturan" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
       <span class="material-symbols-outlined flex-shrink-0">settings</span>
       <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
   </nav>
   <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
-    <a th:href="@{/bantuan}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pusat Bantuan">
+    <a href="/bantuan" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pusat Bantuan">
       <span class="material-symbols-outlined flex-shrink-0">help_center</span>
       <span class="sb-label font-label-sm text-label-sm">Pusat Bantuan</span>
     </a>
-    <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+    <a href="/logout" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
       <span class="material-symbols-outlined flex-shrink-0">logout</span>
       <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
@@ -149,30 +149,18 @@ tailwind.config = {
       <button onclick="togglePopup('notifPopup', event)"
           class="relative w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors">
         <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-        <span th:if="${notifBelumDibaca > 0}"
-            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-error rounded-full flex items-center justify-center text-white text-[9px] font-black px-0.5"
-            th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}"></span>
+        
       </button>
       <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
           <h3 class="font-bold text-[15px] text-primary">Notifikasi</h3>
-          <form th:action="@{/notifikasi/baca-semua}" method="post">
+          <form action="/notifikasi/baca-semua" method="post">
             <button type="submit" class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Tandai Dibaca</button>
           </form>
         </div>
         <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
-          <div th:each="notif : ${daftarNotifikasi}"
-              class="px-5 py-4 flex gap-3 hover:bg-surface-container-low cursor-pointer transition-colors"
-              th:classappend="${!notif.sudahDibaca} ? 'bg-primary-fixed/10'">
-            <div class="w-9 h-9 rounded-full bg-primary-container/10 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary-container text-[18px]" style="font-variation-settings:'FILL' 1">notifications</span>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[13px] font-bold truncate" th:text="${notif.judul}">Judul</p>
-              <p class="text-[12px] text-on-surface-variant mt-0.5 line-clamp-2" th:text="${notif.pesan}">Pesan</p>
-            </div>
-          </div>
-          <div th:if="${#lists.isEmpty(daftarNotifikasi)}" class="px-5 py-8 text-center">
+          
+          <div class="px-5 py-8 text-center">
             <span class="material-symbols-outlined text-outline block mb-2" style="font-size:32px">notifications_off</span>
             <p class="text-[13px] text-on-surface-variant">Tidak ada notifikasi.</p>
           </div>
@@ -184,14 +172,12 @@ tailwind.config = {
     </button>
     <div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
       <div class="text-right hidden sm:block">
-        <p class="font-label-sm text-label-sm text-primary font-bold" th:text="${guru.namaLengkap}">Guru</p>
-        <p class="font-caption-xs text-caption-xs text-on-surface-variant"
-           th:text="${guru.namaSekolah ?: 'Supervisor Akademik'}">Sekolah</p>
+        <p class="font-label-sm text-label-sm text-primary font-bold">Budi Santoso, S.Pd.</p>
+        <p class="font-caption-xs text-caption-xs text-on-surface-variant">SMA Negeri 1 Jakarta</p>
       </div>
       <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0">
-        <img th:if="${guru.fotoProfil != null}" th:src="${guru.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
-        <div th:unless="${guru.fotoProfil != null}" class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"
-             th:text="${#strings.substring(guru.namaLengkap, 0, 2).toUpperCase()}">GU</div>
+        
+        <div class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm">BU</div>
       </div>
     </div>
   </div>
@@ -202,11 +188,10 @@ tailwind.config = {
 
   <!-- Welcome Header -->
   <div class="mb-10">
-    <h2 class="font-display-lg text-display-lg text-primary"
-        th:text="'Selamat Datang, ' + ${guru.namaLengkap}">Selamat Datang</h2>
+    <h2 class="font-display-lg text-display-lg text-primary">Selamat Datang, Budi Santoso, S.Pd.</h2>
     <p class="font-body-lg text-body-lg text-on-surface-variant mt-2">
-      <span th:text="${guru.namaSekolah ?: 'Sekolah'}">Sekolah</span>
-      <span th:if="${guru.nip != null}"> &bull; NIP: <span th:text="${guru.nip}">NIP</span></span>
+      <span>SMA Negeri 1 Jakarta</span>
+      <span> &bull; NIP: <span>198501012010011001</span></span>
     </p>
   </div>
 
@@ -220,20 +205,17 @@ tailwind.config = {
         <span class="font-label-sm text-label-sm text-success-green bg-success-green/10 px-2 py-1 rounded-lg">Aktif</span>
       </div>
       <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Mentor di Scope</p>
-      <h3 class="font-headline-md text-headline-md text-primary-container mt-1"
-          th:text="${statistik['totalMentorDiScope'] ?: 0}">0</h3>
+      <h3 class="font-headline-md text-headline-md text-primary-container mt-1">3</h3>
     </div>
     <div class="bg-white p-7 rounded-2xl border-l-4 border-warning-gold premium-card">
       <div class="flex items-center justify-between mb-4">
         <div class="w-11 h-11 bg-warning-gold/10 flex items-center justify-center rounded-xl text-warning-gold">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">verified</span>
         </div>
-        <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-1 rounded-lg"
-              th:text="${statistik['sesiMenungguValidasi']} + ' Pending'">0 Pending</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-1 rounded-lg">0 Pending</span>
       </div>
       <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Sesi Tervalidasi</p>
-      <h3 class="font-headline-md text-headline-md text-primary-container mt-1"
-          th:text="${statistik['sesiDivalidasi']}">0</h3>
+      <h3 class="font-headline-md text-headline-md text-primary-container mt-1">1</h3>
     </div>
     <div class="bg-white p-7 rounded-2xl border-l-4 border-success-green premium-card">
       <div class="flex items-center justify-between mb-4">
@@ -243,20 +225,17 @@ tailwind.config = {
         <span class="font-label-sm text-label-sm text-success-green bg-success-green/10 px-2 py-1 rounded-lg">Total</span>
       </div>
       <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Total Sesi Diawasi</p>
-      <h3 class="font-headline-md text-headline-md text-primary-container mt-1"
-          th:text="${statistik['totalSesiDiawasi']}">0</h3>
+      <h3 class="font-headline-md text-headline-md text-primary-container mt-1">2</h3>
     </div>
     <div class="bg-white p-7 rounded-2xl border-l-4 border-primary-container premium-card">
       <div class="flex items-center justify-between mb-4">
         <div class="w-11 h-11 bg-primary-container/10 flex items-center justify-center rounded-xl text-primary-container">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">pending_actions</span>
         </div>
-        <span class="font-label-sm text-label-sm text-warning-gold bg-warning-gold/10 px-2 py-1 rounded-lg"
-              th:text="${statistik['sesiMenungguValidasi']} + ' Pending'">0 Pending</span>
+        <span class="font-label-sm text-label-sm text-warning-gold bg-warning-gold/10 px-2 py-1 rounded-lg">0 Pending</span>
       </div>
       <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-widest">Menunggu Validasi</p>
-      <h3 class="font-headline-md text-headline-md text-primary-container mt-1"
-          th:text="${statistik['sesiMenungguValidasi']}">0</h3>
+      <h3 class="font-headline-md text-headline-md text-primary-container mt-1">0</h3>
     </div>
   </div>
 
@@ -273,45 +252,20 @@ tailwind.config = {
             <h4 class="font-headline-md text-headline-md text-primary">Antrean Verifikasi</h4>
             <p class="font-body-md text-body-md text-on-surface-variant">Validasi program mentorship yang diajukan siswa.</p>
           </div>
-          <a th:href="@{/validasi-program}"
+          <a href="/validasi-program"
              class="text-primary-container font-bold font-label-sm text-label-sm flex items-center gap-1 hover:underline">
             Lihat Semua <span class="material-symbols-outlined text-base">chevron_right</span>
           </a>
         </div>
 
-        <div th:if="${#lists.isEmpty(sesiMenungguValidasi)}" class="text-center py-12">
+        <div class="text-center py-12">
           <span class="material-symbols-outlined text-success-green block mb-3" style="font-size:48px;font-variation-settings:'FILL' 1;">check_circle</span>
           <p class="font-body-md text-body-md text-on-surface-variant font-bold">Semua permintaan sudah ditangani</p>
           <p class="text-[13px] text-outline mt-1">Tidak ada sesi yang menunggu validasi.</p>
         </div>
 
         <div class="space-y-4">
-          <div th:each="sesi : ${sesiMenungguValidasi}"
-               class="flex items-center justify-between p-5 bg-surface-container-lowest rounded-2xl border border-surface-container-high hover:border-primary-fixed-dim transition-all group">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-[#001142] flex items-center justify-center text-white font-black text-sm flex-shrink-0"
-                   th:text="${#strings.substring(sesi.mentor.namaLengkap, 0, 2).toUpperCase()}">ME</div>
-              <div>
-                <h5 class="font-body-lg text-body-lg text-primary font-bold" th:text="${sesi.topikPembahasan}">Topik</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                  Mentor: <span class="font-bold" th:text="${sesi.mentor.namaLengkap}">Mentor</span>
-                  &bull; Mentee: <span th:text="${sesi.mentee.namaLengkap}">Mentee</span>
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 flex-shrink-0">
-              <form th:action="@{/tolak-sesi/{id}(id=${sesi.id})}" method="post">
-                <input type="hidden" name="alasan" value="Tidak memenuhi syarat."/>
-                <button type="submit"
-                        class="px-4 py-2 bg-error/10 text-error rounded-xl font-bold font-label-sm text-label-sm uppercase tracking-wider hover:bg-error hover:text-white transition-all">Tolak</button>
-              </form>
-              <form th:action="@{/validasi-program/{id}(id=${sesi.id})}" method="post">
-                <input type="hidden" name="catatan" value="Divalidasi oleh supervisor."/>
-                <button type="submit"
-                        class="px-4 py-2 bg-primary-container text-white rounded-xl font-black font-label-sm text-label-sm uppercase tracking-wider shadow-md hover:bg-primary-container/90 transition-all">Validasi</button>
-              </form>
-            </div>
-          </div>
+          
         </div>
       </section>
 
@@ -325,8 +279,7 @@ tailwind.config = {
             </div>
             <p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Baru saja</p>
             <h6 class="font-body-md text-body-md font-bold text-primary">Sesi Mentorship Berlangsung</h6>
-            <p class="font-body-md text-body-md text-on-surface-variant"
-               th:text="${!#lists.isEmpty(sesiMenungguValidasi) ? 'Ada ' + #lists.size(sesiMenungguValidasi) + ' sesi menunggu validasi Anda.' : 'Semua sesi sedang berjalan lancar.'}">Status sesi.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant">Semua sesi sedang berjalan lancar.</p>
           </div>
           <div class="relative pl-12">
             <div class="absolute left-0 top-1 w-10 h-10 bg-success-green/10 rounded-full flex items-center justify-center text-success-green z-10 border-4 border-white">
@@ -334,8 +287,7 @@ tailwind.config = {
             </div>
             <p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Hari ini</p>
             <h6 class="font-body-md text-body-md font-bold text-primary">Total Validasi Selesai</h6>
-            <p class="font-body-md text-body-md text-on-surface-variant"
-               th:text="${statistik['sesiDivalidasi']} + ' sesi telah divalidasi secara keseluruhan.'">0 sesi divalidasi.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant">1 sesi telah divalidasi secara keseluruhan.</p>
           </div>
           <div class="relative pl-12">
             <div class="absolute left-0 top-1 w-10 h-10 bg-warning-gold/10 rounded-full flex items-center justify-center text-warning-gold z-10 border-4 border-white">
@@ -343,8 +295,7 @@ tailwind.config = {
             </div>
             <p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Update</p>
             <h6 class="font-body-md text-body-md font-bold text-primary">Total Mentor Siswa Aktif</h6>
-            <p class="font-body-md text-body-md text-on-surface-variant"
-               th:text="${statistik['totalMentorSiswa']} + ' mentor siswa terdaftar di sistem.'">0 mentor terdaftar.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant">null mentor siswa terdaftar di sistem.</p>
           </div>
         </div>
       </section>
@@ -353,27 +304,42 @@ tailwind.config = {
       <section class="bg-white p-7 rounded-3xl premium-card">
         <div class="flex justify-between items-center mb-6">
           <h4 class="font-headline-md text-headline-md text-primary">Ranking Mentor Siswa</h4>
-          <a th:href="@{/monitoring-mentor(lingkungan=SEKOLAH)}"
+          <a href="/monitoring-mentor?lingkungan=SEKOLAH"
              class="text-primary-container font-bold font-label-sm text-label-sm hover:underline">Lihat Semua</a>
         </div>
-        <div th:if="${#lists.isEmpty(rankingMentor)}" class="text-center py-8">
-          <p class="font-body-md text-body-md text-on-surface-variant">Belum ada data ranking mentor.</p>
-        </div>
+        
         <div class="space-y-3">
-          <div th:each="mentor,iter : ${rankingMentor}" th:if="${iter.index < 5}"
-               class="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors">
-            <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
-                  th:classappend="${iter.index == 0} ? 'bg-warning-gold text-white' : (${iter.index == 1} ? 'bg-outline-variant text-on-surface' : 'bg-primary-fixed text-primary-container')"
-                  th:text="${iter.index + 1}">1</span>
+          <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors">
+            <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 bg-warning-gold text-white">1</span>
             <div class="flex-1 min-w-0">
-              <p class="font-body-md text-body-md font-bold text-on-surface truncate" th:text="${mentor.namaLengkap}">Nama</p>
-              <p class="font-caption-xs text-caption-xs text-on-surface-variant">Kelas: <span th:text="${mentor.kelas}">Kelas</span></p>
+              <p class="font-body-md text-body-md font-bold text-on-surface truncate">Andi Prasetyo</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">Kelas: <span>XII IPA 1</span></p>
             </div>
             <div class="text-right flex-shrink-0">
-              <p class="font-label-sm text-label-sm font-bold text-primary-container"
-                 th:text="${#numbers.formatDecimal(mentor.hitungRataRataRating(), 1, 1)} + ' ★'">0.0 ★</p>
-              <p class="font-caption-xs text-caption-xs text-on-surface-variant"
-                 th:text="${mentor.jumlahPenilaian} + ' ulasan'">0 ulasan</p>
+              <p class="font-label-sm text-label-sm font-bold text-primary-container">4,5 ★</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">5 ulasan</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors">
+            <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 bg-outline-variant text-on-surface">2</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-body-md text-body-md font-bold text-on-surface truncate">Dewi Lestari</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">Kelas: <span>XI IPA 2</span></p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="font-label-sm text-label-sm font-bold text-primary-container">4,5 ★</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">4 ulasan</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors">
+            <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 bg-primary-fixed text-primary-container">3</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-body-md text-body-md font-bold text-on-surface truncate">Faiz Ramadhan</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">Kelas: <span>XII IPS 1</span></p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="font-label-sm text-label-sm font-bold text-primary-container">4,0 ★</p>
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant">3 ulasan</p>
             </div>
           </div>
         </div>
@@ -391,31 +357,52 @@ tailwind.config = {
         <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-secondary-container/10 rounded-full blur-2xl pointer-events-none"></div>
         <h4 class="font-headline-md text-headline-md mb-6 relative z-10">Siswa Berprestasi</h4>
 
-        <div th:if="${#lists.isEmpty(siswaBerprestasi)}" class="text-center py-8 relative z-10">
-          <p class="text-white/60 font-body-md text-body-md">Belum ada data siswa berprestasi.</p>
-        </div>
+        
 
         <div class="space-y-5 relative z-10">
-          <div th:each="siswa,iter : ${siswaBerprestasi}" th:if="${iter.index < 3}"
-               class="flex items-center gap-4">
+          <div class="flex items-center gap-4">
             <div class="relative flex-shrink-0">
-              <div class="w-14 h-14 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg"
-                   th:text="${#strings.substring(siswa.namaLengkap, 0, 2).toUpperCase()}">SI</div>
-              <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center font-black text-[11px]"
-                   th:classappend="${iter.index == 0} ? 'bg-warning-gold text-white' : 'bg-white/20 text-white'"
-                   th:text="${iter.index + 1}">1</div>
+              <div class="w-14 h-14 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg">AN</div>
+              <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center font-black text-[11px] bg-warning-gold text-white">1</div>
             </div>
             <div>
-              <h5 class="font-body-lg text-body-lg font-black" th:text="${siswa.namaLengkap}">Nama</h5>
+              <h5 class="font-body-lg text-body-lg font-black">Andi Prasetyo</h5>
               <p class="text-white/60 font-body-md text-body-md">
-                Kelas <span th:text="${siswa.kelas}">Kelas</span> &bull;
-                <span th:text="${siswa.totalPoinProgres} + ' poin'">0 poin</span>
+                Kelas <span>XII IPA 1</span> &bull;
+                <span>360 poin</span>
               </p>
             </div>
           </div>
+          <div class="flex items-center gap-4">
+            <div class="relative flex-shrink-0">
+              <div class="w-14 h-14 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg">DE</div>
+              <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center font-black text-[11px] bg-white/20 text-white">2</div>
+            </div>
+            <div>
+              <h5 class="font-body-lg text-body-lg font-black">Dewi Lestari</h5>
+              <p class="text-white/60 font-body-md text-body-md">
+                Kelas <span>XI IPA 2</span> &bull;
+                <span>280 poin</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="relative flex-shrink-0">
+              <div class="w-14 h-14 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg">RI</div>
+              <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center font-black text-[11px] bg-white/20 text-white">3</div>
+            </div>
+            <div>
+              <h5 class="font-body-lg text-body-lg font-black">Riko Fadillah</h5>
+              <p class="text-white/60 font-body-md text-body-md">
+                Kelas <span>X IPA 1</span> &bull;
+                <span>57 poin</span>
+              </p>
+            </div>
+          </div>
+          
         </div>
 
-        <a th:href="@{/data-mahasiswa}"
+        <a href="/data-mahasiswa"
            class="w-full mt-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl font-black font-label-sm text-label-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 relative z-10">
           <span class="material-symbols-outlined text-[18px]">open_in_new</span>
           Lihat Semua Data
@@ -429,31 +416,28 @@ tailwind.config = {
           <div>
             <div class="flex justify-between mb-2">
               <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kuota Terisi</span>
-              <span class="font-label-sm text-label-sm font-black text-primary-container"
-                    th:text="${statistik['totalSesiDiawasi'] != null and statistik['totalSesiDiawasi'] > 0 ? (statistik['sesiDivalidasi'] * 100 / statistik['totalSesiDiawasi']) + '%' : '0%'}">0%</span>
+              <span class="font-label-sm text-label-sm font-black text-primary-container">50%</span>
             </div>
             <div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden">
               <div class="h-full bg-primary-container rounded-full transition-all duration-700"
-                   th:style="${statistik['totalSesiDiawasi'] != null and statistik['totalSesiDiawasi'] > 0 ? 'width: ' + (statistik['sesiDivalidasi'] * 100 / statistik['totalSesiDiawasi']) + '%' : 'width: 0%'}"></div>
+                   style="width: 50%"></div>
             </div>
           </div>
           <div>
             <div class="flex justify-between mb-2">
               <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Menunggu Validasi</span>
-              <span class="font-label-sm text-label-sm font-black text-warning-gold"
-                    th:text="${statistik['sesiMenungguValidasi']} + ' Sesi'">0 Sesi</span>
+              <span class="font-label-sm text-label-sm font-black text-warning-gold">0 Sesi</span>
             </div>
             <div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden">
               <div class="h-full bg-warning-gold rounded-full transition-all duration-700"
-                   th:style="${statistik['totalSesiDiawasi'] != null and statistik['totalSesiDiawasi'] > 0 ? 'width: ' + (statistik['sesiMenungguValidasi'] * 100 / statistik['totalSesiDiawasi']) + '%' : 'width: 0%'}"></div>
+                   style="width: 0%"></div>
             </div>
           </div>
         </div>
         <div class="mt-5 pt-4 border-t border-outline-variant/20">
           <div class="flex items-center justify-between">
             <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Mentor</span>
-            <span class="font-headline-md text-headline-md text-primary-container"
-                  th:text="${statistik['totalMentorSiswa']}">0</span>
+            <span class="font-headline-md text-headline-md text-primary-container"></span>
           </div>
         </div>
       </section>

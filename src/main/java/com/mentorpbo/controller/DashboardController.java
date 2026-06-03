@@ -107,6 +107,13 @@ public class DashboardController {
         Pengguna pengguna = optPengguna.get();
         model.addAttribute("pengguna", pengguna);
 
+        // Mentor yang masih menunggu/ditolak persetujuan supervisor dikunci —
+        // dialihkan ke halaman status, belum bisa mengakses fitur mentor.
+        if (mentorBelumDisetujui(pengguna)) {
+            model.addAttribute("statusMentor", statusValidasiMentor(pengguna));
+            return "auth/menunggu-persetujuan";
+        }
+
         siapkanDataUmum(penggunaId, pengguna, model);
 
         // Tentukan dashboard berdasarkan role menggunakan polimorfisme
@@ -261,8 +268,8 @@ public class DashboardController {
             .getSesiMenungguValidasi(guru.getId());
         model.addAttribute("sesiMenungguValidasi", sesiMenunggu);
 
-        // Siswa berprestasi
-        List<Siswa> siswaBerprestasi = supervisorService.getSiswaBerprestasi();
+        // Siswa berprestasi — scoped ke sekolah Guru ini
+        List<Siswa> siswaBerprestasi = supervisorService.getSiswaBerprestasi(guru.getId());
         model.addAttribute("siswaBerprestasi", siswaBerprestasi);
 
         // Ranking mentor siswa
@@ -287,12 +294,12 @@ public class DashboardController {
         List<Mahasiswa> rankingMentor = mentoringService.getRankingMentorMahasiswa();
         model.addAttribute("rankingMentor", rankingMentor);
 
-        // Kandidat Asdos
-        List<Mahasiswa> kandidatAsdos = supervisorService.cariKandidatAsdos();
+        // Kandidat Asdos — scoped ke program studi Dosen ini
+        List<Mahasiswa> kandidatAsdos = supervisorService.cariKandidatAsdos(dosen.getId());
         model.addAttribute("kandidatAsdos", kandidatAsdos);
 
-        // Asdos aktif
-        List<Mahasiswa> asdosAktif = supervisorService.getAsdosAktif();
+        // Asdos aktif — scoped ke program studi Dosen ini
+        List<Mahasiswa> asdosAktif = supervisorService.getAsdosAktif(dosen.getId());
         model.addAttribute("asdosAktif", asdosAktif);
 
         // Statistik
@@ -316,7 +323,8 @@ public class DashboardController {
         }
 
         Pengguna pengguna = optPengguna.get();
-        if (!(pengguna instanceof Mahasiswa) || !((Mahasiswa) pengguna).isMentor()) {
+        if (!(pengguna instanceof Mahasiswa) || !((Mahasiswa) pengguna).isMentor()
+                || mentorBelumDisetujui(pengguna)) {
             return "redirect:/dashboard";
         }
 
@@ -582,5 +590,20 @@ public class DashboardController {
     @GetMapping("/mentor")
     public String dashboardMentor(HttpSession session) {
         return "redirect:/dashboard/mentorship";
+    }
+
+    // === Helper: status persetujuan mentor ===
+
+    /** Mentor yang belum disetujui supervisor (status BELUM_DITINJAU atau DITOLAK). */
+    private boolean mentorBelumDisetujui(Pengguna p) {
+        return (p instanceof Mahasiswa m && m.isMentor() && !m.isMentorTervalidasi())
+            || (p instanceof Siswa s && s.isMentor() && !s.isMentorTervalidasi());
+    }
+
+    /** Label status validasi mentor untuk ditampilkan di halaman tunggu. */
+    private String statusValidasiMentor(Pengguna p) {
+        var status = (p instanceof Mahasiswa m) ? m.getStatusValidasiMentor()
+                   : (p instanceof Siswa s) ? s.getStatusValidasiMentor() : null;
+        return status != null ? status.getLabel() : "Menunggu Ditinjau";
     }
 }

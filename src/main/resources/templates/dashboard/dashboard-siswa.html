@@ -130,22 +130,26 @@ tailwind.config = {
 </nav>
 
 <!-- ==================== TOPBAR ==================== -->
-<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-8">
-  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0 max-w-xs">
-    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
-    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0"
-           placeholder="Cari mentor, sesi..." type="text"
-           onkeydown="if(event.key==='Enter')window.location.href='/mentoring/cari-mentor?kataKunci='+this.value"/>
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/80 backdrop-blur-lg border-b border-white/50 shadow-sm flex items-center px-margin-desktop gap-4">
+  <!-- Search -->
+  <div class="flex-1 flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container border border-outline-variant/30 min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant text-[20px] flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0 placeholder:text-on-surface-variant/60"
+           placeholder="Cari mentor, sesi, atau materi..." type="text"
+           onkeydown="if(event.key==='Enter')window.location.href='/mentoring/cari-mentor?kataKunci='+encodeURIComponent(this.value)"/>
   </div>
-  <div class="flex items-center gap-3 flex-shrink-0">
+
+  <!-- Actions -->
+  <div class="flex items-center gap-2 flex-shrink-0">
+
     <!-- Notifikasi -->
     <div class="relative">
       <button onclick="togglePopup('notifPopup', event)"
-              class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
-        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+              class="relative w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant text-[22px]">notifications</span>
         <span th:if="${notifBelumDibaca > 0}"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5"
-              th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}">0</span>
+              class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none"
+              th:text="${notifBelumDibaca > 9 ? '9+' : notifBelumDibaca}"></span>
       </button>
       <div id="notifPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
@@ -176,18 +180,20 @@ tailwind.config = {
         </div>
       </div>
     </div>
-    <!-- Inbox -->
+
+    <!-- Inbox / Pesan -->
     <div class="relative">
       <button onclick="togglePopup('inboxPopup', event)"
-              class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
-        <span class="material-symbols-outlined text-on-surface-variant">mail</span>
+              class="relative w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant text-[22px]">mail</span>
         <span th:if="${jumlahPesan > 0}"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-primary-container text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5"
+              class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-primary-container text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none"
               th:text="${jumlahPesan}"></span>
       </button>
       <div id="inboxPopup" class="popup-panel hidden absolute top-12 right-0 w-[340px] bg-white rounded-2xl shadow-2xl border border-outline-variant/30 z-[999] overflow-hidden">
-        <div class="px-5 py-4 border-b border-surface-container-high">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-surface-container-high">
           <h3 class="font-bold text-[15px] text-primary">Kotak Masuk</h3>
+          <a th:href="@{/dashboard/pesan}" class="text-primary text-[11px] font-black hover:underline uppercase tracking-wider">Buka Semua</a>
         </div>
         <div class="max-h-[360px] overflow-y-auto divide-y divide-surface-container-high">
           <div th:each="conv : ${inboxPercakapan}"
@@ -206,14 +212,20 @@ tailwind.config = {
         </div>
       </div>
     </div>
-    <div class="h-8 w-[1px] bg-outline-variant"></div>
-    <div class="flex items-center gap-3 cursor-pointer">
+
+    <!-- Divider -->
+    <div class="h-8 w-px bg-outline-variant mx-1"></div>
+
+    <!-- User info -->
+    <div class="flex items-center gap-3 cursor-pointer group">
       <div class="text-right">
-        <p class="font-label-sm text-label-sm text-primary" th:text="${siswa.namaLengkap}">Siswa</p>
-        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter"
+        <p class="font-label-sm text-label-sm text-primary leading-tight" th:text="${siswa.namaLengkap}">Siswa</p>
+        <p class="text-[10px] font-black uppercase tracking-widest leading-tight mt-0.5"
+           th:classappend="${siswa.mentor} ? 'text-warning-gold' : 'text-on-surface-variant'"
            th:text="${siswa.mentor ? 'Mentor Siswa' : 'Mentee Siswa'}">Mentee</p>
       </div>
-      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 flex-shrink-0 transition-all group-hover:scale-105"
+           th:classappend="${siswa.mentor} ? 'border-warning-gold/60' : 'border-primary-fixed-dim'">
         <img th:if="${siswa.fotoProfil != null}" th:src="${siswa.fotoProfil}" class="w-full h-full object-cover" alt="foto"/>
         <div th:unless="${siswa.fotoProfil != null}"
              class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm"

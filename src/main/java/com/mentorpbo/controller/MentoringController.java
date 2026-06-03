@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/mentoring")
 public class MentoringController {
 
+    /** Maksimum sesi aktif per mentor dalam satu minggu. */
+    private static final int MAKS_SLOT_MENTOR = 15;
+
     private final MentoringService mentoringService;
     private final PenggunaService  penggunaService;
 
@@ -91,6 +94,7 @@ public class MentoringController {
 
         Pengguna pengguna = penggunaService.getPenggunaById(penggunaId).orElse(null);
         if (pengguna == null) return "redirect:/login";
+        if (mentorBelumDisetujui(pengguna)) return "redirect:/dashboard";
         model.addAttribute("mentor", pengguna);
 
         List<Mahasiswa> daftarMentee = penggunaService
@@ -180,6 +184,9 @@ public class MentoringController {
         penggunaService.getPenggunaById(penggunaId)
             .ifPresent(p -> model.addAttribute("pengguna", p));
 
+        boolean isMentor = sesi.getMentor() != null && penggunaId.equals(sesi.getMentor().getId());
+        model.addAttribute("isMentor", isMentor);
+
         model.addAttribute("reviews",
             mentoringService.getReviewUntukPengguna(sesi.getMentor().getId()));
         model.addAttribute("notifBelumDibaca",
@@ -223,8 +230,8 @@ public class MentoringController {
         Pengguna mentor = penggunaService.getPenggunaById(mentorId).orElse(null);
         if (mentor == null) return "redirect:/mentoring/cari-mentor";
 
-        boolean mentorValid = (mentor instanceof Mahasiswa m && m.isMentor())
-                           || (mentor instanceof Siswa s && s.isMentor());
+        boolean mentorValid = (mentor instanceof Mahasiswa m && m.isMentorTervalidasi())
+                           || (mentor instanceof Siswa s && s.isMentorTervalidasi());
         if (!mentorValid) return "redirect:/mentoring/cari-mentor";
 
         model.addAttribute("mentee",       mentee);
@@ -250,7 +257,13 @@ public class MentoringController {
                                   @RequestParam String tanggal,
                                   @RequestParam String jamMulai,
                                   @RequestParam(defaultValue = "60") int durasiMenit,
-                                  @RequestParam(defaultValue = "Zoom") String platformDaring,
+                                  @RequestParam(defaultValue = "ONLINE") String jenisSesi,
+                                  @RequestParam(required = false, defaultValue = "Zoom") String platformDaring,
+                                  @RequestParam(required = false, defaultValue = "") String tautanMeeting,
+                                  @RequestParam(required = false, defaultValue = "") String namaLokasi,
+                                  @RequestParam(required = false, defaultValue = "") String nomorRuangan,
+                                  @RequestParam(required = false, defaultValue = "") String tautanVideo,
+                                  @RequestParam(required = false, defaultValue = "") String platformVideo,
                                   @RequestParam(required = false, defaultValue = "") String catatan,
                                   HttpSession session,
                                   RedirectAttributes flash) {
@@ -260,14 +273,13 @@ public class MentoringController {
         try {
             Pengguna mentee = getPenggunaAtauLempar(penggunaId, "Mentee tidak ditemukan.");
             Pengguna mentor = getPenggunaAtauLempar(mentorId, "Mentor tidak ditemukan.");
-
             LocalDateTime waktuMulai = parseWaktu(tanggal, jamMulai);
 
-            SesiOnline sesi = new SesiOnline(topikPembahasan, durasiMenit,
-                mentor, mentee, "", platformDaring);
+            SesiMentoring sesi = buatSesi(jenisSesi, topikPembahasan, durasiMenit,
+                mentor, mentee, platformDaring, tautanMeeting,
+                namaLokasi, nomorRuangan, tautanVideo, platformVideo);
             if (!catatan.isBlank()) sesi.setDeskripsi(catatan);
 
-            // Delegasi ke service — TIDAK memanggil jadwalkanSesi() manual di sini
             mentoringService.buatPermintaanSesi(sesi, waktuMulai, durasiMenit);
 
             flash.addFlashAttribute("sukses",
@@ -291,6 +303,7 @@ public class MentoringController {
 
         Pengguna pengguna = penggunaService.getPenggunaById(penggunaId).orElse(null);
         if (pengguna == null) return "redirect:/login";
+        if (mentorBelumDisetujui(pengguna)) return "redirect:/dashboard";
 
         model.addAttribute("mentor", pengguna);
         if (menteeId != null) model.addAttribute("selectedMenteeId", menteeId);
@@ -307,27 +320,31 @@ public class MentoringController {
         List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentor(penggunaId);
         model.addAttribute("sesiMendatang", sesiMendatang);
 
-        int maxSlot = 15;
-        int aktif   = Math.min(sesiMendatang.size(), maxSlot);
-        model.addAttribute("maxSlot",          maxSlot);
+        int aktif = Math.min(sesiMendatang.size(), MAKS_SLOT_MENTOR);
+        model.addAttribute("maxSlot",          MAKS_SLOT_MENTOR);
         model.addAttribute("sesiAktifMingguIni", aktif);
-        model.addAttribute("slotTersedia",     Math.max(0, maxSlot - aktif));
-        model.addAttribute("persenTerpakai",   aktif * 100 / maxSlot);
+        model.addAttribute("slotTersedia",     Math.max(0, MAKS_SLOT_MENTOR - aktif));
+        model.addAttribute("persenTerpakai",   aktif * 100 / MAKS_SLOT_MENTOR);
         model.addAttribute("notifBelumDibaca",
             penggunaService.hitungNotifikasiBelumDibaca(penggunaId));
 
         return "mentoring/jadwalkan-sesi";
     }
 
-    /** Submit undangan sesi online dari mentor — bisa ke banyak mentee sekaligus. */
+    /** Submit undangan sesi dari mentor — bisa ke banyak mentee & mendukung Online/Offline/Video. */
     @PostMapping("/jadwalkan-sesi")
     public String buatSesiOnline(@RequestParam List<Long> menteeId,
                                  @RequestParam String topikPembahasan,
                                  @RequestParam String tanggal,
                                  @RequestParam String jamMulai,
                                  @RequestParam int    durasiMenit,
-                                 @RequestParam(defaultValue = "Zoom") String platformDaring,
+                                 @RequestParam(defaultValue = "ONLINE") String jenisSesi,
+                                 @RequestParam(required = false, defaultValue = "Zoom") String platformDaring,
                                  @RequestParam(required = false, defaultValue = "") String tautanMeeting,
+                                 @RequestParam(required = false, defaultValue = "") String namaLokasi,
+                                 @RequestParam(required = false, defaultValue = "") String nomorRuangan,
+                                 @RequestParam(required = false, defaultValue = "") String tautanVideo,
+                                 @RequestParam(required = false, defaultValue = "") String platformVideo,
                                  @RequestParam(required = false, defaultValue = "") String catatan,
                                  HttpSession session, RedirectAttributes flash) {
         Long penggunaId = requireLogin(session);
@@ -337,13 +354,19 @@ public class MentoringController {
         List<String> gagal = new ArrayList<>();
         try {
             Pengguna mentor = getPenggunaAtauLempar(penggunaId, "Mentor tidak ditemukan.");
+            if (mentorBelumDisetujui(mentor)) {
+                flash.addFlashAttribute("error",
+                    "Akun mentor Anda masih menunggu persetujuan supervisor. Belum bisa membuat sesi.");
+                return "redirect:/dashboard";
+            }
             LocalDateTime waktuMulai = parseWaktu(tanggal, jamMulai);
 
             for (Long mid : menteeId) {
                 try {
                     Pengguna mentee = getPenggunaAtauLempar(mid, "Mentee tidak ditemukan.");
-                    SesiOnline sesi = new SesiOnline(topikPembahasan, durasiMenit,
-                        mentor, mentee, tautanMeeting, platformDaring);
+                    SesiMentoring sesi = buatSesi(jenisSesi, topikPembahasan, durasiMenit,
+                        mentor, mentee, platformDaring, tautanMeeting,
+                        namaLokasi, nomorRuangan, tautanVideo, platformVideo);
                     if (!catatan.isBlank()) sesi.setDeskripsi(catatan);
                     mentoringService.buatDanJadwalkanSesi(sesi, waktuMulai, durasiMenit);
                     berhasil++;
@@ -408,11 +431,16 @@ public class MentoringController {
     /**
      * Mentor menyelesaikan sesi: BERLANGSUNG → SELESAI.
      * Service otomatis memicu notifikasi laporan ke supervisor.
+     * Otorisasi: hanya mentor sesi ini (divalidasi di service).
      */
     @PostMapping("/sesi/{id}/selesai")
-    public String selesaikanSesi(@PathVariable Long id, RedirectAttributes flash) {
+    public String selesaikanSesi(@PathVariable Long id,
+                                 HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = requireLogin(session);
+        if (penggunaId == null) return "redirect:/login";
+
         try {
-            mentoringService.selesaikanSesi(id);
+            mentoringService.selesaikanSesi(id, penggunaId);
             flash.addFlashAttribute("sukses",
                 "Sesi selesai! Laporan akademik sudah diteruskan ke supervisor untuk divalidasi.");
         } catch (Exception e) {
@@ -421,17 +449,49 @@ public class MentoringController {
         return "redirect:/mentoring/sesi/" + id;
     }
 
-    /** Membatalkan sesi (bisa dilakukan selama masih aktif). */
+    /** Membatalkan sesi (bisa dilakukan selama masih aktif). Otorisasi: peserta sesi. */
     @PostMapping("/sesi/{id}/batal")
     public String batalkanSesi(@PathVariable Long id,
-                               @RequestParam String alasan, RedirectAttributes flash) {
+                               @RequestParam String alasan,
+                               HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = requireLogin(session);
+        if (penggunaId == null) return "redirect:/login";
+
         try {
-            mentoringService.batalkanSesi(id, alasan);
+            mentoringService.batalkanSesi(id, penggunaId, alasan);
             flash.addFlashAttribute("sukses", "Sesi berhasil dibatalkan.");
         } catch (Exception e) {
             flash.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/mentoring/sesi";
+    }
+
+    /**
+     * Mentor mengubah jadwal sesi: hanya boleh saat status MENUNGGU_KONFIRMASI atau DIJADWALKAN.
+     * Delegasi ke interface Schedulable via MentoringService.
+     * Otorisasi: hanya mentor sesi ini.
+     */
+    @PostMapping("/sesi/{id}/ubah-jadwal")
+    public String ubahJadwalSesi(@PathVariable Long id,
+                                 @RequestParam String tanggal,
+                                 @RequestParam String jamMulai,
+                                 HttpSession session, RedirectAttributes flash) {
+        Long penggunaId = requireLogin(session);
+        if (penggunaId == null) return "redirect:/login";
+
+        try {
+            SesiMentoring sesi = mentoringService.getSesiById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Sesi tidak ditemukan."));
+            if (sesi.getMentor() == null || !sesi.getMentor().getId().equals(penggunaId)) {
+                throw new IllegalStateException("Hanya mentor sesi ini yang bisa mengubah jadwal.");
+            }
+            LocalDateTime waktuBaru = parseWaktu(tanggal, jamMulai);
+            mentoringService.ubahJadwalSesi(id, waktuBaru);
+            flash.addFlashAttribute("sukses", "Jadwal sesi berhasil diperbarui.");
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/mentoring/sesi/" + id;
     }
 
     /** Mentor menolak permintaan sesi dari mentee: MENUNGGU_KONFIRMASI → DIBATALKAN + notif mentee. */
@@ -484,6 +544,7 @@ public class MentoringController {
         Pengguna pengguna = penggunaService.getPenggunaById(penggunaId).orElse(null);
         if (pengguna == null) return "redirect:/login";
 
+        if (mentorBelumDisetujui(pengguna)) return "redirect:/dashboard";
         model.addAttribute("mentor", pengguna);
 
         List<SesiMentoring> sesiMendatang = mentoringService.getSesiMendatangMentor(penggunaId);
@@ -530,6 +591,9 @@ public class MentoringController {
      * @return nama view Thymeleaf yang sesuai
      */
     private String resolveViewSesi(SesiMentoring sesi) {
+        if (sesi.getStatusSesi() == StatusSesi.DIJADWALKAN) {
+            return "mentoring/sesi-dikonfirmasi";
+        }
         if (sesi.getStatusSesi() == StatusSesi.BERLANGSUNG) {
             if (sesi instanceof SesiOnline)  return "mentoring/sesi-online";
             if (sesi instanceof SesiOffline) return "mentoring/sesi-offline";
@@ -545,6 +609,34 @@ public class MentoringController {
     private Long requireLogin(HttpSession session) {
         Object id = session.getAttribute("penggunaId");
         return (id instanceof Long l) ? l : null;
+    }
+
+    /** Mentor yang belum disetujui supervisor (PENDING/DITOLAK) — terkunci dari fitur mentor. */
+    private boolean mentorBelumDisetujui(Pengguna p) {
+        return (p instanceof Mahasiswa m && m.isMentor() && !m.isMentorTervalidasi())
+            || (p instanceof Siswa s && s.isMentor() && !s.isMentorTervalidasi());
+    }
+
+    /**
+     * Factory method: membuat subclass SesiMentoring yang tepat berdasarkan jenisSesi.
+     * Menerapkan POLIMORFISME — pemanggil tidak perlu tahu subclass yang dibuat.
+     */
+    private SesiMentoring buatSesi(String jenisSesi,
+                                   String topik, int durasi,
+                                   Pengguna mentor, Pengguna mentee,
+                                   String platformDaring, String tautanMeeting,
+                                   String namaLokasi, String nomorRuangan,
+                                   String tautanVideo, String platformVideo) {
+        return switch (jenisSesi.toUpperCase()) {
+            case "OFFLINE" -> new SesiOffline(topik, durasi, mentor, mentee,
+                namaLokasi.isBlank() ? "TBD" : namaLokasi,
+                nomorRuangan.isBlank() ? "-" : nomorRuangan);
+            case "VIDEO"   -> new SesiVideo(topik, durasi, mentor, mentee,
+                tautanVideo.isBlank() ? "" : tautanVideo,
+                platformVideo.isBlank() ? "YouTube" : platformVideo);
+            default        -> new SesiOnline(topik, durasi, mentor, mentee,
+                tautanMeeting, platformDaring.isBlank() ? "Zoom" : platformDaring);
+        };
     }
 
     private Pengguna getPenggunaAtauLempar(Long id, String pesan) {

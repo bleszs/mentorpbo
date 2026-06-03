@@ -78,72 +78,86 @@ tailwind.config = {
   .premium-card-shadow:hover { box-shadow: 0 20px 25px -5px rgba(0,17,66,0.1), 0 10px 10px -5px rgba(0,17,66,0.04); transform: translateY(-4px); }
   body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  /* ===== COLLAPSIBLE SIDEBAR ===== */
+  #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
+  body.sb-collapsed #mainSidebar { width:64px; }
+  #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainTopbar { left:64px; }
+  #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainContent { margin-left:64px; }
+  .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+  body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+  .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
+  body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
+  .sb-logo-img { transition:height 0.3s; }
+  body.sb-collapsed .sb-logo-img { height:36px !important; }
+  .sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+  body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+  body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+  body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
 </style>
 </head>
 <body class="font-body-md text-on-background">
 
 <!-- ==================== SIDEBAR (Materi active) ==================== -->
-<nav class="fixed left-0 top-0 bottom-0 w-sidebar-width z-50 flex flex-col h-full py-8 px-6 shadow-2xl" style="background:#001142;">
-  <div class="mb-12 flex items-center gap-3">
-    <a th:href="@{/dashboard}">
-      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;flex-shrink:0;display:block;"/>
+<nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
+  <div class="flex items-center justify-between gap-2 px-3 mb-8 flex-shrink-0">
+    <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
+      <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
+      <div class="sb-logo-text">
+        <h1 class="font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+        <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
+      </div>
     </a>
-    <div>
-      <h1 class="font-headline-md text-headline-md font-black text-white leading-none">Jejak Ilmu</h1>
-      <p class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-1">Platform Mentoring Akademik</p>
-    </div>
+    <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0">
+      <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
+    </button>
   </div>
-
-  <div class="space-y-2 flex-1">
-    <a th:href="@{/dashboard}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-label-sm text-label-sm">Beranda</span>
+  <div class="space-y-0.5 flex-1 overflow-hidden">
+    <a th:href="@{/dashboard}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+      <span class="sb-label font-label-sm text-label-sm">Beranda</span>
     </a>
-    <a th:href="@{/mentoring/sesi}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">groups</span>
-      <span class="font-label-sm text-label-sm">Mentorship</span>
+    <a th:href="@{/mentoring/sesi}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sesi Saya">
+      <span class="material-symbols-outlined flex-shrink-0">calendar_month</span>
+      <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
     </a>
-    <a th:href="@{/dashboard/pesan}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">mail</span>
-      <span class="font-label-sm text-label-sm">Pesan</span>
+    <a th:href="@{/mentoring/cari-mentor}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Cari Mentor">
+      <span class="material-symbols-outlined flex-shrink-0">person_search</span>
+      <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
     </a>
     <!-- ACTIVE: Materi -->
-    <a th:href="@{/dashboard/materi}"
-       class="flex items-center gap-4 px-4 py-3 border-l-4 border-l-white border-y border-r border-white/30 rounded-lg text-white shadow-[0_0_20px_rgba(255,255,255,0.15)] bg-white/10">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">menu_book</span>
-      <span class="font-label-sm text-label-sm">Materi</span>
+    <a th:href="@{/dashboard/materi}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Materi">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">school</span>
+      <span class="sb-label font-label-sm text-label-sm">Materi</span>
     </a>
-    <a th:href="@{/dashboard/sumber-daya}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">library_books</span>
-      <span class="font-label-sm text-label-sm">Sumber Daya</span>
+    <a th:href="@{/dashboard/sumber-daya}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sumber Daya">
+      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
+      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
     </a>
-    <a th:href="@{/dashboard/pengaturan}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">settings</span>
-      <span class="font-label-sm text-label-sm">Pengaturan</span>
+    <a th:href="@{/dashboard/pesan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pesan">
+      <span class="material-symbols-outlined flex-shrink-0">mail</span>
+      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a th:href="@{/dashboard/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+      <span class="material-symbols-outlined flex-shrink-0">settings</span>
+      <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
   </div>
-
-  <div class="pt-8 border-t border-white/10 space-y-2">
-    <a th:href="@{/dashboard/bantuan}"
-       class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-100/70 hover:text-white hover:bg-white/5 transition-all duration-300">
-      <span class="material-symbols-outlined">help</span>
-      <span class="font-label-sm text-label-sm">Bantuan</span>
+  <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+    <a th:href="@{/dashboard/bantuan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Bantuan">
+      <span class="material-symbols-outlined flex-shrink-0">help</span>
+      <span class="sb-label font-label-sm text-label-sm">Bantuan</span>
     </a>
-    <a th:href="@{/logout}"
-       class="flex items-center gap-4 px-4 py-3 text-red-400 hover:text-red-300 transition-all duration-300">
-      <span class="material-symbols-outlined">logout</span>
-      <span class="font-label-sm text-label-sm">Keluar</span>
+    <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+      <span class="material-symbols-outlined flex-shrink-0">logout</span>
+      <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
   </div>
 </nav>
 
 <!-- ==================== TOPBAR ==================== -->
-<header class="fixed top-0 right-0 left-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop ml-[280px] max-w-[calc(100%-280px)]">
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-margin-desktop">
   <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
     <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
     <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari materi, ebook, atau video..." type="text"/>
@@ -170,7 +184,7 @@ tailwind.config = {
 </header>
 
 <!-- ==================== MAIN CONTENT ==================== -->
-<main class="ml-[280px] pt-[72px] min-h-screen bg-surface">
+<main id="mainContent" class="pt-[72px] min-h-screen bg-surface">
 <div class="p-margin-desktop  space-y-10">
 
   <!-- Hero Header -->
@@ -264,21 +278,82 @@ tailwind.config = {
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div th:each="materi : ${daftarMateri}"
-           class="group bg-white rounded-2xl overflow-hidden premium-card-shadow cursor-pointer">
-        <div class="p-6">
-          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">description</span>
-          </div>
-          <h4 class="font-body-md text-body-md font-black text-primary line-clamp-2 group-hover:text-primary/70 transition-colors"
+           class="group bg-white rounded-2xl overflow-hidden premium-card-shadow hover:shadow-lg transition-all">
+
+        <!-- Cover/Thumbnail -->
+        <div class="h-36 relative overflow-hidden flex items-center justify-center"
+             th:classappend="${materi.sampulUrl != null} ? 'bg-surface-container' :
+                             (${materi.jenisMateri == 'DOKUMEN'} ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
+                             (${materi.jenisMateri == 'PRESENTASI'} ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
+                             (${materi.jenisMateri == 'CATATAN'} ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' :
+                             'bg-gradient-to-br from-orange-500 to-orange-700')))">
+          <!-- Sampul cover -->
+          <img th:if="${materi.sampulUrl != null}" th:src="${materi.sampulUrl}"
+               class="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" alt="sampul"/>
+          <!-- Default icon -->
+          <span th:unless="${materi.sampulUrl != null}"
+                class="material-symbols-outlined text-white/30 group-hover:text-white/40 transition-colors"
+                style="font-size:64px; font-variation-settings:'FILL' 1;"
+                th:text="${materi.jenisMateri == 'DOKUMEN'} ? 'description' :
+                         (${materi.jenisMateri == 'PRESENTASI'} ? 'slideshow' :
+                         (${materi.jenisMateri == 'CATATAN'} ? 'edit_note' : 'link'))">description</span>
+          <!-- Badges -->
+          <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wide z-10"
+                th:text="${materi.mataPelajaran ?: 'Umum'}">Umum</span>
+          <span th:if="${materi.jenisMateri != null}"
+                class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[9px] font-black uppercase z-10"
+                th:text="${materi.jenisMateri}">FILE</span>
+        </div>
+
+        <!-- Card body -->
+        <div class="p-5">
+          <h4 class="font-bold text-primary text-[14px] leading-snug mb-1.5 line-clamp-2"
               th:text="${materi.judul}">Judul Materi</h4>
-          <p class="font-caption-xs text-caption-xs text-on-surface-variant mt-2 line-clamp-3"
+          <p class="text-[12px] text-on-surface-variant line-clamp-2 mb-3"
              th:text="${materi.deskripsi ?: 'Tidak ada deskripsi'}">Deskripsi</p>
-          <div class="flex items-center justify-between mt-4 pt-4 border-t border-surface-container-high">
-            <span class="font-caption-xs text-caption-xs text-on-surface-variant uppercase tracking-wider"
-                  th:text="${materi.mataPelajaran ?: 'Umum'}">Kategori</span>
-            <button class="px-3 py-1.5 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity">
-              Pelajari
-            </button>
+
+          <!-- Meta -->
+          <div class="flex items-center gap-3 mb-3 text-[11px] text-on-surface-variant">
+            <span th:if="${materi.namaFile != null}" class="flex items-center gap-1 truncate">
+              <span class="material-symbols-outlined text-[13px]">attach_file</span>
+              <span th:text="${materi.namaFile}" class="truncate max-w-[120px]">file.pdf</span>
+            </span>
+            <span th:if="${materi.tanggalUnggah != null}" class="flex items-center gap-1 flex-shrink-0">
+              <span class="material-symbols-outlined text-[13px]">calendar_today</span>
+              <span th:text="${#temporals.format(materi.tanggalUnggah, 'd MMM yyyy')}">1 Jan</span>
+            </span>
+          </div>
+
+          <!-- Mentor info -->
+          <div class="flex items-center gap-2 mb-4 pb-3 border-b border-surface-container-high">
+            <div class="w-6 h-6 rounded-full bg-[#001142] flex items-center justify-center text-white font-black text-[9px] flex-shrink-0"
+                 th:text="${materi.pengunggah != null ? #strings.substring(materi.pengunggah.namaLengkap,0,2).toUpperCase() : 'ME'}">ME</div>
+            <span class="text-[11px] text-on-surface-variant truncate"
+                  th:text="${materi.pengunggah != null ? materi.pengunggah.namaLengkap : 'Mentor'}">Mentor</span>
+          </div>
+
+          <!-- Action: Pelajari / Download / Buka Link -->
+          <div class="flex gap-2">
+            <!-- File lokal (uploaded) -->
+            <a th:if="${materi.tautanMateri != null and materi.tautanMateri.startsWith('/uploads/')}"
+               th:href="${materi.tautanMateri}" target="_blank" download
+               class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity no-underline">
+              <span class="material-symbols-outlined text-[14px]">download</span>
+              Unduh
+            </a>
+            <!-- Tautan eksternal -->
+            <a th:if="${materi.tautanMateri != null and !materi.tautanMateri.startsWith('/uploads/')}"
+               th:href="${materi.tautanMateri}" target="_blank"
+               class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity no-underline">
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              Buka
+            </a>
+            <!-- Belum ada file -->
+            <span th:if="${materi.tautanMateri == null}"
+                  class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-surface-container text-on-surface-variant rounded-lg font-label-sm text-label-sm cursor-default">
+              <span class="material-symbols-outlined text-[14px]">hourglass_empty</span>
+              Segera
+            </span>
           </div>
         </div>
       </div>
@@ -302,6 +377,32 @@ tailwind.config = {
 </div>
 </main>
 
+<script>
+function toggleSidebar() {
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+  document.addEventListener('click', function(e) {
+    const popups = document.querySelectorAll('.popup-panel');
+    popups.forEach(p => { if (!p.contains(e.target) && !e.target.closest('[onclick*="togglePopup"]')) p.classList.add('hidden'); });
+  });
+});
+function togglePopup(id, event) {
+  if (event) event.stopPropagation();
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('hidden');
+}
+</script>
 </body>
 </html>
 

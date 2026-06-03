@@ -120,7 +120,33 @@ public class SupervisorService {
     // ============================================================
 
     /**
-     * Supervisor memvalidasi laporan sesi: BELUM_DITINJAU → DIVALIDASI.
+     * Supervisor mulai meninjau laporan sesi: BELUM_DITINJAU → SEDANG_DITINJAU.
+     * Mengaktifkan state yang sebelumnya dead (tidak pernah di-set).
+     * Memberi sinyal kepada mentor/mentee bahwa laporan sedang diperiksa.
+     */
+    public SesiMentoring mulaiTinjauSesi(Long sesiId, Long supervisorId) {
+        SesiMentoring sesi = getSesiAtauLempar(sesiId);
+        verifikasiScopeAtauLempar(sesiId, supervisorId);
+
+        if (sesi.getStatusSesi() != StatusSesi.SELESAI) {
+            throw new IllegalStateException("Hanya sesi SELESAI yang bisa ditinjau.");
+        }
+        if (sesi.getStatusValidasi() != StatusValidasi.BELUM_DITINJAU) {
+            throw new IllegalStateException(
+                "Sesi sudah dalam status: " + sesi.getStatusValidasi().getLabel());
+        }
+
+        sesi.setStatusValidasi(StatusValidasi.SEDANG_DITINJAU);
+
+        kirimNotifikasi("Laporan Sedang Ditinjau",
+            "Supervisor sedang meninjau laporan sesi \"" + sesi.getTopikPembahasan() + "\".",
+            "VALIDASI", sesi.getMentor());
+
+        return sesiRepository.save(sesi);
+    }
+
+    /**
+     * Supervisor memvalidasi laporan sesi: BELUM_DITINJAU / SEDANG_DITINJAU → DIVALIDASI.
      *
      * Demonstrasi POLIMORFISME via interface Verifiable:
      * sesi.validasi() dipanggil pada tipe abstrak SesiMentoring,
@@ -217,23 +243,34 @@ public class SupervisorService {
                 .findByIsMentorTrueAndNamaSekolah(guru.getNamaSekolah());
             stat.put("totalMentorDiScope", mentorSekolah.size());
             stat.put("labelScope",         "Mentor Siswa di " + guru.getNamaSekolah());
-            stat.put("totalKandidatAsdos", 0L);
+            stat.put("totalKandidatAsdos", 0L); // tidak relevan untuk Guru
         } else if (supervisor instanceof Dosen dosen) {
             List<Mahasiswa> mentorProdi = mahasiswaRepository
                 .findByIsMentorTrueAndProgramStudi(dosen.getProgramStudi());
             stat.put("totalMentorDiScope", mentorProdi.size());
             stat.put("labelScope",         "Mentor Mahasiswa di " + dosen.getProgramStudi());
-            stat.put("totalKandidatAsdos", mahasiswaRepository.countByKandidatAsdosTrue());
+            // Kandidat asdos hanya dari prodi Dosen ini (scoped)
+            long kandidatProdi = mahasiswaRepository.findByKandidatAsdosTrue().stream()
+                .filter(m -> dosenScopeCocok(dosen, m)).count();
+            stat.put("totalKandidatAsdos", kandidatProdi);
         }
 
         return stat;
     }
 
     /**
-     * Siswa/mahasiswa berprestasi dalam scope supervisor.
+     * Siswa berprestasi berdasarkan scope Guru: hanya dari sekolah Guru tersebut.
+     * Supervisor yang bukan Guru mendapat list kosong (tidak relevan).
+     *
+     * @param supervisorId id Guru yang sedang login
      */
-    public List<Siswa> getSiswaBerprestasi() {
-        return siswaRepository.findByAktifTrueOrderByTotalPoinProgresDesc();
+    public List<Siswa> getSiswaBerprestasi(Long supervisorId) {
+        Pengguna supervisor = penggunaRepository.findById(supervisorId).orElse(null);
+        if (supervisor instanceof Guru guru && guru.getNamaSekolah() != null) {
+            return siswaRepository.findByAktifTrueAndNamaSekolahOrderByTotalPoinProgresDesc(
+                guru.getNamaSekolah());
+        }
+        return List.of();
     }
 
     // ============================================================
@@ -241,31 +278,45 @@ public class SupervisorService {
     // ============================================================
 
     /**
-     * Mencari mahasiswa "bibit unggul" yang layak menjadi Asisten Dosen.
-     * Kriteria default: IPK ≥ 3.0, Rating ≥ 4.0, Min 5 sesi, Min 5 penilaian.
+     * Mencari mahasiswa kandidat Asisten Dosen, difilter ke program studi Dosen yang login.
+     * Kriteria default: IPK >= 3.0, Rating >= 4.0, Min 5 sesi, Min 5 penilaian.
      */
-    public List<Mahasiswa> cariKandidatAsdos() {
-        return cariKandidatAsdos(3.0, 5, 5, 4.0);
+    public List<Mahasiswa> cariKandidatAsdos(Long dosenId) {
+        return cariKandidatAsdos(dosenId, 3.0, 5, 5, 4.0);
     }
 
-    public List<Mahasiswa> cariKandidatAsdos(double minIpk, int minPenilaian,
+    public List<Mahasiswa> cariKandidatAsdos(Long dosenId, double minIpk, int minPenilaian,
                                               int minSesi, double minRating) {
-        return mahasiswaRepository.cariKandidatAsdos(minIpk, minPenilaian, minSesi, minRating);
+        List<Mahasiswa> semua = mahasiswaRepository.cariKandidatAsdos(minIpk, minPenilaian, minSesi, minRating);
+        Pengguna supervisor = penggunaRepository.findById(dosenId).orElse(null);
+        if (supervisor instanceof Dosen dosen) {
+            return semua.stream().filter(m -> dosenScopeCocok(dosen, m)).toList();
+        }
+        return semua;
     }
 
     /**
      * Dosen merekomendasikan mahasiswa sebagai kandidat Asdos.
-     * Sistem mengecek kelayakan via memenuhiSyaratAsdos() di entity Mahasiswa.
+     * Memverifikasi mahasiswa berada dalam scope program studi Dosen
+     * dan memenuhi syarat kelayakan.
      */
     public Mahasiswa rekomendasikanSebagaiAsdos(Long mahasiswaId, Long dosenId) {
         Mahasiswa mhs = mahasiswaRepository.findById(mahasiswaId)
             .orElseThrow(() -> new NoSuchElementException("Mahasiswa tidak ditemukan."));
 
+        // Verifikasi scope: Dosen hanya merekomendasikan mahasiswa di prodinya
+        Pengguna supervisorRaw = penggunaRepository.findById(dosenId).orElse(null);
+        if (supervisorRaw instanceof Dosen dosen && !dosenScopeCocok(dosen, mhs)) {
+            throw new IllegalStateException(
+                "Mahasiswa ini bukan dari program studi Anda (" +
+                dosen.getProgramStudi() + "). Tidak bisa direkomendasikan.");
+        }
+
         if (!mhs.memenuhiSyaratAsdos()) {
             double skor = mhs.hitungSkorKelayakanAsdos();
             throw new IllegalStateException(
-                "Mahasiswa belum memenuhi syarat Asdos. Skor kelayakan saat ini: " + skor +
-                "/100. Syarat: IPK ≥ 3.0, Rating ≥ 4.0, Min 5 sesi, Min 5 ulasan.");
+                "Mahasiswa belum memenuhi syarat Asdos. Skor: " + skor +
+                "/100. Syarat: IPK >= 3.0, Rating >= 4.0, Min 5 sesi, Min 5 ulasan.");
         }
 
         mhs.setKandidatAsdos(true);
@@ -276,7 +327,7 @@ public class SupervisorService {
         });
 
         kirimNotifikasi(
-            "Rekomendasi Asisten Dosen 🎓",
+            "Rekomendasi Asisten Dosen",
             "Selamat! Anda telah direkomendasikan sebagai kandidat Asisten Dosen " +
                 "berdasarkan prestasi akademik Anda.",
             "ASDOS", mhs);
@@ -296,7 +347,7 @@ public class SupervisorService {
 
         mhs.setAsdos(true);
         kirimNotifikasi(
-            "Pengangkatan Resmi Asisten Dosen 🎉",
+            "Pengangkatan Resmi Asisten Dosen",
             "Selamat! Anda resmi diangkat sebagai Asisten Dosen. " +
                 "Status Anda telah diperbarui di sistem.",
             "ASDOS", mhs);
@@ -304,8 +355,162 @@ public class SupervisorService {
         return mahasiswaRepository.save(mhs);
     }
 
+    /** Kandidat asdos scoped ke program studi Dosen yang login. */
+    public List<Mahasiswa> getKandidatAsdos(Long dosenId) {
+        Pengguna supervisor = penggunaRepository.findById(dosenId).orElse(null);
+        List<Mahasiswa> semua = mahasiswaRepository.findByKandidatAsdosTrue();
+        if (supervisor instanceof Dosen dosen) {
+            return semua.stream().filter(m -> dosenScopeCocok(dosen, m)).toList();
+        }
+        return semua;
+    }
+
+    /** Asdos aktif scoped ke program studi Dosen yang login. */
+    public List<Mahasiswa> getAsdosAktif(Long dosenId) {
+        Pengguna supervisor = penggunaRepository.findById(dosenId).orElse(null);
+        List<Mahasiswa> semua = mahasiswaRepository.findByIsAsdosTrue();
+        if (supervisor instanceof Dosen dosen) {
+            return semua.stream().filter(m -> dosenScopeCocok(dosen, m)).toList();
+        }
+        return semua;
+    }
+
+    /** Tanpa scope - backward-compat. */
     public List<Mahasiswa> getKandidatAsdos() { return mahasiswaRepository.findByKandidatAsdosTrue(); }
     public List<Mahasiswa> getAsdosAktif()    { return mahasiswaRepository.findByIsAsdosTrue(); }
+
+    // ============================================================
+    // PERSETUJUAN PENDAFTARAN MENTOR (Verifiable untuk akun mentor)
+    // ============================================================
+
+    /**
+     * Daftar mentor yang menunggu persetujuan, DIFILTER berdasarkan scope supervisor:
+     * - Guru  → Siswa mentor PENDING dari sekolah yang sama
+     * - Dosen → Mahasiswa mentor PENDING dari program studi (atau universitas) yang sama
+     *
+     * Hasil dinormalisasi ke Map agar template tidak perlu tahu tipe konkret
+     * (Siswa vs Mahasiswa) dan terhindar dari error akses getter yang berbeda.
+     */
+    public List<Map<String, Object>> getMentorPendingDalamScope(Long supervisorId) {
+        Pengguna supervisor = penggunaRepository.findById(supervisorId).orElse(null);
+        if (supervisor == null) return List.of();
+
+        List<Map<String, Object>> hasil = new ArrayList<>();
+        if (supervisor instanceof Guru guru) {
+            for (Siswa s : siswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU)) {
+                if (guru.getNamaSekolah() != null && guru.getNamaSekolah().equals(s.getNamaSekolah())) {
+                    hasil.add(mentorRingkas(s.getId(), s.getNamaLengkap(), s.getEmail(),
+                        s.getNamaSekolah(), s.getMataPelajaranKeahlian(), s.getBio()));
+                }
+            }
+        } else if (supervisor instanceof Dosen dosen) {
+            for (Mahasiswa m : mahasiswaRepository.findByIsMentorTrueAndStatusValidasiMentor(StatusValidasi.BELUM_DITINJAU)) {
+                if (dosenScopeCocok(dosen, m)) {
+                    hasil.add(mentorRingkas(m.getId(), m.getNamaLengkap(), m.getEmail(),
+                        m.getProgramStudi(), m.getMataKuliahKeahlian(), m.getBio()));
+                }
+            }
+        }
+        return hasil;
+    }
+
+    /**
+     * Kecocokan scope Dosen → Mahasiswa.
+     * Jika Dosen memiliki program studi, gunakan kesamaan program studi (ketat).
+     * Hanya jika program studi Dosen kosong, fallback ke kesamaan universitas.
+     */
+    private boolean dosenScopeCocok(Dosen dosen, Mahasiswa m) {
+        if (dosen.getProgramStudi() != null && !dosen.getProgramStudi().isBlank()) {
+            return dosen.getProgramStudi().equals(m.getProgramStudi());
+        }
+        return Objects.equals(dosen.getUniversitas(), m.getUniversitas());
+    }
+
+    private Map<String, Object> mentorRingkas(Long id, String nama, String email,
+                                              String institusi, String keahlian, String bio) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", id);
+        m.put("nama", nama);
+        m.put("email", email);
+        m.put("institusi", institusi);
+        m.put("keahlian", keahlian);
+        m.put("bio", bio);
+        return m;
+    }
+
+    /**
+     * Supervisor menyetujui pendaftaran mentor: statusValidasiMentor → DIVALIDASI.
+     * Hanya boleh untuk mentor di dalam scope institusi supervisor.
+     */
+    public void setujuiMentor(Long mentorId, Long supervisorId) {
+        Pengguna supervisor = penggunaRepository.findById(supervisorId)
+            .orElseThrow(() -> new IllegalStateException("Supervisor tidak ditemukan."));
+
+        if (supervisor instanceof Guru guru) {
+            Siswa s = siswaRepository.findById(mentorId)
+                .orElseThrow(() -> new NoSuchElementException("Mentor siswa tidak ditemukan."));
+            if (!Objects.equals(guru.getNamaSekolah(), s.getNamaSekolah())) {
+                throw new IllegalStateException("Mentor ini berada di luar scope sekolah Anda.");
+            }
+            s.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
+            siswaRepository.save(s);
+            kirimNotifikasi("Pendaftaran Mentor Disetujui ✓",
+                "Selamat! Pendaftaran Anda sebagai mentor telah disetujui. Anda kini bisa menerima mentee.",
+                "MENTOR", s);
+        } else if (supervisor instanceof Dosen dosen) {
+            Mahasiswa m = mahasiswaRepository.findById(mentorId)
+                .orElseThrow(() -> new NoSuchElementException("Mentor mahasiswa tidak ditemukan."));
+            if (!dosenScopeCocok(dosen, m)) {
+                throw new IllegalStateException("Mentor ini berada di luar scope program studi Anda.");
+            }
+            m.setStatusValidasiMentor(StatusValidasi.DIVALIDASI);
+            mahasiswaRepository.save(m);
+            kirimNotifikasi("Pendaftaran Mentor Disetujui ✓",
+                "Selamat! Pendaftaran Anda sebagai mentor telah disetujui. Anda kini bisa menerima mentee.",
+                "MENTOR", m);
+        } else {
+            throw new IllegalStateException("Hanya Guru/Dosen yang dapat menyetujui pendaftaran mentor.");
+        }
+        updateKonterValidasi(supervisorId);
+    }
+
+    /**
+     * Supervisor menolak pendaftaran mentor: statusValidasiMentor → DITOLAK.
+     * Hanya boleh untuk mentor di dalam scope institusi supervisor.
+     */
+    public void tolakMentor(Long mentorId, Long supervisorId, String alasan) {
+        if (alasan == null || alasan.isBlank()) {
+            throw new IllegalArgumentException("Alasan penolakan wajib diisi.");
+        }
+        Pengguna supervisor = penggunaRepository.findById(supervisorId)
+            .orElseThrow(() -> new IllegalStateException("Supervisor tidak ditemukan."));
+
+        if (supervisor instanceof Guru guru) {
+            Siswa s = siswaRepository.findById(mentorId)
+                .orElseThrow(() -> new NoSuchElementException("Mentor siswa tidak ditemukan."));
+            if (!Objects.equals(guru.getNamaSekolah(), s.getNamaSekolah())) {
+                throw new IllegalStateException("Mentor ini berada di luar scope sekolah Anda.");
+            }
+            s.setStatusValidasiMentor(StatusValidasi.DITOLAK);
+            siswaRepository.save(s);
+            kirimNotifikasi("Pendaftaran Mentor Ditolak",
+                "Maaf, pendaftaran Anda sebagai mentor ditolak. Alasan: " + alasan,
+                "MENTOR", s);
+        } else if (supervisor instanceof Dosen dosen) {
+            Mahasiswa m = mahasiswaRepository.findById(mentorId)
+                .orElseThrow(() -> new NoSuchElementException("Mentor mahasiswa tidak ditemukan."));
+            if (!dosenScopeCocok(dosen, m)) {
+                throw new IllegalStateException("Mentor ini berada di luar scope program studi Anda.");
+            }
+            m.setStatusValidasiMentor(StatusValidasi.DITOLAK);
+            mahasiswaRepository.save(m);
+            kirimNotifikasi("Pendaftaran Mentor Ditolak",
+                "Maaf, pendaftaran Anda sebagai mentor ditolak. Alasan: " + alasan,
+                "MENTOR", m);
+        } else {
+            throw new IllegalStateException("Hanya Guru/Dosen yang dapat menolak pendaftaran mentor.");
+        }
+    }
 
     // ============================================================
     // HELPER PRIVATE

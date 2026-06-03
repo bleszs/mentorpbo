@@ -23,9 +23,6 @@ public class AuthController {
     private final PenggunaService penggunaService;
     private final EmailService emailService;
 
-    @Value("${app.google.oauth2.enabled:false}")
-    private boolean googleOAuth2Enabled;
-
     @Value("${spring.security.oauth2.client.registration.google.client-id:PLACEHOLDER}")
     private String googleClientId;
 
@@ -43,38 +40,23 @@ public class AuthController {
         return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
     }
 
-    /**
-     * Google Client ID yang valid selalu berakhir dengan .apps.googleusercontent.com.
-     * Ini memastikan hanya credentials asli dari Google Cloud Console yang diterima.
-     */
     private boolean isGoogleOAuth2Ready() {
-        return googleOAuth2Enabled
-            && googleClientId != null
-            && googleClientId.endsWith(".apps.googleusercontent.com")
-            && googleClientSecret != null
-            && !googleClientSecret.startsWith("GANTI")
-            && !googleClientSecret.equals("PLACEHOLDER");
+        String id  = googleClientId  != null ? googleClientId.trim()  : "";
+        String sec = googleClientSecret != null ? googleClientSecret.trim() : "";
+        return id.endsWith(".apps.googleusercontent.com")
+            && !sec.equals("PLACEHOLDER") && !sec.isBlank();
     }
 
-    /**
-     * Menampilkan halaman login.
-     */
     @GetMapping("/login")
     public String halamanLogin(Model model) {
         model.addAttribute("googleOAuth2Ready", isGoogleOAuth2Ready());
         return "auth/login";
     }
 
-    /**
-     * Redirect ke /login jika Google OAuth2 belum dikonfigurasi.
-     * Catatan: jika sudah dikonfigurasi dengan benar, Spring Security intersep URL ini
-     * sebelum mencapai controller ini.
-     */
+    // Ketika OAuth2 belum aktif, Spring Security tidak mengintersep URL ini.
+    // Redirect diam-diam ke login tanpa pesan error yang menakutkan.
     @GetMapping("/oauth2/authorization/google")
-    public String handleGoogleOAuth2(RedirectAttributes ra) {
-        ra.addFlashAttribute("error",
-            "Login Google belum dikonfigurasi. Buka Google Cloud Console, buat OAuth 2.0 Client ID, " +
-            "lalu isi credentials di application.properties dan set app.google.oauth2.enabled=true.");
+    public String handleGoogleOAuth2() {
         return "redirect:/login";
     }
 
@@ -338,6 +320,7 @@ public class AuthController {
                     dto.getNimNisn() != null ? dto.getNimNisn() : ""
                 );
                 siswa.setMentor(true);
+                siswa.setStatusValidasiMentor(com.mentorpbo.model.enums.StatusValidasi.BELUM_DITINJAU);
                 siswa.setMataPelajaranKeahlian(dto.getKeahlian());
                 savedUser = penggunaService.daftarSiswa(siswa);
             } else {
@@ -354,6 +337,7 @@ public class AuthController {
                     semesterInt
                 );
                 mhs.aktifkanSebagaiMentor(dto.getKeahlian(), dto.getTopikKeahlian());
+                mhs.setStatusValidasiMentor(com.mentorpbo.model.enums.StatusValidasi.BELUM_DITINJAU);
                 if (dto.getIpk() != null && !dto.getIpk().isBlank()) {
                     try {
                         String ipkStr = dto.getIpk().replace(",", ".").replaceAll("[^0-9.]", "").trim();

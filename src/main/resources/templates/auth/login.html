@@ -46,7 +46,8 @@ tailwind.config = {
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .sidebar-gradient {
-    background: linear-gradient(to bottom, rgba(0, 17, 66, 0.88), rgba(0, 27, 15, 0.88)), url('/images/background login.jpg') center/cover no-repeat;
+    background: linear-gradient(to bottom, rgba(0,17,66,0.88), rgba(0,27,15,0.88)),
+                url('/images/background-login.jpg') center/cover no-repeat;
     background-blend-mode: multiply;
   }
 </style>
@@ -57,8 +58,12 @@ tailwind.config = {
 
   <!-- Kiri: Branding -->
   <section class="hidden md:flex flex-col w-[45%] sidebar-gradient relative p-12 justify-between overflow-hidden">
-    <div class="z-10">
-      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;"/>
+    <div class="z-10 flex items-center gap-4">
+      <img src="/images/logo.png" alt="Jejak Ilmu" style="height:72px;width:auto;flex-shrink:0;"/>
+      <div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:#fff;letter-spacing:-0.02em;line-height:1.1;">Jejak Ilmu</div>
+        <div style="font-family:'Inter',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.02em;margin-top:3px;">Platform Mentoring Akademik</div>
+      </div>
     </div>
     <div class="z-10 max-w-md">
       <div class="w-12 h-1 bg-warning-gold mb-8"></div>
@@ -177,7 +182,7 @@ tailwind.config = {
       <!-- Register Link -->
       <p class="mt-10 text-center font-body-md text-body-md text-on-surface-variant">
         Belum punya akun?
-        <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register/mentor}">Daftar di sini</a>
+        <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register}">Daftar di sini</a>
       </p>
 
     </div>

@@ -65,8 +65,9 @@ ENTRYPOINT ["sh", "-c", \
    -Djava.security.egd=file:/dev/./urandom \
    -Dserver.port=${PORT:-8080} \
    -Dspring.profiles.active=railway \
-   -Dspring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID:-PLACEHOLDER} \
-   -Dspring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET:-PLACEHOLDER} \
-   -Dspring.mail.username=${SPRING_MAIL_USERNAME:-} \
-   -Dspring.mail.password=${SPRING_MAIL_PASSWORD:-} \
+   -Dspring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID:-73985825796-51sst7m5nsberkia1tq4l3e94n4m5ved.apps.googleusercontent.com} \
+   -Dspring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET:-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} \
+   -Dspring.mail.username=${SPRING_MAIL_USERNAME:-jejakilmu1@gmail.com} \
+   -Dspring.mail.password=${SPRING_MAIL_PASSWORD:-uzbnvckyhyjfvghk} \
+   -Dapp.api.coid.key=${APP_API_COID_KEY:-Uwp6sB81fQBX8571QsqMpccvHc4SBjWuLUggHGuph3gcePEd3T} \
    -jar app.jar"]

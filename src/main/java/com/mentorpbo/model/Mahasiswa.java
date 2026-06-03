@@ -2,6 +2,7 @@ package com.mentorpbo.model;
 
 import com.mentorpbo.model.enums.LingkunganBelajar;
 import com.mentorpbo.model.enums.RolePengguna;
+import com.mentorpbo.model.enums.StatusValidasi;
 import com.mentorpbo.model.interfaces.Ratable;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -45,6 +46,17 @@ public class Mahasiswa extends Pengguna implements Ratable {
     /** Menandakan apakah mahasiswa ini terdaftar sebagai mentor aktif */
     @Column(nullable = false)
     private boolean isMentor = false;
+
+    /**
+     * Status validasi pendaftaran sebagai mentor oleh supervisor (Dosen).
+     * null   = bukan mentor / data lama (legacy, dianggap sudah disetujui)
+     * BELUM_DITINJAU = menunggu persetujuan supervisor (terkunci)
+     * DIVALIDASI     = disetujui, boleh aktif & muncul di pencarian
+     * DITOLAK        = pendaftaran mentor ditolak
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private StatusValidasi statusValidasiMentor;
 
     /** Mata kuliah yang dikuasai (jika menjadi mentor) */
     @Column(length = 500)
@@ -279,6 +291,24 @@ public class Mahasiswa extends Pengguna implements Ratable {
 
     public void setMentor(boolean mentor) {
         isMentor = mentor;
+    }
+
+    public StatusValidasi getStatusValidasiMentor() {
+        return statusValidasiMentor;
+    }
+
+    public void setStatusValidasiMentor(StatusValidasi statusValidasiMentor) {
+        this.statusValidasiMentor = statusValidasiMentor;
+    }
+
+    /** Mentor yang sudah disetujui supervisor (atau data legacy tanpa status). */
+    public boolean isMentorTervalidasi() {
+        return isMentor && (statusValidasiMentor == null || statusValidasiMentor == StatusValidasi.DIVALIDASI);
+    }
+
+    /** Mentor yang masih menunggu persetujuan supervisor. */
+    public boolean isMentorMenungguPersetujuan() {
+        return isMentor && statusValidasiMentor == StatusValidasi.BELUM_DITINJAU;
     }
 
     public String getMataKuliahKeahlian() {
