@@ -1,113 +1,133 @@
 package com.mentorpbo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import java.util.Map;
 
 /**
- * EmailService - Mengirim email notifikasi via Gmail SMTP.
+ * EmailService - Mengirim email notifikasi via Resend HTTP API.
  *
- * Konfigurasi SMTP di application.properties:
- *   spring.mail.host=smtp.gmail.com
- *   spring.mail.port=587
- *   spring.mail.username=emailkamu@gmail.com
- *   spring.mail.password=app_password_gmail
+ * Resend tidak menggunakan SMTP sehingga aman di Railway / cloud platform
+ * yang memblokir port 587. Konfigurasi di application.properties:
+ *   app.resend.api-key=re_xxxxxxxxxxxx
+ *   app.resend.from=noreply@yourdomain.com
+ *
+ * Daftar gratis di https://resend.com (3.000 email/bulan, 100/hari).
+ * Fallback: jika API key belum diset, OTP dicetak ke console (dev mode).
  */
 @Service
 public class EmailService {
 
-    @Autowired(required = false)
-    private JavaMailSender mailSender;
+    private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
-    @Value("${spring.mail.username:no-reply@jejak-ilmu.id}")
+    @Value("${app.resend.api-key:}")
+    private String resendApiKey;
+
+    @Value("${app.resend.from:Jejak Ilmu <noreply@jejakilmu.id>}")
     private String fromEmail;
 
-    @Value("${app.admin.email:${spring.mail.username:admin@jejak-ilmu.id}}")
+    @Value("${app.admin.email:blesslysilaban@gmail.com}")
     private String adminEmail;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    // ================================================================
+    // Pengiriman email internal
+    // ================================================================
+
     /**
-     * Kirim notifikasi ke admin saat mentor baru mendaftar.
-     * Jika mail tidak dikonfigurasi, log saja dan lanjutkan.
+     * Kirim email HTML via Resend API.
+     * Return true jika berhasil, false jika gagal.
      */
-    public void kirimNotifikasiPendaftaranMentor(String namaMentor, String emailMentor,
-                                                  String institusi, String keahlian) {
-        if (mailSender == null) return;
+    private boolean kirimEmail(String to, String subject, String htmlBody) {
+        if (resendApiKey == null || resendApiKey.isBlank()) {
+            // Dev fallback — SMTP tidak tersedia
+            System.out.println("=== [DEV] Resend API key belum diset — email ke " + to
+                + " | Subject: " + subject + " ===");
+            return false;
+        }
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(resendApiKey);
 
-            helper.setFrom(fromEmail);
-            helper.setTo(adminEmail);
-            helper.setSubject("[Jejak Ilmu] Pendaftaran Mentor Baru: " + namaMentor);
+            Map<String, Object> body = Map.of(
+                "from",    fromEmail,
+                "to",      new String[]{to},
+                "subject", subject,
+                "html",    htmlBody
+            );
 
-            String html = buildMentorRegistrationEmail(namaMentor, emailMentor, institusi, keahlian);
-            helper.setText(html, true);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(RESEND_API_URL, request, String.class);
 
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            // Jangan gagalkan registrasi jika email gagal
-            System.err.println("Email gagal dikirim: " + e.getMessage());
+            boolean success = response.getStatusCode().is2xxSuccessful();
+            if (success) {
+                System.out.println("[RESEND] Email terkirim ke: " + to + " | " + subject);
+            } else {
+                System.err.println("[RESEND ERROR] Status: " + response.getStatusCode()
+                    + " | Body: " + response.getBody());
+            }
+            return success;
+
+        } catch (Exception e) {
+            System.err.println("[RESEND ERROR] Gagal kirim ke " + to + " | " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ================================================================
+    // Public API
+    // ================================================================
+
+    /**
+     * Kirim kode OTP 6 digit ke email pengguna yang baru mendaftar.
+     * OTP berlaku 15 menit. Jika Resend gagal, OTP dicetak ke console (dev fallback).
+     */
+    public void kirimEmailVerifikasi(String namaUser, String emailUser, String otp) {
+        boolean terkirim = kirimEmail(
+            emailUser,
+            "Kode Verifikasi Akun Jejak Ilmu: " + otp,
+            buildOtpEmail(namaUser, otp)
+        );
+        if (!terkirim) {
+            // Fallback: cetak OTP ke log agar bisa dilihat di Railway Deploy Logs
+            System.out.println("=== [FALLBACK OTP] ke: " + emailUser + " | OTP: " + otp + " ===");
         }
     }
 
     /**
-     * Kirim kode OTP 6 digit ke email pengguna yang baru mendaftar.
-     * OTP berlaku 15 menit. Jika SMTP gagal, OTP dicetak ke console (dev fallback).
+     * Kirim notifikasi ke admin saat mentor baru mendaftar.
      */
-    public void kirimEmailVerifikasi(String namaUser, String emailUser, String otp) {
-        if (mailSender == null) {
-            System.out.println("=== [DEV] SMTP tidak dikonfigurasi — OTP untuk " + emailUser + ": " + otp + " ===");
-            return;
-        }
-
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail, "Jejak Ilmu");
-            helper.setTo(emailUser);
-            helper.setSubject("Kode Verifikasi Akun Jejak Ilmu: " + otp);
-
-            helper.setText(buildOtpEmail(namaUser, otp), true);
-            mailSender.send(message);
-            System.out.println("[EMAIL OTP TERKIRIM] ke: " + emailUser + " | OTP: " + otp);
-        } catch (Exception e) {
-            System.err.println("=== [ERROR] Email OTP gagal dikirim ke " + emailUser
-                + " | OTP fallback: " + otp + " | Penyebab: " + e.getMessage() + " ===");
-        }
+    public void kirimNotifikasiPendaftaranMentor(String namaMentor, String emailMentor,
+                                                  String institusi, String keahlian) {
+        kirimEmail(
+            adminEmail,
+            "[Jejak Ilmu] Pendaftaran Mentor Baru: " + namaMentor,
+            buildMentorRegistrationEmail(namaMentor, emailMentor, institusi, keahlian)
+        );
     }
 
     /**
      * Kirim email konfirmasi ke mentor yang baru mendaftar.
      */
     public void kirimKonfirmasiKeMentor(String namaMentor, String emailMentor) {
-        if (mailSender == null) return;
-
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail, "Jejak Ilmu");
-            helper.setTo(emailMentor);
-            helper.setSubject("Selamat Datang di Jejak Ilmu, " + namaMentor + "!");
-
-            String html = buildWelcomeEmail(namaMentor);
-            helper.setText(html, true);
-
-            mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("Email konfirmasi gagal: " + e.getMessage());
-        }
+        kirimEmail(
+            emailMentor,
+            "Selamat Datang di Jejak Ilmu, " + namaMentor + "!",
+            buildWelcomeEmail(namaMentor)
+        );
     }
 
+    // ================================================================
+    // HTML Template Builder
+    // ================================================================
+
     private String buildOtpEmail(String nama, String otp) {
-        // Pisahkan tiap digit agar tampil sebagai kotak terpisah di email
         StringBuilder digitBoxes = new StringBuilder();
         for (char c : otp.toCharArray()) {
             digitBoxes.append(
@@ -123,7 +143,7 @@ public class EmailService {
             + "</div>"
             + "<div style=\"background:#ffffff;padding:32px;border-radius:14px;border:1px solid #e5e7eb;\">"
             + "  <h2 style=\"color:#061748;margin:0 0 6px 0;font-size:20px;font-weight:900;\">Kode Verifikasi Anda</h2>"
-            + "  <p style=\"color:#6b7280;margin:0 0 24px 0;font-size:14px;\">Halo <strong>" + nama + "</strong>, masukkan kode berikut di halaman verifikasi:</p>"
+            + "  <p style=\"color:#6b7280;margin:0 0 24px 0;font-size:14px;\">Halo <strong>" + (nama.isBlank() ? "Pengguna" : nama) + "</strong>, masukkan kode berikut di halaman verifikasi:</p>"
             + "  <div style=\"text-align:center;margin:24px 0;\">" + digitBoxes + "</div>"
             + "  <div style=\"background:#fef3c7;padding:12px 16px;border-radius:8px;border-left:4px solid #fea619;margin-top:24px;\">"
             + "    <p style=\"margin:0;color:#92400e;font-size:13px;font-weight:700;\">⏰ Kode berlaku 15 menit</p>"
@@ -160,10 +180,6 @@ public class EmailService {
                     + keahlian + """
                 </td></tr>
                 </table>
-                <a href="http://localhost:8080/monitoring-mentor"
-                   style="display:inline-block;padding:12px 24px;background:#061748;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;font-size:13px;">
-                  Lihat di Dashboard
-                </a>
               </div>
               <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
                 © 2025 Jejak Ilmu. Platform Mentoring Akademik Indonesia.
@@ -186,19 +202,6 @@ public class EmailService {
                   Pendaftaran Anda sebagai mentor di <strong>Jejak Ilmu</strong> telah kami terima.
                   Tim kami akan meninjau profil Anda dalam <strong>1×24 jam</strong>.
                 </p>
-                <p style="color:#6b7280;line-height:1.6;">
-                  Setelah diverifikasi, Anda dapat langsung mulai menerima mentee dan menjadwalkan sesi bimbingan.
-                </p>
-                <div style="background:#f0f7ff;padding:16px;border-radius:8px;border-left:4px solid #061748;margin:20px 0;">
-                  <p style="margin:0;color:#061748;font-weight:700;font-size:14px;">💡 Tips untuk Mentor Baru</p>
-                  <p style="margin:8px 0 0 0;color:#6b7280;font-size:13px;">
-                    Lengkapi profil Anda dengan foto dan bio yang menarik untuk meningkatkan kepercayaan mentee.
-                  </p>
-                </div>
-                <a href="http://localhost:8080/login"
-                   style="display:inline-block;padding:12px 24px;background:#061748;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;font-size:13px;">
-                  Masuk ke Akun
-                </a>
               </div>
               <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
                 © 2025 Jejak Ilmu. Platform Mentoring Akademik Indonesia.
