@@ -10,8 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.StreamSupport;
-
 /**
  * Proxy ke api.co.id untuk data universitas dan sekolah.
  * API key tetap di server — tidak terekspos ke browser.
