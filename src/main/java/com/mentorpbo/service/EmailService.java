@@ -5,29 +5,37 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * EmailService - Mengirim email notifikasi via Resend HTTP API.
+ * EmailService - Mengirim email notifikasi via Brevo (Sendinblue) HTTP API.
  *
- * Resend tidak menggunakan SMTP sehingga aman di Railway / cloud platform
- * yang memblokir port 587. Konfigurasi di application.properties:
- *   app.resend.api-key=re_xxxxxxxxxxxx
- *   app.resend.from=noreply@yourdomain.com
+ * Keunggulan Brevo vs Resend/SMTP:
+ * - Tidak butuh verifikasi domain — cukup verifikasi email pengirim
+ * - Bisa kirim ke email SIAPAPUN (user yang baru daftar, dll)
+ * - Gratis 300 email/hari
+ * - Menggunakan HTTP API → tidak diblokir Railway
  *
- * Daftar gratis di https://resend.com (3.000 email/bulan, 100/hari).
- * Fallback: jika API key belum diset, OTP dicetak ke console (dev mode).
+ * Setup:
+ * 1. Daftar di https://app.brevo.com
+ * 2. Verifikasi email pengirim di Settings → Senders & IPs
+ * 3. Buat API Key di Settings → API Keys
+ * 4. Set BREVO_API_KEY di Railway Environment Variables
  */
 @Service
 public class EmailService {
 
-    private static final String RESEND_API_URL = "https://api.resend.com/emails";
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-    @Value("${app.resend.api-key:}")
-    private String resendApiKey;
+    @Value("${app.brevo.api-key:}")
+    private String brevoApiKey;
 
-    @Value("${app.resend.from:Jejak Ilmu <noreply@jejakilmu.id>}")
+    @Value("${app.brevo.from-email:jejakilmu1@gmail.com}")
     private String fromEmail;
+
+    @Value("${app.brevo.from-name:Jejak Ilmu}")
+    private String fromName;
 
     @Value("${app.admin.email:blesslysilaban@gmail.com}")
     private String adminEmail;
@@ -39,13 +47,13 @@ public class EmailService {
     // ================================================================
 
     /**
-     * Kirim email HTML via Resend API.
+     * Kirim email HTML via Brevo HTTP API.
+     * Bisa kirim ke email siapapun tanpa verifikasi domain.
      * Return true jika berhasil, false jika gagal.
      */
-    private boolean kirimEmail(String to, String subject, String htmlBody) {
-        if (resendApiKey == null || resendApiKey.isBlank()) {
-            // Dev fallback — SMTP tidak tersedia
-            System.out.println("=== [DEV] Resend API key belum diset — email ke " + to
+    private boolean kirimEmail(String toEmail, String toName, String subject, String htmlBody) {
+        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+            System.out.println("=== [DEV] Brevo API key belum diset — email ke " + toEmail
                 + " | Subject: " + subject + " ===");
             return false;
         }
@@ -53,29 +61,29 @@ public class EmailService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(resendApiKey);
+            headers.set("api-key", brevoApiKey);
 
             Map<String, Object> body = Map.of(
-                "from",    fromEmail,
-                "to",      new String[]{to},
-                "subject", subject,
-                "html",    htmlBody
+                "sender",      Map.of("name", fromName, "email", fromEmail),
+                "to",          List.of(Map.of("email", toEmail, "name", toName != null ? toName : toEmail)),
+                "subject",     subject,
+                "htmlContent", htmlBody
             );
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(RESEND_API_URL, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(BREVO_API_URL, request, String.class);
 
             boolean success = response.getStatusCode().is2xxSuccessful();
             if (success) {
-                System.out.println("[RESEND] Email terkirim ke: " + to + " | " + subject);
+                System.out.println("[BREVO] Email terkirim ke: " + toEmail + " | " + subject);
             } else {
-                System.err.println("[RESEND ERROR] Status: " + response.getStatusCode()
+                System.err.println("[BREVO ERROR] Status: " + response.getStatusCode()
                     + " | Body: " + response.getBody());
             }
             return success;
 
         } catch (Exception e) {
-            System.err.println("[RESEND ERROR] Gagal kirim ke " + to + " | " + e.getMessage());
+            System.err.println("[BREVO ERROR] Gagal kirim ke " + toEmail + " | " + e.getMessage());
             return false;
         }
     }
@@ -86,16 +94,18 @@ public class EmailService {
 
     /**
      * Kirim kode OTP 6 digit ke email pengguna yang baru mendaftar.
-     * OTP berlaku 15 menit. Jika Resend gagal, OTP dicetak ke console (dev fallback).
+     * OTP berlaku 15 menit.
+     * Jika Brevo gagal, OTP dicetak ke Railway logs sebagai fallback.
      */
     public void kirimEmailVerifikasi(String namaUser, String emailUser, String otp) {
         boolean terkirim = kirimEmail(
             emailUser,
+            namaUser,
             "Kode Verifikasi Akun Jejak Ilmu: " + otp,
             buildOtpEmail(namaUser, otp)
         );
         if (!terkirim) {
-            // Fallback: cetak OTP ke log agar bisa dilihat di Railway Deploy Logs
+            // Fallback — OTP tetap bisa dilihat di Railway Deploy Logs
             System.out.println("=== [FALLBACK OTP] ke: " + emailUser + " | OTP: " + otp + " ===");
         }
     }
@@ -107,17 +117,19 @@ public class EmailService {
                                                   String institusi, String keahlian) {
         kirimEmail(
             adminEmail,
+            "Admin Jejak Ilmu",
             "[Jejak Ilmu] Pendaftaran Mentor Baru: " + namaMentor,
             buildMentorRegistrationEmail(namaMentor, emailMentor, institusi, keahlian)
         );
     }
 
     /**
-     * Kirim email konfirmasi ke mentor yang baru mendaftar.
+     * Kirim email konfirmasi selamat datang ke mentor yang baru mendaftar.
      */
     public void kirimKonfirmasiKeMentor(String namaMentor, String emailMentor) {
         kirimEmail(
             emailMentor,
+            namaMentor,
             "Selamat Datang di Jejak Ilmu, " + namaMentor + "!",
             buildWelcomeEmail(namaMentor)
         );
@@ -136,6 +148,7 @@ public class EmailService {
                 "background:#dce1ff;border-radius:10px;margin:0 4px;\">" + c + "</span>"
             );
         }
+        String displayNama = (nama == null || nama.isBlank()) ? "Pengguna" : nama;
         return "<div style=\"font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f8f9fa;padding:28px;\">"
             + "<div style=\"background:#061748;padding:22px 28px;border-radius:14px;margin-bottom:20px;\">"
             + "  <h1 style=\"color:#ffffff;margin:0;font-size:20px;font-weight:900;\">Jejak Ilmu</h1>"
@@ -143,7 +156,7 @@ public class EmailService {
             + "</div>"
             + "<div style=\"background:#ffffff;padding:32px;border-radius:14px;border:1px solid #e5e7eb;\">"
             + "  <h2 style=\"color:#061748;margin:0 0 6px 0;font-size:20px;font-weight:900;\">Kode Verifikasi Anda</h2>"
-            + "  <p style=\"color:#6b7280;margin:0 0 24px 0;font-size:14px;\">Halo <strong>" + (nama.isBlank() ? "Pengguna" : nama) + "</strong>, masukkan kode berikut di halaman verifikasi:</p>"
+            + "  <p style=\"color:#6b7280;margin:0 0 24px 0;font-size:14px;\">Halo <strong>" + displayNama + "</strong>, masukkan kode berikut di halaman verifikasi:</p>"
             + "  <div style=\"text-align:center;margin:24px 0;\">" + digitBoxes + "</div>"
             + "  <div style=\"background:#fef3c7;padding:12px 16px;border-radius:8px;border-left:4px solid #fea619;margin-top:24px;\">"
             + "    <p style=\"margin:0;color:#92400e;font-size:13px;font-weight:700;\">⏰ Kode berlaku 15 menit</p>"
