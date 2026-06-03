@@ -70,4 +70,5 @@ ENTRYPOINT ["sh", "-c", \
    -Dspring.mail.username=${SPRING_MAIL_USERNAME:-jejakilmu1@gmail.com} \
    -Dspring.mail.password=${SPRING_MAIL_PASSWORD:-uzbnvckyhyjfvghk} \
    -Dapp.api.coid.key=${APP_API_COID_KEY:-Uwp6sB81fQBX8571QsqMpccvHc4SBjWuLUggHGuph3gcePEd3T} \
+   -DDB_PASSWORD=${DB_PASSWORD:-onicudil11} \
    -jar app.jar"]

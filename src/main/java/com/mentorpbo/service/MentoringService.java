@@ -26,6 +26,15 @@ import java.util.*;
 @Transactional
 public class MentoringService {
 
+    // === Konstanta poin bisnis ===
+    private static final int POIN_MENTOR_PENDEK  = 5;   // sesi < 30 menit
+    private static final int POIN_MENTOR_SEDANG  = 10;  // sesi 30–60 menit
+    private static final int POIN_MENTOR_PANJANG = 15;  // sesi > 60 menit
+    private static final int POIN_MENTEE_SELESAI = 10;  // bonus selesai sesi
+    private static final int POIN_BONUS_TEPAT_WAKTU = 2;  // bonus hadir tepat waktu
+    private static final int POIN_BONUS_FEEDBACK    = 3;  // bonus memberi rating
+    private static final int POIN_PENALTI_BATAL     = 25; // penalti pembatalan mendadak
+
     private final SesiMentoringRepository sesiRepository;
     private final SiswaRepository siswaRepository;
     private final MahasiswaRepository mahasiswaRepository;
@@ -277,18 +286,16 @@ public class MentoringService {
                 ". Pastikan sesi sudah dimulai terlebih dahulu.");
         }
 
-        // Poin mentor (awal berdasarkan durasi — rating akan menambah/kurangi poin setelahnya)
         int poinMentor;
-        if (sesi.getDurasiMenit() < 30) poinMentor = 5;
-        else if (sesi.getDurasiMenit() <= 60) poinMentor = 10;
-        else poinMentor = 15;
+        if (sesi.getDurasiMenit() < 30) poinMentor = POIN_MENTOR_PENDEK;
+        else if (sesi.getDurasiMenit() <= 60) poinMentor = POIN_MENTOR_SEDANG;
+        else poinMentor = POIN_MENTOR_PANJANG;
 
-        // Poin mentee: selesai sesi +10, tepat waktu +2 (jika waktu mulai sudah lewat ≤ 5 menit)
-        int poinMentee = 10;
+        int poinMentee = POIN_MENTEE_SELESAI;
         boolean tepatWaktu = sesi.getWaktuMulai() != null &&
             !LocalDateTime.now().isBefore(sesi.getWaktuMulai()) &&
             LocalDateTime.now().isBefore(sesi.getWaktuMulai().plusMinutes(sesi.getDurasiMenit() + 5));
-        if (tepatWaktu) poinMentee += 2;
+        if (tepatWaktu) poinMentee += POIN_BONUS_TEPAT_WAKTU;
 
         // Panggil method entity — mengubah status ke SELESAI dan menyimpan poin
         sesi.selesaikanSesi(poinMentor, poinMentee);
@@ -371,10 +378,10 @@ public class MentoringService {
         if (mendadak) {
             Pengguna pembatal = isMentor ? sesi.getMentor() : sesi.getMentee();
             if (pembatal instanceof Siswa s) {
-                s.setTotalPoinProgres(Math.max(0, s.getTotalPoinProgres() - 25));
+                s.setTotalPoinProgres(Math.max(0, s.getTotalPoinProgres() - POIN_PENALTI_BATAL));
                 siswaRepository.save(s);
             } else if (pembatal instanceof Mahasiswa m) {
-                m.setTotalPoinProgres(Math.max(0, m.getTotalPoinProgres() - 25));
+                m.setTotalPoinProgres(Math.max(0, m.getTotalPoinProgres() - POIN_PENALTI_BATAL));
                 mahasiswaRepository.save(m);
             }
         }
@@ -525,8 +532,7 @@ public class MentoringService {
             mahasiswaRepository.save(mahasiswa);
         }
 
-        // Mentee mendapat +3 poin untuk memberikan feedback/rating
-        tambahPoinKePengguna(pemberi, 3);
+        tambahPoinKePengguna(pemberi, POIN_BONUS_FEEDBACK);
 
         // Notifikasi mentor tentang rating baru
         String pesanRating = "Mentee memberi rating " + nilaiRating + " bintang (" +

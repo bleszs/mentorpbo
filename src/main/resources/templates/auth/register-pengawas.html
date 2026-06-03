@@ -52,9 +52,7 @@ tailwind.config = {
   body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .mesh-gradient {
-    background: linear-gradient(to bottom, rgba(0,17,66,0.88), rgba(0,27,15,0.88)),
-                url('/images/background-login.jpg') center/cover no-repeat;
-    background-blend-mode: multiply;
+    background: linear-gradient(135deg, #001142 0%, #001b3a 40%, #001b0f 100%);
   }
   input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(6,23,72,0.15); }
 </style>
@@ -130,7 +128,7 @@ tailwind.config = {
         <span class="font-label-sm text-label-sm text-on-error-container" th:text="${error}">Terjadi kesalahan!</span>
       </div>
 
-      <form th:action="@{/register-pengawas}" th:object="${pengawasDto}" method="post" enctype="multipart/form-data" class="space-y-8">
+      <form th:action="@{/register-pengawas}" th:object="${pengawasDto}" method="post" class="space-y-8">
 
         <!-- Section 1: Data Pribadi -->
         <div class="space-y-5">
@@ -247,23 +245,12 @@ tailwind.config = {
           </div>
         </div>
 
-        <!-- Section 3: Dokumen Verifikasi -->
-        <div class="space-y-5">
-          <div class="flex items-center gap-3 pb-3 border-b border-outline-variant">
-            <div class="w-9 h-9 rounded-xl bg-primary-fixed flex items-center justify-center">
-              <span class="material-symbols-outlined text-primary-container text-[18px]" style="font-variation-settings:'FILL' 1;">upload_file</span>
-            </div>
-            <h4 class="font-headline-md text-headline-md text-primary-container">Dokumen Verifikasi</h4>
-          </div>
-
-          <div class="border-2 border-dashed border-outline-variant rounded-2xl p-8 text-center hover:bg-surface-container-low hover:border-primary-container transition-all cursor-pointer group"
-               onclick="document.getElementById('fileUpload').click()">
-            <input class="hidden" id="fileUpload" name="dokumenVerifikasi" type="file" accept=".jpg,.jpeg,.png,.pdf"/>
-            <span class="material-symbols-outlined text-4xl text-outline mb-3 group-hover:text-primary-container transition-colors block">badge</span>
-            <p class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider mb-1">Klik untuk unggah Kartu Identitas Pengajar</p>
-            <p class="font-body-md text-body-md text-on-surface-variant">Format JPG, PNG atau PDF (Maks. 5MB)</p>
-            <p id="fileName" class="font-body-md text-body-md text-primary-container mt-2 hidden"></p>
-          </div>
+        <!-- Section 3: Verifikasi Status (tanpa upload file — validasi dilakukan admin) -->
+        <div class="flex items-start gap-3 p-4 rounded-2xl bg-primary-fixed/20 border border-primary-fixed/40">
+          <span class="material-symbols-outlined text-primary-container mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1; font-size:20px;">info</span>
+          <p class="font-body-md text-body-md text-primary-container leading-relaxed">
+            Akun Anda akan diverifikasi oleh tim Jejak Ilmu setelah pendaftaran. Anda akan menerima notifikasi email setelah akun diaktifkan.
+          </p>
         </div>
 
         <!-- T&C -->
@@ -297,16 +284,6 @@ tailwind.config = {
   </section>
 </main>
 
-<script>
-  document.getElementById('fileUpload').addEventListener('change', function(e) {
-    const fileName = e.target.files[0]?.name;
-    const display = document.getElementById('fileName');
-    if (fileName) {
-      display.textContent = 'File terpilih: ' + fileName;
-      display.classList.remove('hidden');
-    }
-  });
-</script>
 <script>
 (function() {
   const input    = document.getElementById('institusiPengawas');

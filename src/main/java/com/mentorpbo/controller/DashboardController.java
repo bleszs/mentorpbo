@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/dashboard")
 public class DashboardController {
 
+    /** Estimasi rata-rata durasi satu sesi mentoring dalam jam (dipakai untuk statistik). */
+    private static final double JAM_PER_SESI = 1.5;
+
     private final PenggunaService penggunaService;
     private final MentoringService mentoringService;
     private final SupervisorService supervisorService;
@@ -227,7 +230,7 @@ public class DashboardController {
             statistik.put("sesiDiselesaikan", mahasiswa.getSesiDiselesaikan());
             statistik.put("permintaanBaru", sesiMenungguKonfirmasi.size());
             statistik.put("totalJamMengajar",
-                Math.round(mahasiswa.getSesiDiselesaikan() * 1.5 * 10.0) / 10.0);
+                Math.round(mahasiswa.getSesiDiselesaikan() * JAM_PER_SESI * 10.0) / 10.0);
             model.addAttribute("statistik", statistik);
         } else {
             // Data untuk dashboard-mahasiswa.html (mentee)
