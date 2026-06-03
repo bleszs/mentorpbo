@@ -193,10 +193,20 @@ tailwind.config = {
         </p>
       </div>
 
-      <p class="mt-8 text-center font-body-md text-body-md text-on-surface-variant">
+      <!-- Dev helper: tampilkan OTP aktif jika ada (bantu testing) -->
+      <div th:if="${devOtp}" class="mt-4 p-3 rounded-xl bg-warning-gold/10 border border-warning-gold/30 text-center">
+        <p class="font-caption-xs text-caption-xs text-warning-gold uppercase tracking-wider mb-1">OTP Aktif (Dev Mode)</p>
+        <p class="font-mono font-black text-2xl text-on-background tracking-[0.3em]" th:text="${devOtp}" id="devOtpBoxes"></p>
+        <button type="button" onclick="autoFillOtp(document.getElementById('devOtpBoxes').textContent.trim())"
+                class="mt-2 text-[11px] font-bold text-warning-gold hover:underline uppercase tracking-wider">
+          Isi Otomatis
+        </button>
+      </div>
+
+      <p class="mt-6 text-center font-body-md text-body-md text-on-surface-variant">
         Salah akun?
         <a class="text-on-primary-container font-bold hover:underline" th:href="@{/register}">Daftar ulang</a>
-        &nbsp;Â·&nbsp;
+        &nbsp;·&nbsp;
         <a class="text-on-primary-container font-bold hover:underline" th:href="@{/login}">Kembali login</a>
       </p>
 
