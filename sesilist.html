@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daftar Sesi | Jejak Ilmu - Platform Mentoring Akademik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "outline-variant": "#c6c6d0",
+        "surface-variant": "#e1e3e4",
+        "secondary-container": "#fdb965",
+        "primary-fixed-dim": "#b6c4fe",
+        "glass-border": "rgba(255,255,255,0.4)",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-highest": "#e1e3e4",
+        "on-secondary-container": "#754900",
+        "inverse-on-surface": "#f0f1f2",
+        "success-green": "#10b981",
+        "surface-dim": "#d9dadb",
+        "on-error-container": "#93000a",
+        "warning-gold": "#fea619",
+        "surface-container-high": "#e7e8e9",
+        "error-crimson": "#ba1a1a",
+        "surface-container": "#edeeef",
+        "error-container": "#ffdad6",
+        "on-primary-fixed": "#061748",
+        "on-background": "#191c1d",
+        "on-primary": "#ffffff",
+        "surface": "#f8f9fa",
+        "outline": "#767680",
+        "primary": "#000000",
+        "background": "#f8f9fa",
+        "on-surface-variant": "#45464f",
+        "primary-container": "#061748",
+        "on-primary-container": "#7382b7",
+        "primary-fixed": "#dce1ff",
+        "on-primary-fixed-variant": "#364475",
+        "on-surface": "#191c1d",
+        "surface-container-lowest": "#ffffff",
+        "tertiary-fixed": "#caead6",
+        "on-tertiary-fixed": "#042014",
+        "secondary-fixed": "#ffddb8",
+        "on-secondary-fixed": "#2a1700"
+      },
+      spacing: {
+        "margin-mobile": "16px", "topbar-height": "72px", "base": "8px",
+        "margin-desktop": "32px", "container-max": "1280px",
+        "sidebar-width": "280px", "gutter": "24px"
+      },
+      borderRadius: {
+        "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem",
+        "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"
+      },
+      fontFamily: {
+        "headline-md": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"],
+        "label-sm": ["Inter"], "caption-xs": ["Inter"]
+      },
+      fontSize: {
+        "headline-md": ["24px", {"lineHeight":"1.3","letterSpacing":"-0.01em","fontWeight":"900"}],
+        "body-lg": ["18px", {"lineHeight":"1.6","fontWeight":"500"}],
+        "body-md": ["14px", {"lineHeight":"1.5","fontWeight":"400"}],
+        "label-sm": ["12px", {"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"800"}],
+        "caption-xs": ["10px", {"lineHeight":"1","letterSpacing":"0.2em","fontWeight":"900"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); }
+  .premium-shadow { box-shadow: 0 4px 6px -1px rgba(0,17,66,0.04), 0 2px 4px -1px rgba(0,17,66,0.02); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .premium-shadow:hover { box-shadow: 0 20px 25px -5px rgba(0,17,66,0.1), 0 10px 10px -5px rgba(0,17,66,0.04); transform: translateY(-2px); }
+  /* ===== COLLAPSIBLE SIDEBAR ===== */
+  #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
+  body.sb-collapsed #mainSidebar { width:64px; }
+  #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainTopbar { left:64px; }
+  #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+  body.sb-collapsed #mainContent { margin-left:64px; }
+  .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+  body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+  .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
+  body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
+  .sb-logo-img { transition:height 0.3s; }
+  body.sb-collapsed .sb-logo-img { height:36px !important; }
+  .sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+  body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+  body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+  body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
+</style>
+</head>
+<body class="font-body-md text-on-background">
+
+<!-- ==================== SIDEBAR (Sesi Saya active) ==================== -->
+<nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
+  <div class="flex items-center justify-between gap-2 px-3 mb-8 flex-shrink-0">
+    <a href="/dashboard" class="flex items-center gap-3 overflow-hidden min-w-0">
+      <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
+      <div class="sb-logo-text">
+        <h1 class="font-headline-md font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+        <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
+      </div>
+    </a>
+    <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0">
+      <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
+    </button>
+  </div>
+  <div class="space-y-0.5 flex-1 overflow-hidden">
+    <a href="/dashboard" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+      <span class="sb-label font-label-sm text-label-sm">Beranda</span>
+    </a>
+    <a href="/mentoring/sesi" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Sesi Saya">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">calendar_month</span>
+      <span class="sb-label font-label-sm text-label-sm">Sesi Saya</span>
+    </a>
+    <a href="/mentoring/cari-mentor" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Cari Mentor">
+      <span class="material-symbols-outlined flex-shrink-0">person_search</span>
+      <span class="sb-label font-label-sm text-label-sm">Cari Mentor</span>
+    </a>
+    <a href="/dashboard/materi" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Materi">
+      <span class="material-symbols-outlined flex-shrink-0">school</span>
+      <span class="sb-label font-label-sm text-label-sm">Materi</span>
+    </a>
+    <a href="/dashboard/sumber-daya" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Sumber Daya">
+      <span class="material-symbols-outlined flex-shrink-0">library_books</span>
+      <span class="sb-label font-label-sm text-label-sm">Sumber Daya</span>
+    </a>
+    <a href="/dashboard/pesan" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pesan">
+      <span class="material-symbols-outlined flex-shrink-0">mail</span>
+      <span class="sb-label font-label-sm text-label-sm">Pesan</span>
+    </a>
+    <a href="/dashboard/pengaturan" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+      <span class="material-symbols-outlined flex-shrink-0">settings</span>
+      <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
+    </a>
+  </div>
+  <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+    <a href="/dashboard/bantuan" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Bantuan">
+      <span class="material-symbols-outlined flex-shrink-0">help</span>
+      <span class="sb-label font-label-sm text-label-sm">Bantuan</span>
+    </a>
+    <a href="/logout" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+      <span class="material-symbols-outlined flex-shrink-0">logout</span>
+      <span class="sb-label font-label-sm text-label-sm">Keluar</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ==================== TOPBAR ==================== -->
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] z-40 bg-white/60 backdrop-blur-lg border-b border-white/40 shadow-sm flex items-center gap-4 px-8">
+  <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
+    <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
+    <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0" placeholder="Cari sesi atau mentor..." type="text"/>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <button class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center">2</span>
+      </button>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant"></div>
+    <div class="flex items-center gap-3 cursor-pointer">
+      <div class="text-right">
+        <p class="font-label-sm text-label-sm text-primary">Rizky Ramadhan</p>
+        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter">Mentee</p>
+      </div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
+        
+        <div class="w-full h-full bg-[#001142] flex items-center justify-center text-white font-black text-sm">RI</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main id="mainContent" class="pt-[72px] min-h-screen bg-surface flex flex-col">
+<div class="flex-1 px-gutter py-8">
+
+  <!-- ===== HERO ===== -->
+  <section class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div>
+      <h2 class="font-headline-md text-[40px] font-black text-primary tracking-tight">Manajemen Mentorship</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Kelola perjalanan akademikmu dengan bimbingan terbaik.</p>
+    </div>
+    <a href="/mentoring/cari-mentor"
+       class="bg-primary text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 premium-shadow hover:scale-105 active:scale-95 transition-all">
+      <span class="material-symbols-outlined">person_add</span>
+      Cari Mentor Baru
+    </a>
+  </section>
+
+  <!-- ===== BENTO GRID ===== -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+
+    <!-- ===== LEFT: Active Sessions + History ===== -->
+    <div class="md:col-span-8 space-y-6">
+
+      <!-- Active Sessions Heading -->
+      <div class="flex items-center justify-between px-2">
+        <h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-warning-gold" style="font-variation-settings:'FILL' 1;">bolt</span>
+          Sesi Aktif
+        </h3>
+        <span class="text-caption-xs text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">0 SESI MENDATANG</span>
+      </div>
+
+      <!-- Empty state for active sessions -->
+      <div class="bg-white rounded-3xl p-10 text-center premium-shadow">
+        <span class="material-symbols-outlined text-outline mb-3 block" style="font-size:44px;">event_busy</span>
+        <p class="font-bold text-on-surface-variant text-[16px]">Belum ada sesi mendatang</p>
+        <p class="text-[13px] text-outline mt-1 mb-6">Mulai perjalanan belajarmu dengan memilih mentor yang tepat.</p>
+        <a href="/mentoring/cari-mentor"
+           class="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-2xl hover:scale-105 transition-transform text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          Cari Mentor Sekarang
+        </a>
+      </div>
+
+      <!-- Session Cards (dynamic) -->
+      
+
+      <!-- ===== History Table ===== -->
+      <div>
+        <div class="flex items-center justify-between mb-5 px-2">
+          <h3 class="font-headline-md text-headline-md text-primary">Riwayat Sesi</h3>
+          <a href="/mentoring/sesi" class="text-primary font-bold text-label-sm flex items-center gap-1 hover:underline">
+            LIHAT SEMUA <span class="material-symbols-outlined text-sm">open_in_new</span>
+          </a>
+        </div>
+        <div class="bg-white rounded-3xl overflow-hidden premium-shadow">
+          <table class="w-full text-left">
+            <thead class="bg-surface-container-low">
+              <tr>
+                <th class="px-7 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase">Mentor</th>
+                <th class="px-7 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase hidden md:table-cell">Topik</th>
+                <th class="px-7 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase hidden sm:table-cell">Tanggal</th>
+                <th class="px-7 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase">Status</th>
+                <th class="px-7 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container">
+              
+              
+              <tr class="hover:bg-surface-container-lowest transition-colors group">
+                <td class="px-7 py-5">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm flex-shrink-0">RI</div>
+                    <span class="font-bold text-[14px] truncate max-w-[120px]">Rizky Ramadhan</span>
+                  </div>
+                </td>
+                <td class="px-7 py-5 text-on-surface-variant text-[13px] hidden md:table-cell">
+                  <span class="truncate block max-w-[180px]">Struktur Data: Linked List &amp; Tree</span>
+                </td>
+                <td class="px-7 py-5 text-on-surface-variant text-[13px] hidden sm:table-cell">-</td>
+                <td class="px-7 py-5">
+                  <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-success-green/10 text-success-green">Selesai</span>
+                </td>
+                <td class="px-7 py-5 text-right">
+                  <a href="/mentoring/sesi/5"
+                     class="text-primary opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1 text-[12px] font-bold">
+                    <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                  </a>
+                </td>
+              </tr>
+              
+              
+              
+              <!-- Empty history row -->
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty all-sessions state -->
+      
+
+    </div>
+
+    <!-- ===== RIGHT SIDEBAR ===== -->
+    <div class="md:col-span-4 space-y-6">
+
+      <!-- Progress Card -->
+      <div class="glass-card rounded-3xl p-7 shadow-sm">
+        <h3 class="font-headline-md text-headline-md text-primary mb-6">Progres Belajar</h3>
+        <div class="space-y-6">
+          <!-- Progress Bar -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Target Semester</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">0%</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+              <div class="h-full bg-primary rounded-full transition-all duration-700"
+                   style="width: 0%"></div>
+            </div>
+          </div>
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white/50 p-4 rounded-2xl">
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase mb-1">Total Sesi</p>
+              <p class="font-headline-md text-headline-md text-primary">6</p>
+            </div>
+            <div class="bg-white/50 p-4 rounded-2xl">
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase mb-1">Sesi Selesai</p>
+              <p class="font-headline-md text-headline-md text-primary">0</p>
+            </div>
+            <div class="bg-white/50 p-4 rounded-2xl">
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase mb-1">Poin Belajar</p>
+              <p class="font-headline-md text-headline-md text-warning-gold">0</p>
+            </div>
+            <div class="bg-white/50 p-4 rounded-2xl">
+              <p class="font-caption-xs text-caption-xs text-on-surface-variant uppercase mb-1">Sesi Aktif</p>
+              <p class="font-headline-md text-headline-md text-success-green">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Find Mentor Promo Card -->
+      <div class="rounded-3xl p-7 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform" style="background:#001142;">
+        <div class="relative z-10">
+          <span class="px-3 py-1 rounded-full text-caption-xs font-bold uppercase mb-4 inline-block"
+                style="background:#fdb965; color:#754900;">PREMIUM</span>
+          <h3 class="font-headline-md text-headline-md mb-2">Akses Eksklusif Mentor Global</h3>
+          <p class="font-body-md text-body-md text-white/70 mb-6">Konsultasi dengan pakar terbaik di bidangnya.</p>
+          <a href="/mentoring/cari-mentor"
+             class="flex items-center gap-2 font-bold group-hover:gap-4 transition-all text-[14px]">
+            Jelajahi Mentor
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-3xl p-6 premium-shadow space-y-3">
+        <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-4">AKSI CEPAT</h3>
+        <a href="/mentoring/cari-mentor"
+           class="w-full flex items-center gap-3 px-4 py-3 bg-surface-container-low hover:bg-surface-container rounded-xl transition-colors text-[13px] font-bold">
+          <span class="material-symbols-outlined text-primary text-[18px]">person_search</span>
+          Temukan Mentor Baru
+        </a>
+        <a href="/dashboard"
+           class="w-full flex items-center gap-3 px-4 py-3 bg-surface-container-low hover:bg-surface-container rounded-xl transition-colors text-[13px] font-bold">
+          <span class="material-symbols-outlined text-warning-gold text-[18px]">home</span>
+          Kembali ke Beranda
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<script>
+function toggleSidebar() {
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+  document.addEventListener('click', function(e) {
+    const popups = document.querySelectorAll('.popup-panel');
+    popups.forEach(p => { if (!p.contains(e.target) && !e.target.closest('[onclick*="togglePopup"]')) p.classList.add('hidden'); });
+  });
+});
+function togglePopup(id, event) {
+  if (event) event.stopPropagation();
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('hidden');
+}
+</script>
+</body>
+</html>
+
