@@ -51,24 +51,25 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
   .premium-card { box-shadow: 0 4px 20px rgba(0,17,66,0.04); transition: all 0.3s ease; }
   .premium-card:hover { box-shadow: 0 12px 30px rgba(0,17,66,0.1); transform: translateY(-2px); }
+  /* ===== COLLAPSIBLE SIDEBAR ===== */
   #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
   body.sb-collapsed #mainSidebar { width:64px; }
   #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
   body.sb-collapsed #mainTopbar { left:64px; }
   #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
   body.sb-collapsed #mainContent { margin-left:64px; }
-  .sb-logo-text { overflow:hidden; white-space:nowrap; transition:opacity 0.2s,max-width 0.25s; max-width:180px; }
+  .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+  body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+  .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
   body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
   .sb-logo-img { transition:height 0.3s; }
   body.sb-collapsed .sb-logo-img { height:36px !important; }
-  .sb-badge { overflow:hidden; white-space:nowrap; transition:opacity 0.2s,max-width 0.25s; max-width:220px; }
+  .sb-badge { overflow:hidden; transition:opacity 0.2s,max-width 0.25s; max-width:220px; white-space:nowrap; }
   body.sb-collapsed .sb-badge { opacity:0; max-width:0; }
-  #mainSidebar nav a > span:not(.material-symbols-outlined),
-  #mainSidebar .pt-6 a > span:not(.material-symbols-outlined) { display:inline-block; white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s; max-width:200px; }
-  body.sb-collapsed #mainSidebar nav a > span:not(.material-symbols-outlined),
-  body.sb-collapsed #mainSidebar .pt-6 a > span:not(.material-symbols-outlined) { opacity:0; max-width:0; }
-  body.sb-collapsed #mainSidebar nav a,
-  body.sb-collapsed #mainSidebar .pt-6 a { justify-content:center !important; gap:0 !important; padding-left:8px !important; padding-right:8px !important; }
+  .sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+  body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+  body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+  body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
 </style>
 </head>
 <body class="bg-surface text-on-surface overflow-x-hidden">
@@ -94,56 +95,48 @@ tailwind.config = {
     </div>
   </div>
 
-  <nav class="flex-grow space-y-1">
-    <a th:href="@{/dashboard}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-body-md text-body-md">Beranda</span>
+  <div class="space-y-0.5 flex-1 overflow-hidden">
+    <a th:href="@{/dashboard}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+      <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+      <span class="sb-label font-label-sm text-label-sm">Beranda</span>
     </a>
-    <a th:href="@{/validasi-program}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">verified_user</span>
-      <span class="font-body-md text-body-md">Validasi Program</span>
+    <a th:href="@{/validasi-program}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
+      <span class="material-symbols-outlined flex-shrink-0">verified_user</span>
+      <span class="sb-label font-label-sm text-label-sm">Validasi Program</span>
     </a>
-    <a th:href="@{/monitoring-mentor}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">monitoring</span>
-      <span class="font-body-md text-body-md">Monitoring Mentor</span>
+    <a th:href="@{/monitoring-mentor}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
+      <span class="material-symbols-outlined flex-shrink-0">monitoring</span>
+      <span class="sb-label font-label-sm text-label-sm">Monitoring Mentor</span>
     </a>
     <!-- ACTIVE: Data Mahasiswa -->
-    <a th:href="@{/data-mahasiswa}"
-       class="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl shadow-[0_0_15px_rgba(181,196,255,0.2)] transition-all">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">badge</span>
-      <span class="font-body-md text-body-md font-bold">Data Mahasiswa</span>
+    <a th:href="@{/data-mahasiswa}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Data Mahasiswa">
+      <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">badge</span>
+      <span class="sb-label font-label-sm text-label-sm">Data Mahasiswa</span>
     </a>
-    <a th:href="@{/laporan-akademik}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">analytics</span>
-      <span class="font-body-md text-body-md">Laporan Akademik</span>
+    <a th:href="@{/laporan-akademik}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
+      <span class="material-symbols-outlined flex-shrink-0">analytics</span>
+      <span class="sb-label font-label-sm text-label-sm">Laporan Akademik</span>
     </a>
-    <a th:href="@{/pengaturan}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">settings</span>
-      <span class="font-body-md text-body-md">Pengaturan</span>
+    <a th:href="@{/pengaturan}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+      <span class="material-symbols-outlined flex-shrink-0">settings</span>
+      <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
     </a>
-  </nav>
+  </div>
 
-  <div class="pt-6 border-t border-white/10 space-y-1">
-    <a th:href="@{/bantuan}"
-       class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">help_center</span>
-      <span class="font-body-md text-body-md">Pusat Bantuan</span>
+  <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+    <a th:href="@{/bantuan}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pusat Bantuan">
+      <span class="material-symbols-outlined flex-shrink-0">help_center</span>
+      <span class="sb-label font-label-sm text-label-sm">Pusat Bantuan</span>
     </a>
-    <a th:href="@{/logout}"
-       class="flex items-center gap-3 p-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-xl transition-all">
-      <span class="material-symbols-outlined">logout</span>
-      <span class="font-body-md text-body-md">Keluar</span>
+    <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+      <span class="material-symbols-outlined flex-shrink-0">logout</span>
+      <span class="sb-label font-label-sm text-label-sm">Keluar</span>
     </a>
   </div>
 </aside>
 
 <!-- ==================== TOPBAR ==================== -->
-<header class="fixed top-0 right-0 h-[72px] left-[280px] flex justify-between items-center px-8 bg-white/60 backdrop-blur-lg border-b border-glass-border shadow-sm z-40">
+<header id="mainTopbar" class="fixed top-0 right-0 h-[72px] flex justify-between items-center px-8 bg-white/60 backdrop-blur-lg border-b border-glass-border shadow-sm z-40">
   <div class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0">
     <span class="material-symbols-outlined text-on-surface-variant mr-3 flex-shrink-0">search</span>
     <input class="bg-transparent border-none focus:ring-0 text-body-md w-full outline-none min-w-0"
@@ -204,7 +197,7 @@ tailwind.config = {
 </header>
 
     <!-- ==================== MAIN CONTENT ==================== -->
-    <main class="ml-[280px] min-h-screen pb-12 pt-[72px]">
+    <main id="mainContent" class="min-h-screen pb-12 pt-[72px]">
 <div class="p-8">
 
   <!-- Page Header -->
@@ -398,14 +391,30 @@ tailwind.config = {
 </main>
 
 <script>
-function togglePopup(id, event) {
-    event.stopPropagation();
-    document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
-    document.getElementById(id).classList.toggle('hidden');
+function toggleSidebar() {
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
 }
-document.addEventListener('click', function() {
-    document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+  document.addEventListener('click', function(e) {
+    const popups = document.querySelectorAll('.popup-panel');
+    popups.forEach(p => { if (!p.contains(e.target) && !e.target.closest('[onclick*="togglePopup"]')) p.classList.add('hidden'); });
+  });
 });
+function togglePopup(id, event) {
+  if (event) event.stopPropagation();
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('hidden');
+}
 </script>
 </body>
 </html>

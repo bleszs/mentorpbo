@@ -110,148 +110,93 @@
             };
         </script>
         <style>
-            body {
-                font-family: "Inter", sans-serif;
-                background-color: #f8f9fa;
-            }
-            .material-symbols-outlined {
-                font-variation-settings:
-                    "FILL" 0,
-                    "wght" 400,
-                    "GRAD" 0,
-                    "opsz" 24;
-                vertical-align: middle;
-            }
-            .premium-shadow {
-                box-shadow: 0 4px 20px rgba(0, 17, 66, 0.04);
-                transition: all 0.3s ease;
-            }
-            .premium-shadow:hover {
-                box-shadow: 0 12px 30px rgba(0, 17, 66, 0.1);
-                transform: translateY(-2px);
-            }
+            body { font-family: "Inter", sans-serif; background-color: #f8f9fa; }
+            .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; vertical-align: middle; }
+            .premium-shadow { box-shadow: 0 4px 20px rgba(0,17,66,0.04); transition: all 0.3s ease; }
+            .premium-shadow:hover { box-shadow: 0 12px 30px rgba(0,17,66,0.1); transform: translateY(-2px); }
+            /* ===== COLLAPSIBLE SIDEBAR ===== */
+            #mainSidebar { width:280px; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
+            body.sb-collapsed #mainSidebar { width:64px; }
+            #mainTopbar { left:280px; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); }
+            body.sb-collapsed #mainTopbar { left:64px; }
+            #mainContent { margin-left:280px; transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+            body.sb-collapsed #mainContent { margin-left:64px; }
+            .sb-label { white-space:nowrap; overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:200px; }
+            body.sb-collapsed .sb-label { opacity:0; max-width:0; }
+            .sb-logo-text { overflow:hidden; transition:opacity 0.2s,max-width 0.25s cubic-bezier(0.4,0,0.2,1); max-width:180px; white-space:nowrap; }
+            body.sb-collapsed .sb-logo-text { opacity:0; max-width:0; }
+            .sb-logo-img { transition:height 0.3s; }
+            body.sb-collapsed .sb-logo-img { height:36px !important; }
+            .sb-badge { overflow:hidden; transition:opacity 0.2s,max-width 0.25s; max-width:220px; white-space:nowrap; }
+            body.sb-collapsed .sb-badge { opacity:0; max-width:0; }
+            .sb-item { display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:8px; transition:all 0.2s; text-decoration:none; white-space:nowrap; position:relative; }
+            body.sb-collapsed .sb-item { justify-content:center; gap:0; padding:12px 8px; }
+            body.sb-collapsed .sb-item[data-tip]::after { content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:#001142; color:white; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:800; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.15s; z-index:1000; border:1px solid rgba(255,255,255,0.15); letter-spacing:0.05em; text-transform:uppercase; }
+            body.sb-collapsed .sb-item[data-tip]:hover::after { opacity:1; }
         </style>
     </head>
     <body class="overflow-x-hidden">
         <!-- ==================== SIDEBAR ==================== -->
-        <aside
-            class="fixed left-0 top-0 h-screen w-[280px] flex flex-col py-8 px-6 gap-y-4 shadow-2xl z-50"
-            style="background: linear-gradient(to bottom, #00081e, #001142)"
-        >
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-4">
-                    <a th:href="@{/dashboard}">
-                        <img
-                            src="/images/logo.png"
-                            alt="Jejak Ilmu"
-                            style="height:52px;width:auto;flex-shrink:0;display:block;"
-                        />
-                    </a>
-                    <div>
-                        <h1
-                            class="font-headline-md text-headline-md font-black text-white leading-none"
-                        >
-                            Jejak Ilmu
-                        </h1>
-                        <p
-                            class="text-[10px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5"
-                        >
-                            Platform Mentoring Akademik
-                        </p>
-                    </div>
-                </div>
-                <div
-                    class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 border border-secondary-container/30"
-                >
-                    <span
-                        class="text-[10px] font-black uppercase tracking-widest text-secondary-container"
-                        th:text="${#strings.contains(pengguna.role.name(), 'GURU') ? 'AKSES: GURU / SUPERVISOR' : 'AKSES: DOSEN / SUPERVISOR'}"
-                        >AKSES: SUPERVISOR</span
-                    >
-                </div>
+        <nav id="mainSidebar" class="fixed left-0 top-0 bottom-0 z-50 flex flex-col h-full py-6 px-3 shadow-2xl" style="background:#001142;">
+          <div class="flex items-center justify-between gap-2 px-3 mb-6 flex-shrink-0">
+            <a th:href="@{/dashboard}" class="flex items-center gap-3 overflow-hidden min-w-0">
+              <img src="/images/logo.png" alt="Jejak Ilmu" class="sb-logo-img flex-shrink-0" style="height:52px;width:auto;"/>
+              <div class="sb-logo-text">
+                <h1 class="font-black text-white leading-none" style="font-size:15px;">Jejak Ilmu</h1>
+                <p class="text-[9px] uppercase tracking-widest text-blue-200/60 font-bold mt-0.5">Platform Mentoring Akademik</p>
+              </div>
+            </a>
+            <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0">
+              <span class="material-symbols-outlined text-[20px]" id="sb-toggle-icon">chevron_left</span>
+            </button>
+          </div>
+          <div class="sb-badge px-3 mb-4 flex-shrink-0">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 border border-secondary-container/30">
+              <span class="text-[10px] font-black uppercase tracking-widest text-secondary-container whitespace-nowrap" th:text="${#strings.contains(pengguna.role.name(), 'GURU') ? 'AKSES: GURU / SUPERVISOR' : 'AKSES: DOSEN / SUPERVISOR'}">AKSES: SUPERVISOR</span>
             </div>
-
-            <nav class="flex-grow space-y-1">
-                <a
-                    th:href="@{/dashboard}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <span class="font-body-md text-body-md">Beranda</span>
-                </a>
-                <a
-                    th:href="@{/validasi-program}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">verified_user</span>
-                    <span class="font-body-md text-body-md"
-                        >Validasi Program</span
-                    >
-                </a>
-                <a
-                    th:href="@{/monitoring-mentor}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">monitoring</span>
-                    <span class="font-body-md text-body-md"
-                        >Monitoring Mentor</span
-                    >
-                </a>
-                <a
-                    th:href="@{/data-mahasiswa}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">badge</span>
-                    <span class="font-body-md text-body-md"
-                        >Data Mahasiswa</span
-                    >
-                </a>
-                <a
-                    th:href="@{/laporan-akademik}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">analytics</span>
-                    <span class="font-body-md text-body-md"
-                        >Laporan Akademik</span
-                    >
-                </a>
-                <a
-                    th:href="@{/pengaturan}"
-                    class="flex items-center gap-3 p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">settings</span>
-                    <span class="font-body-md text-body-md">Pengaturan</span>
-                </a>
-            </nav>
-
-            <div class="pt-6 border-t border-white/10 space-y-1">
-                <!-- ACTIVE: Bantuan -->
-                <a
-                    th:href="@{/bantuan}"
-                    class="flex items-center gap-3 p-3 bg-white/10 border border-white/20 text-white rounded-xl shadow-[0_0_15px_rgba(181,196,255,0.2)] transition-all"
-                >
-                    <span
-                        class="material-symbols-outlined"
-                        style="font-variation-settings: &quot;FILL&quot; 1"
-                        >help_center</span
-                    >
-                    <span class="font-body-md text-body-md font-bold"
-                        >Pusat Bantuan</span
-                    >
-                </a>
-                <a
-                    th:href="@{/logout}"
-                    class="flex items-center gap-3 p-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-xl transition-all"
-                >
-                    <span class="material-symbols-outlined">logout</span>
-                    <span class="font-body-md text-body-md">Keluar</span>
-                </a>
-            </div>
-        </aside>
+          </div>
+          <div class="space-y-0.5 flex-1 overflow-hidden">
+            <a th:href="@{/dashboard}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+              <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+              <span class="sb-label font-label-sm text-label-sm">Beranda</span>
+            </a>
+            <a th:href="@{/validasi-program}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
+              <span class="material-symbols-outlined flex-shrink-0">verified_user</span>
+              <span class="sb-label font-label-sm text-label-sm">Validasi Program</span>
+            </a>
+            <a th:href="@{/monitoring-mentor}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
+              <span class="material-symbols-outlined flex-shrink-0">monitoring</span>
+              <span class="sb-label font-label-sm text-label-sm">Monitoring Mentor</span>
+            </a>
+            <a th:href="@{/data-mahasiswa}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Data Mahasiswa">
+              <span class="material-symbols-outlined flex-shrink-0">badge</span>
+              <span class="sb-label font-label-sm text-label-sm">Data Mahasiswa</span>
+            </a>
+            <a th:href="@{/laporan-akademik}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
+              <span class="material-symbols-outlined flex-shrink-0">analytics</span>
+              <span class="sb-label font-label-sm text-label-sm">Laporan Akademik</span>
+            </a>
+            <a th:href="@{/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+              <span class="material-symbols-outlined flex-shrink-0">settings</span>
+              <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
+            </a>
+          </div>
+          <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
+            <!-- ACTIVE: Bantuan -->
+            <a th:href="@{/bantuan}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Pusat Bantuan">
+              <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">help_center</span>
+              <span class="sb-label font-label-sm text-label-sm">Pusat Bantuan</span>
+            </a>
+            <a th:href="@{/logout}" class="sb-item text-red-400 hover:text-red-300" data-tip="Keluar">
+              <span class="material-symbols-outlined flex-shrink-0">logout</span>
+              <span class="sb-label font-label-sm text-label-sm">Keluar</span>
+            </a>
+          </div>
+        </nav>
 
         <!-- ==================== TOPBAR ==================== -->
-        <header
-            class="fixed top-0 right-0 h-[72px] left-[280px] flex justify-between items-center px-8 bg-white/60 backdrop-blur-lg border-b border-glass-border shadow-sm z-40"
+        <header id="mainTopbar"
+            class="fixed top-0 right-0 h-[72px] flex justify-between items-center px-8 bg-white/60 backdrop-blur-lg border-b border-glass-border shadow-sm z-40"
         >
             <div
                 class="flex-1 flex items-center px-4 py-2 rounded-full bg-surface-container min-w-0"
@@ -322,7 +267,7 @@
         </header>
 
         <!-- ==================== MAIN CONTENT ==================== -->
-        <main class="ml-[280px] pt-[104px] pb-12 px-8 min-h-screen">
+        <main id="mainContent" class="pt-[104px] pb-12 px-8 min-h-screen">
             <!-- Hero Section -->
             <section
                 class="mb-12 relative overflow-hidden rounded-[32px] p-12 text-white"
@@ -675,6 +620,23 @@
             document.addEventListener('click', function() {
                 document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
             });
+        </script>
+        <script>
+        function toggleSidebar() {
+          document.body.classList.toggle('sb-collapsed');
+          const icon = document.getElementById('sb-toggle-icon');
+          if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+          try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+          try {
+            if (localStorage.getItem('sb-collapsed') === 'true') {
+              document.body.classList.add('sb-collapsed');
+              const icon = document.getElementById('sb-toggle-icon');
+              if (icon) icon.textContent = 'chevron_right';
+            }
+          } catch(e) {}
+        });
         </script>
     </body>
 </html>

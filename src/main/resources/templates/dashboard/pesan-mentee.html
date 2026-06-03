@@ -403,17 +403,20 @@ tailwind.config = {
 </script>
 <script>
 function toggleSidebar() {
-  const collapsed = document.body.classList.toggle('sb-collapsed');
-  localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
-  document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
+  document.body.classList.toggle('sb-collapsed');
+  const icon = document.getElementById('sb-toggle-icon');
+  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
+  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
 }
-(function() {
-  if (localStorage.getItem('jejak-sb') === '1') {
-    document.body.classList.add('sb-collapsed');
-    const icon = document.getElementById('sb-toggle-icon');
-    if (icon) icon.textContent = 'chevron_right';
-  }
-})();
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (localStorage.getItem('sb-collapsed') === 'true') {
+      document.body.classList.add('sb-collapsed');
+      const icon = document.getElementById('sb-toggle-icon');
+      if (icon) icon.textContent = 'chevron_right';
+    }
+  } catch(e) {}
+});
 </script>
 </body>
 </html>
