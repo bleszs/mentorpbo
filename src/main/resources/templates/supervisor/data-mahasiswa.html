@@ -108,12 +108,12 @@ tailwind.config = {
       <span class="material-symbols-outlined flex-shrink-0">how_to_reg</span>
       <span class="sb-label font-label-sm text-label-sm">Validasi Mentor</span>
     </a>
-    <a th:href="@{/monitoring-mentor}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
+    <a th:href="@{/monitoring-mentor(lingkungan=KAMPUS)}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
       <span class="material-symbols-outlined flex-shrink-0">monitoring</span>
       <span class="sb-label font-label-sm text-label-sm">Monitoring Mentor</span>
     </a>
     <!-- ACTIVE: Data Mahasiswa -->
-    <a th:href="@{/data-mahasiswa}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Data Mahasiswa">
+    <a th:href="@{/data-mahasiswa}" class="sb-item text-white bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(181,196,255,0.2)]" data-tip="Data Mahasiswa">
       <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">badge</span>
       <span class="sb-label font-label-sm text-label-sm">Data Mahasiswa</span>
     </a>
@@ -396,29 +396,25 @@ tailwind.config = {
 
 <script>
 function toggleSidebar() {
-  document.body.classList.toggle('sb-collapsed');
-  const icon = document.getElementById('sb-toggle-icon');
-  if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
-  try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+  const collapsed = document.body.classList.toggle('sb-collapsed');
+  localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
+  document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
 }
-document.addEventListener('DOMContentLoaded', function() {
-  try {
-    if (localStorage.getItem('sb-collapsed') === 'true') {
-      document.body.classList.add('sb-collapsed');
-      const icon = document.getElementById('sb-toggle-icon');
-      if (icon) icon.textContent = 'chevron_right';
-    }
-  } catch(e) {}
-  document.addEventListener('click', function(e) {
-    const popups = document.querySelectorAll('.popup-panel');
-    popups.forEach(p => { if (!p.contains(e.target) && !e.target.closest('[onclick*="togglePopup"]')) p.classList.add('hidden'); });
-  });
-});
 function togglePopup(id, event) {
   if (event) event.stopPropagation();
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('hidden');
+  document.querySelectorAll('.popup-panel').forEach(p => { if (p.id !== id) p.classList.add('hidden'); });
+  document.getElementById(id).classList.toggle('hidden');
 }
+document.addEventListener('click', function() {
+  document.querySelectorAll('.popup-panel').forEach(p => p.classList.add('hidden'));
+});
+(function() {
+  if (localStorage.getItem('jejak-sb') === '1') {
+    document.body.classList.add('sb-collapsed');
+    const icon = document.getElementById('sb-toggle-icon');
+    if (icon) icon.textContent = 'chevron_right';
+  }
+})();
 </script>
 </body>
 </html>

@@ -156,38 +156,38 @@
             </div>
           </div>
           <div class="space-y-0.5 flex-1 overflow-hidden">
-            <a th:href="@{/dashboard}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
+            <a th:href="@{/dashboard}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Beranda">
               <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
               <span class="sb-label font-label-sm text-label-sm">Beranda</span>
             </a>
-            <a th:href="@{/validasi-program}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
+            <a th:href="@{/validasi-program}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Program">
               <span class="material-symbols-outlined flex-shrink-0">verified_user</span>
               <span class="sb-label font-label-sm text-label-sm">Validasi Program</span>
             </a>
-            <a th:href="@{/validasi-mentor}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Validasi Mentor">
+            <a th:href="@{/validasi-mentor}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Validasi Mentor">
               <span class="material-symbols-outlined flex-shrink-0">how_to_reg</span>
               <span class="sb-label font-label-sm text-label-sm">Validasi Mentor</span>
             </a>
-            <a th:href="@{/monitoring-mentor}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
+            <a th:href="@{/monitoring-mentor(lingkungan=KAMPUS)}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Monitoring Mentor">
               <span class="material-symbols-outlined flex-shrink-0">monitoring</span>
               <span class="sb-label font-label-sm text-label-sm">Monitoring Mentor</span>
             </a>
-            <a th:href="@{/data-mahasiswa}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Data Mahasiswa">
+            <a th:href="@{/data-mahasiswa}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Data Mahasiswa">
               <span class="material-symbols-outlined flex-shrink-0">badge</span>
               <span class="sb-label font-label-sm text-label-sm">Data Mahasiswa</span>
             </a>
-            <a th:href="@{/laporan-akademik}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
+            <a th:href="@{/laporan-akademik}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Laporan Akademik">
               <span class="material-symbols-outlined flex-shrink-0">analytics</span>
               <span class="sb-label font-label-sm text-label-sm">Laporan Akademik</span>
             </a>
-            <a th:href="@{/pengaturan}" class="sb-item text-blue-100/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
+            <a th:href="@{/pengaturan}" class="sb-item text-white/70 hover:text-white hover:bg-white/5" data-tip="Pengaturan">
               <span class="material-symbols-outlined flex-shrink-0">settings</span>
               <span class="sb-label font-label-sm text-label-sm">Pengaturan</span>
             </a>
           </div>
           <div class="pt-4 border-t border-white/10 space-y-0.5 flex-shrink-0">
             <!-- ACTIVE: Bantuan -->
-            <a th:href="@{/bantuan}" class="sb-item text-white bg-white/10 border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)]" data-tip="Pusat Bantuan">
+            <a th:href="@{/bantuan}" class="sb-item text-white bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(181,196,255,0.2)]" data-tip="Pusat Bantuan">
               <span class="material-symbols-outlined flex-shrink-0" style="font-variation-settings:'FILL' 1;">help_center</span>
               <span class="sb-label font-label-sm text-label-sm">Pusat Bantuan</span>
             </a>
@@ -627,20 +627,17 @@
         </script>
         <script>
         function toggleSidebar() {
-          document.body.classList.toggle('sb-collapsed');
-          const icon = document.getElementById('sb-toggle-icon');
-          if (icon) icon.textContent = document.body.classList.contains('sb-collapsed') ? 'chevron_right' : 'chevron_left';
-          try { localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed')); } catch(e) {}
+          const collapsed = document.body.classList.toggle('sb-collapsed');
+          localStorage.setItem('jejak-sb', collapsed ? '1' : '0');
+          document.getElementById('sb-toggle-icon').textContent = collapsed ? 'chevron_right' : 'chevron_left';
         }
-        document.addEventListener('DOMContentLoaded', function() {
-          try {
-            if (localStorage.getItem('sb-collapsed') === 'true') {
-              document.body.classList.add('sb-collapsed');
-              const icon = document.getElementById('sb-toggle-icon');
-              if (icon) icon.textContent = 'chevron_right';
-            }
-          } catch(e) {}
-        });
+        (function() {
+          if (localStorage.getItem('jejak-sb') === '1') {
+            document.body.classList.add('sb-collapsed');
+            const icon = document.getElementById('sb-toggle-icon');
+            if (icon) icon.textContent = 'chevron_right';
+          }
+        })();
         </script>
     </body>
 </html>
